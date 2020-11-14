@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
-namespace WeatherLibrary
+namespace WeatherLibrary.Services
 {
     public class WeatherService : IWeatherService
     {
@@ -21,9 +22,8 @@ namespace WeatherLibrary
         /// Filters XML data
         /// </summary>
         /// <param name="xml">xml document downloaded from API</param>
-        /// <param name="location">location</param>
         /// <returns>Filtered weather data as weather model </returns>
-        private Weather DownloadWeather(string xml, string location)
+        private Weather ParseWeather(string xml)
         {
             XmlDocument xmlDocument = new XmlDocument();
 
@@ -81,13 +81,14 @@ namespace WeatherLibrary
         /// </summary>
         /// <param name="location">locaiotn</param>
         /// <returns>string containing weather data</returns>
-        public string GetWeather(string location)
+        public async Task<string> GetWeather(string location)
         {
             using var webClient = new WebClient();
 
             try
             {
-                return $"{ConvertToString(DownloadWeather(webClient.DownloadString(weatherUrl.Replace("@lokalizacja@", location)), location))}\n";
+                var apiContent = await webClient.DownloadStringTaskAsync(weatherUrl.Replace("@lokalizacja@", location));
+                return await Task.Run(() => $"{ConvertToString(ParseWeather(apiContent))}\n");
             }
             catch (Exception ex)
             {

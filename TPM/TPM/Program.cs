@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServerLibrary;
+using ServerLibrary.Services;
 using WeatherLibrary;
+using WeatherLibrary.Services;
 
 namespace TPM
 {
@@ -21,7 +23,7 @@ namespace TPM
 
             _serviceProvider = servicesCollection.BuildServiceProvider();
 
-            _serviceProvider.GetRequiredService<IServerService>().Run(); //TODO after '.' add method which starts TCP server
+            _serviceProvider.GetRequiredService<IServerService>().Server().Wait();
         }
 
         private static void ConfigureServices(IServiceCollection servicesCollection)
