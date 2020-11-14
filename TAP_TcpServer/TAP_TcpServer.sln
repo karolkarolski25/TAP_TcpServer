@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TPM", "TPM\TPM.csproj", "{FA9DA08C-9535-42DB-B032-F4FB33B1F323}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tap_TcpServer", "TPM\Tap_TcpServer.csproj", "{FA9DA08C-9535-42DB-B032-F4FB33B1F323}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLibrary", "WeatherLibrary\WeatherLibrary.csproj", "{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}"
 EndProject

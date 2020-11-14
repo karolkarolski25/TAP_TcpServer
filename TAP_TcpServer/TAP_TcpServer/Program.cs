@@ -5,7 +5,7 @@ using ServerLibrary.Services;
 using WeatherLibrary;
 using WeatherLibrary.Services;
 
-namespace TPM
+namespace TAP_TcpServer
 {
     class Program
     {
