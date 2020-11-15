@@ -19,7 +19,11 @@ namespace LoginLibrary.Services
 
             aes = Aes.Create();
         }
-
+        /// <summary>
+        /// Checks if user is already in database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>Information if user is in database</returns>
         public bool CheckData(string data)
         {
             try
@@ -62,7 +66,11 @@ namespace LoginLibrary.Services
             }
             return false;
         }
-
+        /// <summary>
+        /// Adds user to database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>Status of registration</returns>
         public bool RegisterAccount(string data)
         {
             FileStream fileStream = null;
