@@ -9,12 +9,12 @@ namespace WeatherLibrary.Services
 {
     public class WeatherService : IWeatherService
     {
-        private readonly ILogger<IWeatherService> _logger;
+        private readonly ILogger<WeatherService> _logger;
 
         private readonly WeatherApiConfiguration _weatherApiConfiguration;
         private string weatherUrl = $"http://api.openweathermap.org/data/2.5/weather?q=@lokalizacja@&mode=xml&units=metric&appid=@api@";
 
-        public WeatherService(WeatherApiConfiguration weatherApiConfiguration, ILogger<IWeatherService> logger)
+        public WeatherService(WeatherApiConfiguration weatherApiConfiguration, ILogger<WeatherService> logger)
         {
             _logger = logger;
             _weatherApiConfiguration = weatherApiConfiguration;

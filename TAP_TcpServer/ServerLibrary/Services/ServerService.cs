@@ -1,12 +1,12 @@
-﻿using System;
+﻿using LoginLibrary.Services;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using WeatherLibrary.Services;
-using LoginLibrary.Services;
-using Microsoft.Extensions.Logging;
 
 namespace ServerLibrary.Services //TODO implement server
 {
@@ -14,7 +14,7 @@ namespace ServerLibrary.Services //TODO implement server
     {
         private readonly IWeatherService _weatherService;
         private readonly ILoginService _loginService;
-        private readonly ILogger<IServerService> _logger;
+        private readonly ILogger<ServerService> _logger;
         private readonly ServerConfiguration _serverConfiguration;
 
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
@@ -23,8 +23,8 @@ namespace ServerLibrary.Services //TODO implement server
         private readonly string enterPasswordMessage = "Password: ";
         private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
 
-        public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration, 
-            ILoginService loginService, ILogger<IServerService> logger)
+        public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
+            ILoginService loginService, ILogger<ServerService> logger)
         {
             _weatherService = weatherService;
             _loginService = loginService;
@@ -153,7 +153,7 @@ namespace ServerLibrary.Services //TODO implement server
                     byte[] buffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) => 
+                        async (t) =>
                         {
                             data = Encoding.ASCII.GetString(buffer);
                         });
@@ -171,8 +171,9 @@ namespace ServerLibrary.Services //TODO implement server
                         {
                             data += Encoding.ASCII.GetString(buffer);
                         });
+
                     data = data.Replace("\0", "");
-                    data = data.Substring(0, data.Length-1);
+                    data = data.Substring(0, data.Length - 1);
 
                     await client.GetStream().ReadAsync(buffer, 0, 2);
 
@@ -184,16 +185,19 @@ namespace ServerLibrary.Services //TODO implement server
                         async (t) =>
                         {
                             string response = Encoding.ASCII.GetString(buffer);
-                            if(response[0] == 'Y' || response[0] == 'y')
+
+                            if (response[0] == 'Y' || response[0] == 'y')
                             {
                                 _loginService.RegisterAccount(data);
-                                Console.WriteLine("New user: " + data.Substring(0, data.IndexOf(';')) + " registered");
+                                Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                                _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
                             }
                         });
                     }
                     else
                     {
-                        Console.WriteLine("User: " + data.Substring(0, data.IndexOf(';')) + " logged in");
+                        Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+                        _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
                     }
 
                     data = data.Substring(0, data.IndexOf(';'));

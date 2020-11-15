@@ -10,9 +10,9 @@ namespace LoginLibrary.Services
         private readonly Aes aes;
         private readonly CryptoConfiguration cryptoConfiguration;
 
-        private readonly ILogger<ILoginService> _logger;
+        private readonly ILogger<LoginService> _logger;
 
-        public LoginService(CryptoConfiguration _cryptoConfiguration, ILogger<ILoginService> logger)
+        public LoginService(CryptoConfiguration _cryptoConfiguration, ILogger<LoginService> logger)
         {
             _logger = logger;
             cryptoConfiguration = _cryptoConfiguration;
@@ -44,6 +44,8 @@ namespace LoginLibrary.Services
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+
+                    _logger.LogInformation(e.Message);
                 }
                 finally
                 {
@@ -55,6 +57,8 @@ namespace LoginLibrary.Services
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+
+                _logger.LogInformation(e.Message);
             }
             return false;
         }
@@ -76,6 +80,9 @@ namespace LoginLibrary.Services
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+
+                _logger.LogInformation(e.Message);
+
                 return false;
             }
             finally
@@ -103,6 +110,9 @@ namespace LoginLibrary.Services
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+
+                _logger.LogInformation(e.Message);
+
                 return false;
             }
             finally
