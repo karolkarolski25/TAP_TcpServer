@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WeatherLibrary.Services;
 
-namespace ServerLibrary.Services
+namespace ServerLibrary.Services //TODO implement server
 {
     public class ServerService : IServerService
     {
@@ -32,10 +32,6 @@ namespace ServerLibrary.Services
             _logger = logger;
         }
 
-        /// <summary>
-        /// Checks if given server configuration is correct
-        /// </summary>
-        /// <returns>True or false</returns>
         private (bool result, string message) IsServerConfigurationCorrect()
         {
             string wrongServerConfigurationMessage = string.Empty;
@@ -74,12 +70,6 @@ namespace ServerLibrary.Services
             }
         }
 
-        /// <summary>
-        /// Opeartes weather communication
-        /// </summary>
-        /// <param name="stream">client stream</param>
-        /// <param name="buffer">buffer for weather data</param>
-        /// <returns>string containing current state</returns>
         private async Task<string> ProcessWeatherCommunication(NetworkStream stream, byte[] buffer)
         {
             try
@@ -136,12 +126,6 @@ namespace ServerLibrary.Services
             }
         }
 
-        /// <summary>
-        /// Gets login from user
-        /// </summary>
-        /// <param name="stream">client stream</param>
-        /// <param name="buffer">buffer for weather data</param>
-        /// <returns>Login from user</returns>
         private async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
         {
             string data = string.Empty;
@@ -161,13 +145,6 @@ namespace ServerLibrary.Services
             return data;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="stream">client stream</param>
-        /// <param name="buffer">buffer for weather data</param>
-        /// <param name="data">current string for sign in</param>
-        /// <returns>Password from user</returns>
         private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
@@ -182,13 +159,6 @@ namespace ServerLibrary.Services
             return data;
         }
 
-        /// <summary>
-        /// Opeartes welcome message
-        /// </summary>
-        /// <param name="stream">client stream</param>
-        /// <param name="buffer">buffer for weather data</param>
-        /// <param name="signInBuffer">Buffer with logging cridentials</param>
-        /// <returns>task for handling logging</returns>
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
             if (!_loginService.CheckData(data))
@@ -220,10 +190,6 @@ namespace ServerLibrary.Services
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 
-        /// <summary>
-        /// Starts TCP server
-        /// </summary>
-        /// <returns>Task for tcp server</returns>
         public async Task StartServer()
         {
             var serverConfigurationResult = IsServerConfigurationCorrect();
