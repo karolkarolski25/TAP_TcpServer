@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using LoginLibrary;
+using LoginLibrary.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServerLibrary;
 using ServerLibrary.Services;
 using System;
 using WeatherLibrary;
 using WeatherLibrary.Services;
-using LoginLibrary;
 
 namespace TAP_TcpServer
 {
@@ -46,8 +48,10 @@ namespace TAP_TcpServer
                 .AddSingleton(weatherApiConfiguration)
                 .AddSingleton(serverConfiguration)
                 .AddSingleton(cryptoConfiguration)
+                .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IWeatherService, WeatherService>()
-                .AddSingleton<IServerService, ServerService>();
+                .AddSingleton<IServerService, ServerService>()
+                .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
         }
     }
 }
