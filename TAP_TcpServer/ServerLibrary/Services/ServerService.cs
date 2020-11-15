@@ -64,6 +64,8 @@ namespace ServerLibrary.Services //TODO implement server
                     wrongServerConfigurationMessage += "- Server ip address is wrong\n";
                 }
 
+                _logger.LogDebug($"Server configuration message: {wrongServerConfigurationMessage}");
+
                 return (false, wrongServerConfigurationMessage);
             }
         }
@@ -87,7 +89,11 @@ namespace ServerLibrary.Services //TODO implement server
 
                         location = new string(location.Where(c => c != '\0').ToArray());
 
-                        byte[] weather = Encoding.ASCII.GetBytes(await _weatherService.GetWeather(location));
+                        string weatherData = await _weatherService.GetWeather(location);
+
+                        _logger.LogInformation($"Weather for location: {location}: \n {weatherData}\n");
+
+                        byte[] weather = Encoding.ASCII.GetBytes(weatherData);
 
                         await stream.WriteAsync(weather, 0, weather.Length);
 
@@ -104,6 +110,8 @@ namespace ServerLibrary.Services //TODO implement server
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(nonAsciiCharsMessage), 0, nonAsciiCharsMessage.Length);
 
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+
+                    _logger.LogInformation("Non ASCII char detected in location");
 
                     Array.Clear(buffer, 0, buffer.Length);
                 }
@@ -195,6 +203,8 @@ namespace ServerLibrary.Services //TODO implement server
             else
             {
                 Console.WriteLine($"Server configuration is wrong, \n{serverConfigurationResult.message}");
+
+                _logger.LogInformation("Server configuration is wrong");
             }
         }
     }
