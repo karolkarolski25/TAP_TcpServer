@@ -142,9 +142,11 @@ namespace ServerLibrary.Services //TODO implement server
                             data = Encoding.ASCII.GetString(buffer);
                         });
 
+                    data = data.Replace("\0", "");
+
                     data += ";";
 
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length);
+                    await client.GetStream().ReadAsync(buffer, 0, 2);
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
@@ -153,8 +155,10 @@ namespace ServerLibrary.Services //TODO implement server
                         {
                             data += Encoding.ASCII.GetString(buffer);
                         });
+                    data = data.Replace("\0", "");
+                    data = data.Substring(0, data.Length-1);
 
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length);
+                    await client.GetStream().ReadAsync(buffer, 0, 2);
 
                     if (!_loginService.CheckData(data))
                     {
@@ -167,8 +171,13 @@ namespace ServerLibrary.Services //TODO implement server
                             if(response[0] == 'Y' || response[0] == 'y')
                             {
                                 _loginService.RegisterAccount(data);
+                                Console.WriteLine("New user: " + data.Substring(0, data.IndexOf(';')) + " registered");
                             }
                         });
+                    }
+                    else
+                    {
+                        Console.WriteLine("User: " + data.Substring(0, data.IndexOf(';')) + " logged in");
                     }
 
                     data = data.Substring(0, data.IndexOf(';'));
