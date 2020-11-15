@@ -6,14 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using WeatherLibrary.Services;
 using LoginLibrary.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ServerLibrary.Services //TODO implement server
 {
     public class ServerService : IServerService
     {
         private readonly IWeatherService _weatherService;
-        private readonly ServerConfiguration _serverConfiguration;
         private readonly ILoginService _loginService;
+        private readonly ILogger<IServerService> _logger;
+        private readonly ServerConfiguration _serverConfiguration;
 
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
         private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
@@ -21,11 +23,13 @@ namespace ServerLibrary.Services //TODO implement server
         private readonly string enterPasswordMessage = "Password: ";
         private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
 
-        public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration, ILoginService loginService)
+        public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration, 
+            ILoginService loginService, ILogger<IServerService> logger)
         {
             _weatherService = weatherService;
-            _serverConfiguration = serverConfiguration;
             _loginService = loginService;
+            _serverConfiguration = serverConfiguration;
+            _logger = logger;
         }
 
         private (bool result, string message) IsServerConfigurationCorrect()
@@ -60,6 +64,8 @@ namespace ServerLibrary.Services //TODO implement server
                     wrongServerConfigurationMessage += "- Server ip address is wrong\n";
                 }
 
+                _logger.LogDebug($"Server configuration message: {wrongServerConfigurationMessage}");
+
                 return (false, wrongServerConfigurationMessage);
             }
         }
@@ -83,7 +89,11 @@ namespace ServerLibrary.Services //TODO implement server
 
                         location = new string(location.Where(c => c != '\0').ToArray());
 
-                        byte[] weather = Encoding.ASCII.GetBytes(await _weatherService.GetWeather(location));
+                        string weatherData = await _weatherService.GetWeather(location);
+
+                        _logger.LogInformation($"Weather for location: {location}: \n {weatherData}\n");
+
+                        byte[] weather = Encoding.ASCII.GetBytes(weatherData);
 
                         await stream.WriteAsync(weather, 0, weather.Length);
 
@@ -100,6 +110,8 @@ namespace ServerLibrary.Services //TODO implement server
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(nonAsciiCharsMessage), 0, nonAsciiCharsMessage.Length);
 
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+
+                    _logger.LogInformation("Non ASCII char detected in location");
 
                     Array.Clear(buffer, 0, buffer.Length);
                 }
@@ -122,13 +134,17 @@ namespace ServerLibrary.Services //TODO implement server
 
                 server.Start();
 
-                Console.WriteLine("Starting Server");
+                Console.WriteLine($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
+
+                _logger.LogInformation($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
 
                 while (true)
                 {
                     TcpClient client = await server.AcceptTcpClientAsync();
 
                     Console.WriteLine("Client connected");
+
+                    _logger.LogInformation("Client connected");
 
                     string data = String.Empty;
 
@@ -200,6 +216,8 @@ namespace ServerLibrary.Services //TODO implement server
             else
             {
                 Console.WriteLine($"Server configuration is wrong, \n{serverConfigurationResult.message}");
+
+                _logger.LogInformation("Server configuration is wrong");
             }
         }
     }

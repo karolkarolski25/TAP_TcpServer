@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -9,9 +10,13 @@ namespace LoginLibrary.Services
         private readonly Aes aes;
         private readonly CryptoConfiguration cryptoConfiguration;
 
-        public LoginService(CryptoConfiguration _cryptoConfiguration)
+        private readonly ILogger<ILoginService> _logger;
+
+        public LoginService(CryptoConfiguration _cryptoConfiguration, ILogger<ILoginService> logger)
         {
+            _logger = logger;
             cryptoConfiguration = _cryptoConfiguration;
+
             aes = Aes.Create();
         }
 

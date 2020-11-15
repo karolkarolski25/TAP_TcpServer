@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,11 +9,14 @@ namespace WeatherLibrary.Services
 {
     public class WeatherService : IWeatherService
     {
+        private readonly ILogger<IWeatherService> _logger;
+
         private readonly WeatherApiConfiguration _weatherApiConfiguration;
         private string weatherUrl = $"http://api.openweathermap.org/data/2.5/weather?q=@lokalizacja@&mode=xml&units=metric&appid=@api@";
 
-        public WeatherService(WeatherApiConfiguration weatherApiConfiguration)
+        public WeatherService(WeatherApiConfiguration weatherApiConfiguration, ILogger<IWeatherService> logger)
         {
+            _logger = logger;
             _weatherApiConfiguration = weatherApiConfiguration;
 
             weatherUrl = weatherUrl.Replace("@api@", _weatherApiConfiguration.ApiKey);
