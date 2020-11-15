@@ -148,11 +148,9 @@ namespace ServerLibrary.Services
 
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
 
-            await stream.ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                async (t) =>
-                {
-                    data = Encoding.ASCII.GetString(buffer);
-                });
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            data = Encoding.ASCII.GetString(buffer);
 
             data = data.Replace("\0", "");
 
@@ -172,11 +170,10 @@ namespace ServerLibrary.Services
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
-            await stream.ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                async (t) =>
-                {
-                    data += Encoding.ASCII.GetString(buffer);
-                });
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            data += Encoding.ASCII.GetString(buffer);
+
             data = data.Replace("\0", "");
 
             return data;
@@ -196,18 +193,16 @@ namespace ServerLibrary.Services
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
 
-                await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length).ContinueWith(
-                async (t) =>
-                {
-                    string response = Encoding.ASCII.GetString(signInBuffer);
+                await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
 
-                    if (response[0] == 'Y' || response[0] == 'y')
-                    {
-                        _loginService.RegisterAccount(data);
-                        Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
-                        _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
-                    }
-                });
+                string response = Encoding.ASCII.GetString(signInBuffer);
+
+                if (response[0] == 'Y' || response[0] == 'y')
+                {
+                    _loginService.RegisterAccount(data);
+                    Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                    _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                }
             }
             else
             {
