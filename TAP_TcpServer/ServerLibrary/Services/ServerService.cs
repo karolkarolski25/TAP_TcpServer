@@ -22,27 +22,39 @@ namespace ServerLibrary.Services //TODO implement server
             _serverConfiguration = serverConfiguration;
         }
 
-        private bool IsServerConfigurationCorrect()
+        private (bool result, string message) IsServerConfigurationCorrect()
         {
+            string wrongServerConfigurationMessage = string.Empty;
+
             try
             {
-                IPAddress.Parse(_serverConfiguration.IpAddress);
-
                 if (_serverConfiguration.Port < 1024 || _serverConfiguration.Port > 65535)
                 {
-                    throw new Exception();
+                    wrongServerConfigurationMessage += "- Port number is wrong\n";
                 }
 
-                if (_serverConfiguration.BufferSize != 85)
+                if (_serverConfiguration.WeatherBufferSize != 85)
+                {
+                    wrongServerConfigurationMessage += "- Buffer size is incorrect\n";
+                }
+
+                IPAddress.Parse(_serverConfiguration.IpAddress);
+
+                if (wrongServerConfigurationMessage.Length > 0)
                 {
                     throw new Exception();
                 }
 
-                return true;
+                return (true, string.Empty);
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                if (ex is FormatException || ex is ArgumentNullException)
+                {
+                    wrongServerConfigurationMessage += "- Server ip address is wrong\n";
+                }
+
+                return (false, wrongServerConfigurationMessage);
             }
         }
 
@@ -86,7 +98,7 @@ namespace ServerLibrary.Services //TODO implement server
                     Array.Clear(buffer, 0, buffer.Length);
                 }
 
-                await stream.ReadAsync(buffer, 0, _serverConfiguration.BufferSize);
+                await stream.ReadAsync(buffer, 0, _serverConfiguration.WeatherBufferSize);
             }
             catch
             {
@@ -96,7 +108,9 @@ namespace ServerLibrary.Services //TODO implement server
 
         public async Task Server()
         {
-            if (IsServerConfigurationCorrect())
+            var serverConfigurationResult = IsServerConfigurationCorrect();
+
+            if (serverConfigurationResult.result)
             {
                 TcpListener server = new TcpListener(IPAddress.Parse(_serverConfiguration.IpAddress), _serverConfiguration.Port);
 
@@ -112,7 +126,7 @@ namespace ServerLibrary.Services //TODO implement server
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-                    byte[] buffer = new byte[_serverConfiguration.BufferSize];
+                    byte[] buffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
                         async (t) =>
@@ -126,7 +140,7 @@ namespace ServerLibrary.Services //TODO implement server
             }
             else
             {
-                Console.WriteLine("Server configuration is wrong");
+                Console.WriteLine($"Server configuration is wrong, \n{serverConfigurationResult.message}");
             }
         }
     }
