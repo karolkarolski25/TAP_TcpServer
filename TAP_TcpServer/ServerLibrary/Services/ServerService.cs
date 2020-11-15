@@ -128,7 +128,7 @@ namespace ServerLibrary.Services //TODO implement server
 
                     byte[] buffer = new byte[_serverConfiguration.WeatherBufferSize];
 
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
+                    client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
                         async (t) =>
                         {
                             while (true)
