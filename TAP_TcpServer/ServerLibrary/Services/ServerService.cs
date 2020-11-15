@@ -70,7 +70,7 @@ namespace ServerLibrary.Services //TODO implement server
             }
         }
 
-        private async Task ProcessWeatherCommunication(NetworkStream stream, byte[] buffer)
+        private async Task<string> ProcessWeatherCommunication(NetworkStream stream, byte[] buffer)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace ServerLibrary.Services //TODO implement server
 
                 if (location.IndexOf("exit") >= 0)
                 {
-                    return;
+                    return "exit";
                 }
 
                 else if (location.IndexOf("??") < 0)
@@ -117,10 +117,12 @@ namespace ServerLibrary.Services //TODO implement server
                 }
 
                 await stream.ReadAsync(buffer, 0, _serverConfiguration.WeatherBufferSize);
+
+                return "ok";
             }
             catch
             {
-                return;
+                return "exit";
             }
         }
 
@@ -210,7 +212,10 @@ namespace ServerLibrary.Services //TODO implement server
                         {
                             while (true)
                             {
-                                await ProcessWeatherCommunication(client.GetStream(), buffer);
+                                if (await ProcessWeatherCommunication(client.GetStream(), buffer) == "exit")
+                                {
+                                    client.Close();
+                                }
                             }
                         });
                 }
