@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using WeatherLibrary.Services;
 
@@ -10,6 +12,9 @@ namespace ServerLibrary.Services //TODO implement server
     {
         private readonly IWeatherService _weatherService;
         private readonly ServerConfiguration _serverConfiguration;
+
+        private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
+        private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration)
         {
@@ -41,6 +46,54 @@ namespace ServerLibrary.Services //TODO implement server
             }
         }
 
+        private async Task ProcessWeatherCommunication(NetworkStream stream, byte[] buffer)
+        {
+            try
+            {
+                string location = Encoding.ASCII.GetString(buffer);
+
+                if (location.IndexOf("exit") >= 0)
+                {
+                    return;
+                }
+
+                else if (location.IndexOf("??") < 0)
+                {
+                    if (location.IndexOf("\r\n") < 0)
+                    {
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
+
+                        location = new string(location.Where(c => c != '\0').ToArray());
+
+                        byte[] weather = Encoding.ASCII.GetBytes(await _weatherService.GetWeather(location));
+
+                        await stream.WriteAsync(weather, 0, weather.Length);
+
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                    }
+
+                    Array.Clear(buffer, 0, buffer.Length);
+                }
+
+                else if (location.IndexOf("??") >= 0)
+                {
+                    string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
+
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(nonAsciiCharsMessage), 0, nonAsciiCharsMessage.Length);
+
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+
+                    Array.Clear(buffer, 0, buffer.Length);
+                }
+
+                await stream.ReadAsync(buffer, 0, _serverConfiguration.BufferSize);
+            }
+            catch
+            {
+                return;
+            }
+        }
+
         public async Task Server()
         {
             if (IsServerConfigurationCorrect())
@@ -57,16 +110,16 @@ namespace ServerLibrary.Services //TODO implement server
 
                     Console.WriteLine("Client connected");
 
+                    await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+
                     byte[] buffer = new byte[_serverConfiguration.BufferSize];
 
                     await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
                         async (t) =>
                         {
-                            int i = t.Result;
                             while (true)
                             {
-                                await client.GetStream().WriteAsync(buffer, 0, i);
-                                i = await client.GetStream().ReadAsync(buffer, 0, buffer.Length);
+                                await ProcessWeatherCommunication(client.GetStream(), buffer);
                             }
                         });
                 }

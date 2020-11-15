@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tap_TcpServer", "TPM\Tap_TcpServer.csproj", "{FA9DA08C-9535-42DB-B032-F4FB33B1F323}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherLibrary", "WeatherLibrary\WeatherLibrary.csproj", "{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLibrary", "WeatherLibrary\WeatherLibrary.csproj", "{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerLibrary", "ServerLibrary\ServerLibrary.csproj", "{72F92E49-195B-4AF2-BE65-70C5BE945926}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLibrary", "ServerLibrary\ServerLibrary.csproj", "{72F92E49-195B-4AF2-BE65-70C5BE945926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tap_TcpServer", "TAP_TcpServer\Tap_TcpServer.csproj", "{D92A86F2-C373-41C2-B91A-29DAD9C53AED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FA9DA08C-9535-42DB-B032-F4FB33B1F323}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA9DA08C-9535-42DB-B032-F4FB33B1F323}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA9DA08C-9535-42DB-B032-F4FB33B1F323}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA9DA08C-9535-42DB-B032-F4FB33B1F323}.Release|Any CPU.Build.0 = Release|Any CPU
 		{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{006E537C-D07A-42DF-8BDD-8CC0A00FDEBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{72F92E49-195B-4AF2-BE65-70C5BE945926}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72F92E49-195B-4AF2-BE65-70C5BE945926}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72F92E49-195B-4AF2-BE65-70C5BE945926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D92A86F2-C373-41C2-B91A-29DAD9C53AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D92A86F2-C373-41C2-B91A-29DAD9C53AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D92A86F2-C373-41C2-B91A-29DAD9C53AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D92A86F2-C373-41C2-B91A-29DAD9C53AED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
