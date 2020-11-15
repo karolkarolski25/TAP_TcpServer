@@ -21,7 +21,7 @@ namespace ServerLibrary.Services //TODO implement server
         private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
         private readonly string enterLoginMessage = "Login: ";
         private readonly string enterPasswordMessage = "Password: ";
-        private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N)";
+        private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration, 
             ILoginService loginService, ILogger<IServerService> logger)
@@ -158,7 +158,11 @@ namespace ServerLibrary.Services //TODO implement server
                             data = Encoding.ASCII.GetString(buffer);
                         });
 
+                    data = data.Replace("\0", "");
+
                     data += ";";
+
+                    await client.GetStream().ReadAsync(buffer, 0, 2);
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
@@ -167,8 +171,12 @@ namespace ServerLibrary.Services //TODO implement server
                         {
                             data += Encoding.ASCII.GetString(buffer);
                         });
+                    data = data.Replace("\0", "");
+                    data = data.Substring(0, data.Length-1);
 
-                    if(!_loginService.CheckData(data))
+                    await client.GetStream().ReadAsync(buffer, 0, 2);
+
+                    if (!_loginService.CheckData(data))
                     {
                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
 
@@ -176,15 +184,20 @@ namespace ServerLibrary.Services //TODO implement server
                         async (t) =>
                         {
                             string response = Encoding.ASCII.GetString(buffer);
-                            if(response == "Y" || response == "y")
+                            if(response[0] == 'Y' || response[0] == 'y')
                             {
                                 _loginService.RegisterAccount(data);
+                                Console.WriteLine("New user: " + data.Substring(0, data.IndexOf(';')) + " registered");
                             }
                         });
                     }
+                    else
+                    {
+                        Console.WriteLine("User: " + data.Substring(0, data.IndexOf(';')) + " logged in");
+                    }
 
                     data = data.Substring(0, data.IndexOf(';'));
-                    data = "Welcome " + data;
+                    data = "Welcome " + data + "\r\n";
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);

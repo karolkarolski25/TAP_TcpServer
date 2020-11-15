@@ -7,7 +7,7 @@ namespace LoginLibrary.Services
 {
     public class LoginService : ILoginService
     {
-        private Aes aes;
+        private readonly Aes aes;
         private readonly CryptoConfiguration cryptoConfiguration;
 
         private readonly ILogger<ILoginService> _logger;

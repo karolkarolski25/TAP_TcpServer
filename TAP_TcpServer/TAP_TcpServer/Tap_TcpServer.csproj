@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LoginLibrary\LoginLibrary.csproj" />
     <ProjectReference Include="..\ServerLibrary\ServerLibrary.csproj" />
     <ProjectReference Include="..\WeatherLibrary\WeatherLibrary.csproj" />
   </ItemGroup>
