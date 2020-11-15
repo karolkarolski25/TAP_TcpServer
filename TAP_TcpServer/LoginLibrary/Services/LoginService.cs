@@ -6,18 +6,23 @@ namespace LoginLibrary.Services
 {
     class LoginService : ILoginService
     {
-        private Aes aes = Aes.Create();
-        private byte[] key, iv;
+        private Aes aes;
+        private readonly CryptoConfiguration cryptoConfiguration;
+
+        public LoginService(CryptoConfiguration _cryptoConfiguration)
+        {
+            cryptoConfiguration = _cryptoConfiguration;
+            aes = Aes.Create();
+        }
 
         public bool CheckData(string data)
         {
             try
             {
                 FileStream fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                CryptoStream cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read);
+                CryptoStream cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Read);
                 StreamReader streamReader = new StreamReader(cryptoStream);
                 string dbData;
-                data = data.Substring(0, data.Length - 1);
 
                 try
                 {
@@ -49,21 +54,17 @@ namespace LoginLibrary.Services
             return false;
         }
 
-        public bool ReadCryptoData()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool RegisterAccount(string data)
         {
             FileStream fileStream = null;
             CryptoStream cryptoStream = null;
             StreamReader streamReader = null;
             string dbData;
+            data += "|";
             try
             {
                 fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read);
+                cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Read);
                 streamReader = new StreamReader(cryptoStream);
                 dbData = streamReader.ReadToEnd();
             }
@@ -83,7 +84,7 @@ namespace LoginLibrary.Services
             try
             {
                 fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(key, iv), CryptoStreamMode.Write);
+                cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Write);
 
                 byte[] binaryData = new byte[dbData.Length];
 

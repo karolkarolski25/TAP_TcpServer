@@ -4,6 +4,5 @@
     {
         bool RegisterAccount(string data);
         bool CheckData(string data);
-        bool ReadCryptoData();
     }
 }
