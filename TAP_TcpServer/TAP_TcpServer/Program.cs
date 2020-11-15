@@ -5,6 +5,7 @@ using ServerLibrary.Services;
 using System;
 using WeatherLibrary;
 using WeatherLibrary.Services;
+using LoginLibrary.Services;
 using LoginLibrary;
 
 namespace TAP_TcpServer
@@ -47,6 +48,7 @@ namespace TAP_TcpServer
                 .AddSingleton(serverConfiguration)
                 .AddSingleton(cryptoConfiguration)
                 .AddSingleton<IWeatherService, WeatherService>()
+                .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>();
         }
     }

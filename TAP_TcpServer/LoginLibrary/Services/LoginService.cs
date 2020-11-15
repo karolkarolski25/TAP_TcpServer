@@ -4,9 +4,9 @@ using System.Security.Cryptography;
 
 namespace LoginLibrary.Services
 {
-    class LoginService : ILoginService
+    public class LoginService : ILoginService
     {
-        private Aes aes;
+        private readonly Aes aes;
         private readonly CryptoConfiguration cryptoConfiguration;
 
         public LoginService(CryptoConfiguration _cryptoConfiguration)
