@@ -4,6 +4,6 @@ namespace ServerLibrary.Services
 {
     public interface IServerService
     {
-        Task Server();
+        Task StartServer();
     }
 }

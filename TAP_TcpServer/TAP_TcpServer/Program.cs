@@ -29,7 +29,7 @@ namespace TAP_TcpServer
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
 
-                _serviceProvider.GetRequiredService<IServerService>().Server().Wait();
+                _serviceProvider.GetRequiredService<IServerService>().StartServer().Wait();
             }
             catch (Exception ex)
             {

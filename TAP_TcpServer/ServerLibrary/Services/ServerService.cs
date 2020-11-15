@@ -126,7 +126,71 @@ namespace ServerLibrary.Services //TODO implement server
             }
         }
 
-        public async Task Server()
+        private async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
+        {
+            string data = string.Empty;
+
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length).ContinueWith(
+                async (t) =>
+                {
+                    data = Encoding.ASCII.GetString(buffer);
+                });
+
+            data = data.Replace("\0", "");
+
+            data += ";";
+
+            return data;
+        }
+
+        private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length).ContinueWith(
+                async (t) =>
+                {
+                    data += Encoding.ASCII.GetString(buffer);
+                });
+            data = data.Replace("\0", "");
+
+            return data;
+        }
+
+        private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
+        {
+            if (!_loginService.CheckData(data))
+            {
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
+
+                await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length).ContinueWith(
+                async (t) =>
+                {
+                    string response = Encoding.ASCII.GetString(signInBuffer);
+
+                    if (response[0] == 'Y' || response[0] == 'y')
+                    {
+                        _loginService.RegisterAccount(data);
+                        Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                        _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                    }
+                });
+            }
+            else
+            {
+                Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+                _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+            }
+
+            data = data.Substring(0, data.IndexOf(';'));
+            data = "Welcome " + data + "\r\n";
+
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+        }
+
+        public async Task StartServer()
         {
             var serverConfigurationResult = IsServerConfigurationCorrect();
 
@@ -148,71 +212,31 @@ namespace ServerLibrary.Services //TODO implement server
 
                     _logger.LogInformation("Client connected");
 
-                    string data = String.Empty;
+                    byte[] signInBuffer = new byte[_serverConfiguration.LoginBufferSize];
+                    string data = string.Empty;
 
-                    await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
+                    data += await GetLoginString(client.GetStream(), signInBuffer);
 
-                    byte[] buffer = new byte[_serverConfiguration.WeatherBufferSize];
+                    await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) =>
-                        {
-                            data = Encoding.ASCII.GetString(buffer);
-                        });
+                    data = await GetPasswordString(client.GetStream(), signInBuffer, data);
 
-                    data = data.Replace("\0", "");
-
-                    data += ";";
-
-                    await client.GetStream().ReadAsync(buffer, 0, 2);
-
-                    await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
-
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) =>
-                        {
-                            data += Encoding.ASCII.GetString(buffer);
-                        });
-                    data = data.Replace("\0", "");
                     data = data.Substring(0, data.Length - 1);
 
-                    await client.GetStream().ReadAsync(buffer, 0, 2);
+                    await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                    if (!_loginService.CheckData(data))
-                    {
-                        await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
+                    await HandleLogin(client.GetStream(), signInBuffer, data);
 
-                        await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) =>
-                        {
-                            string response = Encoding.ASCII.GetString(buffer);
-
-                            if (response[0] == 'Y' || response[0] == 'y')
-                            {
-                                _loginService.RegisterAccount(data);
-                                Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
-                                _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
-                            }
-                        });
-                    }
-                    else
-                    {
-                        Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
-                        _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
-                    }
-
-                    data = data.Substring(0, data.IndexOf(';'));
-                    data = "Welcome " + data + "\r\n";
-                    await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+                    byte[] weatherBudder = new byte[_serverConfiguration.WeatherBufferSize];
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-                    client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
+                    client.GetStream().ReadAsync(weatherBudder, 0, weatherBudder.Length).ContinueWith(
                         async (t) =>
                         {
                             while (true)
                             {
-                                if (await ProcessWeatherCommunication(client.GetStream(), buffer) == "exit")
+                                if (await ProcessWeatherCommunication(client.GetStream(), weatherBudder) == "exit")
                                 {
                                     client.Close();
                                 }
