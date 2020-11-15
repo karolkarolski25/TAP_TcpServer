@@ -171,7 +171,6 @@ namespace ServerLibrary.Services //TODO implement server
                         {
                             data += Encoding.ASCII.GetString(buffer);
                         });
-
                     data = data.Replace("\0", "");
                     data = data.Substring(0, data.Length - 1);
 
@@ -206,8 +205,7 @@ namespace ServerLibrary.Services //TODO implement server
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-
-                    await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
+                    client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
                         async (t) =>
                         {
                             while (true)
