@@ -137,7 +137,10 @@ namespace ServerLibrary.Services //TODO implement server
                     byte[] buffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) => await Task.Run(() => data = Encoding.ASCII.GetString(buffer)));
+                        async (t) => 
+                        {
+                            data = Encoding.ASCII.GetString(buffer);
+                        });
 
                     data = data.Replace("\0", "");
 
@@ -148,8 +151,10 @@ namespace ServerLibrary.Services //TODO implement server
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
                     await client.GetStream().ReadAsync(buffer, 0, buffer.Length).ContinueWith(
-                        async (t) => await Task.Run(() => data += Encoding.ASCII.GetString(buffer)));
-
+                        async (t) =>
+                        {
+                            data += Encoding.ASCII.GetString(buffer);
+                        });
                     data = data.Replace("\0", "");
                     data = data.Substring(0, data.Length-1);
 
