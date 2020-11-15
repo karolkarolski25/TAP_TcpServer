@@ -191,6 +191,7 @@ namespace ServerLibrary.Services
         /// <returns>task for handling logging</returns>
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
+            data = data.Substring(0, data.Length - 1);
             if (!_loginService.CheckData(data))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
@@ -249,28 +250,26 @@ namespace ServerLibrary.Services
                     byte[] signInBuffer = new byte[_serverConfiguration.LoginBufferSize];
                     string data = string.Empty;
 
-                    data += await GetLoginString(client.GetStream(), signInBuffer);
+                    data = await GetLoginString(client.GetStream(), signInBuffer);
 
                     await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
                     data = await GetPasswordString(client.GetStream(), signInBuffer, data);
 
-                    data = data.Substring(0, data.Length - 1);
-
                     await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
                     await HandleLogin(client.GetStream(), signInBuffer, data);
 
-                    byte[] weatherBudder = new byte[_serverConfiguration.WeatherBufferSize];
+                    byte[] weatherBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-                    client.GetStream().ReadAsync(weatherBudder, 0, weatherBudder.Length).ContinueWith(
+                    client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length).ContinueWith(
                         async (t) =>
                         {
                             while (true)
                             {
-                                if (await ProcessWeatherCommunication(client.GetStream(), weatherBudder) == "exit")
+                                if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
                                 {
                                     client.Close();
                                 }
