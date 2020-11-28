@@ -20,6 +20,10 @@ namespace ServerLibrary.Services
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
         private readonly string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
         private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
+        private readonly string enterLoginMessage = "Login: ";
+        private readonly string enterPasswordMessage = "Password: ";
+        private readonly string enterTimePeriodMessage = "Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020): ";
+        private readonly string wrongTimePeriodMessage = "\r\nIncorrect weather period, try again\r\n\n";
         private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
@@ -98,7 +102,7 @@ namespace ServerLibrary.Services
 
                         var daysPeriodBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
-                        int days = await _weatherService.GetWeatherPeriod(stream, daysPeriodBuffer);            
+                        int days = await GetWeatherPeriod(stream, daysPeriodBuffer);            
 
                         await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
 
@@ -135,6 +139,128 @@ namespace ServerLibrary.Services
             {
                 return "exit";
             }
+        }
+
+        /// <summary>
+        /// Gets correct weather period from client
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <returns>dates period eg. 3</returns>
+        public async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
+
+            do
+            {
+                Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+            } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
+
+            string weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
+
+            int days;
+
+            if (weatherDate.Contains('-'))
+            {
+                DateTime date;
+
+                if (DateTime.TryParse(weatherDate, out date))
+                {
+                    var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+                    days = (int)(date - currentDate).TotalDays + 1;
+                }
+                else
+                {
+                    days = -1;
+                }
+            }
+            else
+            {
+                if (!int.TryParse(weatherDate, out days))
+                {
+                    days = -1;
+                }
+            }
+
+            while (days < 1 || days > 6)
+            {
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(wrongTimePeriodMessage), 0, wrongTimePeriodMessage.Length);
+
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
+
+                do
+                {
+                    Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                    await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
+
+                weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
+
+                if (weatherDate.Contains('-'))
+                {
+                    DateTime date;
+
+                    if (DateTime.TryParse(weatherDate, out date))
+                    {
+                        var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+                        days = (int)(date - currentDate).TotalDays;
+                    }
+                    else
+                    {
+                        days = -1;
+                    }
+                }
+                else
+                {
+                    if (!int.TryParse(weatherDate, out days))
+                    {
+                        days = -1;
+                    }
+                }
+            }
+
+            return days;
+        }
+
+        /// <summary>
+        /// Gets login from user
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <param name="buffer">buffer for weather data</param>
+        /// <returns>Login from user</returns>
+        public async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            string data = Encoding.ASCII.GetString(buffer);
+
+            data = data.Replace("\0", "");
+
+            data += ";";
+
+            return data;
+        }
+
+        /// <summary>
+        /// Gets password from user
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <param name="buffer">buffer for weather data</param>
+        /// <param name="data">current string for sign in</param>
+        /// <returns>Password from user</returns>
+        public async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            data += Encoding.ASCII.GetString(buffer);
+
+            data = data.Replace("\0", "");
+
+            return data;
         }
 
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
@@ -200,11 +326,11 @@ namespace ServerLibrary.Services
 
                     Task.Run(async () =>
                      {
-                         data = await _loginService.GetLoginString(client.GetStream(), signInBuffer);
+                         data = await GetLoginString(client.GetStream(), signInBuffer);
 
                          await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                         data = await _loginService.GetPasswordString(client.GetStream(), signInBuffer, data);
+                         data = await GetPasswordString(client.GetStream(), signInBuffer, data);
 
                          await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 

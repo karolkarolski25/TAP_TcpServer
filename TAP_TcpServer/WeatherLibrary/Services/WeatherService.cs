@@ -17,9 +17,6 @@ namespace WeatherLibrary.Services
 
         private string weatherUrl = $"http://api.openweathermap.org/data/2.5/forecast?q=@lokalizacja@&mode=xml&units=metric&appid=@api@";
 
-        private readonly string enterTimePeriodMessage = "Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020): ";
-        private readonly string wrongTimePeriodMessage = "\r\nIncorrect weather period, try again\r\n\n";
-
         public WeatherService(WeatherApiConfiguration weatherApiConfiguration, ILogger<WeatherService> logger)
         {
             _logger = logger;
@@ -181,87 +178,5 @@ namespace WeatherLibrary.Services
                 return $"\r\nError: {ex.Message}\r\n\n";
             }
         }
-
-        /// <summary>
-        /// Gets correct weather period from client
-        /// </summary>
-        /// <param name="stream">client stream</param>
-        /// <returns>dates period eg. 3</returns>
-        public async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
-        {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
-
-            do
-            {
-                Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
-                await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
-            } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
-
-            string weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
-
-            int days;
-
-            if (weatherDate.Contains('-'))
-            {
-                DateTime date;
-
-                if (DateTime.TryParse(weatherDate, out date))
-                {
-                    var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-                    days = (int)(date - currentDate).TotalDays + 1;
-                }
-                else
-                {
-                    days = -1;
-                }
-            }
-            else
-            {
-                if (!int.TryParse(weatherDate, out days))
-                {
-                    days = -1;
-                }
-            }
-
-            while (days < 1 || days > 6)
-            {
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(wrongTimePeriodMessage), 0, wrongTimePeriodMessage.Length);
-
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
-
-                do
-                {
-                    Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
-                    await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
-                } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
-
-                weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
-
-                if (weatherDate.Contains('-'))
-                {
-                    DateTime date;
-
-                    if (DateTime.TryParse(weatherDate, out date))
-                    {
-                        var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-                        days = (int)(date - currentDate).TotalDays;
-                    }
-                    else
-                    {
-                        days = -1;
-                    }
-                }
-                else
-                {
-                    if (!int.TryParse(weatherDate, out days))
-                    {
-                        days = -1;
-                    }
-                }
-            }
-
-            return days;
-        }
-
     }
 }

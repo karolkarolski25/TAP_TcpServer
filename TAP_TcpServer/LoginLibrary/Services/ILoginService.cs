@@ -7,7 +7,5 @@ namespace LoginLibrary.Services
     {
         bool RegisterAccount(string data);
         bool CheckData(string data);
-        Task<string> GetLoginString(NetworkStream stream, byte[] buffer);
-        Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data);
     }
 }
