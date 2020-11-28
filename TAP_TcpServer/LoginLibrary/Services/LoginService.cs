@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LoginLibrary.Services
 {
@@ -9,6 +12,9 @@ namespace LoginLibrary.Services
     {
         private readonly Aes aes;
         private readonly CryptoConfiguration cryptoConfiguration;
+
+        private readonly string enterLoginMessage = "Login: ";
+        private readonly string enterPasswordMessage = "Password: ";
 
         private readonly ILogger<LoginService> _logger;
 
@@ -129,6 +135,47 @@ namespace LoginLibrary.Services
                 fileStream.Close();
             }
             return true;
+        }
+
+        /// <summary>
+        /// Gets login from user
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <param name="buffer">buffer for weather data</param>
+        /// <returns>Login from user</returns>
+        public async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            string data = Encoding.ASCII.GetString(buffer);
+
+            data = data.Replace("\0", "");
+
+            data += ";";
+
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <param name="buffer">buffer for weather data</param>
+        /// <param name="data">current string for sign in</param>
+        /// <returns>Password from user</returns>
+        public async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
+        {
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            data += Encoding.ASCII.GetString(buffer);
+
+            data = data.Replace("\0", "");
+
+            return data;
         }
     }
 }
