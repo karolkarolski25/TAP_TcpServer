@@ -18,6 +18,9 @@ namespace ServerLibrary.Services
         private readonly ServerConfiguration _serverConfiguration;
 
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
+        private readonly string enterTimePeriodMessage = "Enter days count for weather forecast (1 - 6): ";
+        private readonly string wrongTimePeriodMessage = "\r\nIncorrect weather period, enter values betweed 1 and 6\r\n\n";
+        private readonly string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
         private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
         private readonly string enterLoginMessage = "Login: ";
         private readonly string enterPasswordMessage = "Password: ";
@@ -95,13 +98,41 @@ namespace ServerLibrary.Services
                 {
                     if (location.IndexOf("\r\n") < 0)
                     {
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
-
                         location = new string(location.Where(c => c != '\0').ToArray());
 
-                        string weatherData = await _weatherService.GetWeather(location);
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
 
-                        _logger.LogInformation($"Weather for location: {location}: \n {weatherData}\n");
+                        var daysPeriodBuffer = new byte[_serverConfiguration.WeatherBufferSize];
+
+                        do
+                        {
+                            Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                            await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                        } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
+
+                        int days = BitConverter.ToInt32(daysPeriodBuffer, 0) - 48;
+
+                        while (days < 1 || days > 6)
+                        {
+                            await stream.WriteAsync(Encoding.ASCII.GetBytes(wrongTimePeriodMessage), 0, wrongTimePeriodMessage.Length);
+
+                            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
+
+                            do
+                            {
+                                Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                                await stream.ReadAsync(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
+                            } while (Encoding.ASCII.GetString(daysPeriodBuffer).Contains("\r\n"));
+
+                            days = BitConverter.ToInt32(daysPeriodBuffer, 0) - 48;
+
+                        }
+
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
+
+                        string weatherData = await _weatherService.GetWeather(location, BitConverter.ToInt32(daysPeriodBuffer, 0) - 48);
+
+                        _logger.LogInformation($"Weather for location: {location} for {days} days: \n {weatherData}\n");
 
                         byte[] weather = Encoding.ASCII.GetBytes(weatherData);
 
@@ -115,8 +146,6 @@ namespace ServerLibrary.Services
 
                 else if (location.IndexOf("??") >= 0)
                 {
-                    string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
-
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(nonAsciiCharsMessage), 0, nonAsciiCharsMessage.Length);
 
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
@@ -248,29 +277,29 @@ namespace ServerLibrary.Services
                     string data = string.Empty;
 
                     Task.Run(async () =>
-                    {
-                        data = await GetLoginString(client.GetStream(), signInBuffer);
+                     {
+                         data = await GetLoginString(client.GetStream(), signInBuffer);
 
-                        await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                         await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                        data = await GetPasswordString(client.GetStream(), signInBuffer, data);
+                         data = await GetPasswordString(client.GetStream(), signInBuffer, data);
 
-                        await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                         await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                        await HandleLogin(client.GetStream(), signInBuffer, data);
+                         await HandleLogin(client.GetStream(), signInBuffer, data);
 
-                        await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-                        await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
+                         await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
 
-                        while (true)
-                        {
-                            if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
-                            {
-                                client.Close();
-                            }
-                        }
-                    });
+                         while (true)
+                         {
+                             if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
+                             {
+                                 client.Close();
+                             }
+                         }
+                     });
                 }
             }
             else

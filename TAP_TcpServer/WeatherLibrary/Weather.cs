@@ -2,6 +2,7 @@
 {
     public class Weather
     {
+        public string Day { get; set; }
         public string Location { get; set; }
         public string Temperature { get; set; }
         public string MinTemperature { get; set; }
@@ -14,6 +15,5 @@
         public string WindName { get; set; }
         public string WindDirection { get; set; }
         public string CloudsName { get; set; }
-        public string GeneralWeather { get; set; }
     }
 }

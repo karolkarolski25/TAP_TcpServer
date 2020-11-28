@@ -4,6 +4,6 @@ namespace WeatherLibrary.Services
 {
     public interface IWeatherService
     {
-        Task<string> GetWeather(string location);
+        Task<string> GetWeather(string location, int days);
     }
 }
