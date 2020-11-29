@@ -17,6 +17,8 @@ namespace ServerLibrary.Services
         private readonly ILogger<ServerService> _logger;
         private readonly ServerConfiguration _serverConfiguration;
 
+        private bool badCredentials = false;
+
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
         private readonly string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
         private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
@@ -232,6 +234,11 @@ namespace ServerLibrary.Services
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
 
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = 0;
+            }
+
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
             string data = Encoding.ASCII.GetString(buffer);
@@ -254,6 +261,11 @@ namespace ServerLibrary.Services
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
+            for(int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = 0;
+            }
+
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
             data += Encoding.ASCII.GetString(buffer);
@@ -265,6 +277,7 @@ namespace ServerLibrary.Services
 
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
+            badCredentials = false;
             data = data.Substring(0, data.Length - 1);
             if (!_loginService.CheckData(data))
             {
@@ -279,6 +292,12 @@ namespace ServerLibrary.Services
                     _loginService.RegisterAccount(data);
                     Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
                     _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                }
+                else if (response[0] == 'N' || response[0] == 'n')
+                {
+                    badCredentials = true;
+                    await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
+                    return;
                 }
             }
             else
@@ -326,15 +345,18 @@ namespace ServerLibrary.Services
 
                     Task.Run(async () =>
                      {
-                         data = await GetLoginString(client.GetStream(), signInBuffer);
+                         do
+                         {
+                             data = await GetLoginString(client.GetStream(), signInBuffer);
 
-                         await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                             await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                         data = await GetPasswordString(client.GetStream(), signInBuffer, data);
+                             data = await GetPasswordString(client.GetStream(), signInBuffer, data);
 
-                         await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                             await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                         await HandleLogin(client.GetStream(), signInBuffer, data);
+                             await HandleLogin(client.GetStream(), signInBuffer, data);
+                         } while (badCredentials);
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 

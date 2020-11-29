@@ -88,7 +88,10 @@ namespace WeatherClient
 
                 textBox1.Text = Encoding.ASCII.GetString(buffer);
 
+                buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);
+
+                string tak = Encoding.ASCII.GetString(buffer);
 
                 buttonGetWeather.Enabled = true;
                 buttonLogin.Enabled = false;
