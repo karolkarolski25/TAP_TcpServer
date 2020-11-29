@@ -46,7 +46,15 @@ namespace WeatherClient
                 return;
             }
 
-            klient = new TcpClient(ipAddress, port);
+            try
+            {
+                klient = new TcpClient(ipAddress, port);
+            }
+            catch
+            {
+                MessageBox.Show("Can't connect to server");
+                return;
+            }
 
             stream = klient.GetStream();
 
@@ -86,12 +94,36 @@ namespace WeatherClient
 
                 stream.Read(buffer, 0, buffer.Length);
 
-                textBox1.Text = Encoding.ASCII.GetString(buffer);
+                string message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+                if (message == "Account not found, do you want to create new account? (Y/N): ")
+                {
+                    DialogResult dialogResult = MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        buffer = Encoding.ASCII.GetBytes("Y");
+                        stream.Write(buffer, 0, buffer.Length);
+                        buffer = new byte[2];
+                        stream.Write(buffer, 0, 2);
+                    }
+                    else if (dialogResult == DialogResult.No)
+                    {
+                        buffer = Encoding.ASCII.GetBytes("N");
+                        stream.Write(buffer, 0, buffer.Length);
+                        buffer = new byte[2];
+                        stream.Write(buffer, 0, 2);
+                        buffer = new byte[85];
+                        stream.Read(buffer, 0, 85);
+                        return;
+                    }
+                }
 
                 buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);
 
-                string tak = Encoding.ASCII.GetString(buffer);
+                textBox1.Text = "Enter Location and number of days or date";
+
+                //stream.Read(buffer, 0, buffer.Length);
 
                 buttonGetWeather.Enabled = true;
                 buttonLogin.Enabled = false;
@@ -100,6 +132,8 @@ namespace WeatherClient
 
         private void buttonGetWeather_Click(object sender, EventArgs e)
         {
+            //buffer = new byte[1024];
+            //stream.Read(buffer, 0, buffer.Length);
             buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
 
             stream.Write(buffer, 0, buffer.Length);
@@ -112,11 +146,14 @@ namespace WeatherClient
             stream.Write(buffer, 0, buffer.Length);
 
             buffer = new byte[1024];
-            stream.Read(buffer, 0, buffer.Length);
-            stream.Read(buffer, 0, buffer.Length);
+            string data = "";
+            do
+            {
+                stream.Read(buffer, 0, buffer.Length);
+                data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+            } while (data.Contains("API") || data.Contains("forecast"));
 
-            textBox1.Text = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-            stream.Read(buffer, 0, buffer.Length);
+            textBox1.Text = data;
         }
 
     }
