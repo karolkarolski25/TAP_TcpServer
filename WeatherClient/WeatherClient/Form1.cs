@@ -9,14 +9,13 @@ namespace WeatherClient
     {
         private string ipAddress;
         private int port;
-        TcpClient klient;
-        byte[] buffer;
-        NetworkStream stream;
-        bool connected = false;
+        private TcpClient klient;
+        private byte[] buffer;
+        private NetworkStream stream;
+        private bool connected = false;
         public Form1()
         {
             InitializeComponent();
-            buffer = new byte[85];
             textBoxIPAddress.Text = "127.0.0.1";
             textBoxPort.Text = "2048";
             textBoxLogin.Text = "test";
@@ -25,19 +24,11 @@ namespace WeatherClient
             textBoxDate.Text = "2";
         }
 
-        private void buttonConnect_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Function that connects to server and receives first message from server
+        /// </summary>
+        private void ConnectToServer()
         {
-            if (connected)
-            {
-                klient.Close();
-                buttonConnect.Text = "Connect";
-                connected = false;
-                buttonLogin.Enabled = false;
-                buttonGetWeather.Enabled = false;
-                buffer = new byte[85];
-                textBox1.Text = "";
-                return;
-            }
             ipAddress = textBoxIPAddress.Text;
             try
             {
@@ -67,6 +58,7 @@ namespace WeatherClient
 
             stream = klient.GetStream();
 
+            buffer = new byte[85];
             stream.Read(buffer, 0, 85);
 
             if (Encoding.ASCII.GetString(buffer).Replace("\0", "") == "Login: ")
@@ -76,10 +68,26 @@ namespace WeatherClient
                 buttonConnect.Text = "Disconnect";
                 connected = true;
             }
-
         }
 
-        private void buttonLogin_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Function that disconnects from server
+        /// </summary>
+        private void DisconnectFromServer()
+        {
+            klient.Close();
+            buttonConnect.Text = "Connect";
+            connected = false;
+            buttonLogin.Enabled = false;
+            buttonGetWeather.Enabled = false;
+            buffer = new byte[85];
+            textBox1.Text = "";
+        }
+
+        /// <summary>
+        /// Function that sends login and password to server
+        /// </summary>
+        private void HandleLogin()
         {
             buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text);
 
@@ -107,22 +115,8 @@ namespace WeatherClient
 
                 if (message == "Account not found, do you want to create new account? (Y/N): ")
                 {
-                    DialogResult dialogResult = MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                    if(!HandleRegistration())
                     {
-                        buffer = Encoding.ASCII.GetBytes("Y");
-                        stream.Write(buffer, 0, buffer.Length);
-                        buffer = new byte[85];
-                        stream.Read(buffer, 0, buffer.Length);
-                    }
-                    else if (dialogResult == DialogResult.No)
-                    {
-                        buffer = Encoding.ASCII.GetBytes("N");
-                        stream.Write(buffer, 0, buffer.Length);
-                        buffer = new byte[2];
-                        stream.Write(buffer, 0, 2);
-                        buffer = new byte[85];
-                        stream.Read(buffer, 0, 85);
                         return;
                     }
                 }
@@ -137,7 +131,38 @@ namespace WeatherClient
             }
         }
 
-        private void buttonGetWeather_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Function that shows popup message if user wants to register account
+        /// </summary>
+        /// <returns>True if user wants to register, false if user don't want to register</returns>
+        private bool HandleRegistration()
+        {
+            DialogResult dialogResult = MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                buffer = Encoding.ASCII.GetBytes("Y");
+                stream.Write(buffer, 0, buffer.Length);
+                buffer = new byte[85];
+                stream.Read(buffer, 0, buffer.Length);
+                return true;
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                buffer = Encoding.ASCII.GetBytes("N");
+                stream.Write(buffer, 0, buffer.Length);
+                buffer = new byte[2];
+                stream.Write(buffer, 0, 2);
+                buffer = new byte[85];
+                stream.Read(buffer, 0, 85);
+                return false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Function that sends location and data to server
+        /// </summary>
+        private void SendLocationAndData()
         {
             buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
 
@@ -156,7 +181,7 @@ namespace WeatherClient
             {
                 stream.Read(buffer, 0, buffer.Length);
                 data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-                if(data.Contains("Incorrect weather period, try again"))
+                if (data.Contains("Incorrect weather period, try again"))
                 {
                     MessageBox.Show("Incorrect weather period, try different formatting");
                     return;
@@ -164,6 +189,29 @@ namespace WeatherClient
             } while (!data.Contains(textBoxLocation.Text));
 
             textBox1.Text = data;
+        }
+
+        private void buttonConnect_Click(object sender, EventArgs e)
+        {
+            if (connected)
+            {
+                DisconnectFromServer();
+                return;
+            }
+            else
+            {
+                ConnectToServer();
+            }
+        }
+
+        private void buttonLogin_Click(object sender, EventArgs e)
+        {
+            HandleLogin();
+        }
+
+        private void buttonGetWeather_Click(object sender, EventArgs e)
+        {
+            SendLocationAndData();
         }
 
     }
