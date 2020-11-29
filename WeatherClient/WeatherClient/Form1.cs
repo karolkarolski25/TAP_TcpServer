@@ -105,6 +105,8 @@ namespace WeatherClient
                         stream.Write(buffer, 0, buffer.Length);
                         buffer = new byte[2];
                         stream.Write(buffer, 0, 2);
+                        buffer = new byte[85];
+                        stream.Read(buffer, 0, buffer.Length);
                     }
                     else if (dialogResult == DialogResult.No)
                     {
@@ -120,10 +122,9 @@ namespace WeatherClient
 
                 buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);
+                string tak = Encoding.ASCII.GetString(buffer);
 
                 textBox1.Text = "Enter Location and number of days or date";
-
-                //stream.Read(buffer, 0, buffer.Length);
 
                 buttonGetWeather.Enabled = true;
                 buttonLogin.Enabled = false;
@@ -132,26 +133,25 @@ namespace WeatherClient
 
         private void buttonGetWeather_Click(object sender, EventArgs e)
         {
-            //buffer = new byte[1024];
-            //stream.Read(buffer, 0, buffer.Length);
             buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
 
             stream.Write(buffer, 0, buffer.Length);
 
             buffer = new byte[1024];
             stream.Read(buffer, 0, buffer.Length);
+            string tak = Encoding.ASCII.GetString(buffer);
 
             buffer = Encoding.ASCII.GetBytes(textBoxDate.Text);
 
             stream.Write(buffer, 0, buffer.Length);
 
-            buffer = new byte[1024];
+            buffer = new byte[2048];
             string data = "";
             do
             {
                 stream.Read(buffer, 0, buffer.Length);
                 data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-            } while (data.Contains("API") || data.Contains("forecast"));
+            } while (!data.Contains(textBoxLocation.Text));
 
             textBox1.Text = data;
         }
