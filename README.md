@@ -6,10 +6,10 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
 <ul>
     <li>
         Example communication between server and GUI client:
-
-        
-
+   </li>                 
  </ul>
+
+ <img src="WeatherClient_si3dpipAmR.png">
 
 <ul>
     <li>
