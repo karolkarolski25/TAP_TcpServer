@@ -148,7 +148,7 @@ namespace ServerLibrary.Services
         /// </summary>
         /// <param name="stream">client stream</param>
         /// <returns>dates period eg. 3</returns>
-        public async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
+        private async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
 
@@ -230,7 +230,7 @@ namespace ServerLibrary.Services
         /// <param name="stream">client stream</param>
         /// <param name="buffer">buffer for weather data</param>
         /// <returns>Login from user</returns>
-        public async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
+        private async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
 
@@ -257,7 +257,7 @@ namespace ServerLibrary.Services
         /// <param name="buffer">buffer for weather data</param>
         /// <param name="data">current string for sign in</param>
         /// <returns>Password from user</returns>
-        public async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
+        private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
