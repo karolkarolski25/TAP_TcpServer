@@ -90,8 +90,6 @@ namespace WeatherClient
 
                 stream.Read(buffer, 0, buffer.Length);
 
-                textBox1.Text += Encoding.ASCII.GetString(buffer);
-
                 buttonGetWeather.Enabled = true;
                 buttonLogin.Enabled = false;
             }
@@ -104,7 +102,13 @@ namespace WeatherClient
             stream.Write(buffer, 0, buffer.Length);
 
             buffer = new byte[1024];
+            stream.Read(buffer, 0, buffer.Length);
 
+            buffer = Encoding.ASCII.GetBytes(textBoxDate.Text);
+
+            stream.Write(buffer, 0, buffer.Length);
+
+            buffer = new byte[1024];
             stream.Read(buffer, 0, buffer.Length);
             stream.Read(buffer, 0, buffer.Length);
 

@@ -43,6 +43,8 @@ namespace WeatherClient
             this.textBoxLocation = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.buttonGetWeather = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.textBoxDate = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // textBoxIPAddress
@@ -163,7 +165,7 @@ namespace WeatherClient
             // buttonGetWeather
             // 
             this.buttonGetWeather.Enabled = false;
-            this.buttonGetWeather.Location = new System.Drawing.Point(100, 259);
+            this.buttonGetWeather.Location = new System.Drawing.Point(104, 306);
             this.buttonGetWeather.Name = "buttonGetWeather";
             this.buttonGetWeather.Size = new System.Drawing.Size(109, 23);
             this.buttonGetWeather.TabIndex = 13;
@@ -171,11 +173,31 @@ namespace WeatherClient
             this.buttonGetWeather.UseVisualStyleBackColor = true;
             this.buttonGetWeather.Click += new System.EventHandler(this.buttonGetWeather_Click);
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.Transparent;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label6.Location = new System.Drawing.Point(3, 261);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(119, 42);
+            this.label6.TabIndex = 15;
+            this.label6.Text = "Date or \r\nnumber of days";
+            // 
+            // textBoxDate
+            // 
+            this.textBoxDate.Location = new System.Drawing.Point(86, 259);
+            this.textBoxDate.Name = "textBoxDate";
+            this.textBoxDate.Size = new System.Drawing.Size(154, 23);
+            this.textBoxDate.TabIndex = 14;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(858, 540);
+            this.Controls.Add(this.textBoxDate);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.buttonGetWeather);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBoxLocation);
@@ -194,6 +216,7 @@ namespace WeatherClient
             this.Text = "Form1";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -212,6 +235,8 @@ namespace WeatherClient
         private System.Windows.Forms.TextBox textBoxLocation;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button buttonGetWeather;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox textBoxDate;
     }
 }
 
