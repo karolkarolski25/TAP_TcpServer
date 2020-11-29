@@ -49,7 +49,7 @@ namespace WeatherClient
             // 
             // textBoxIPAddress
             // 
-            this.textBoxIPAddress.Location = new System.Drawing.Point(86, 12);
+            this.textBoxIPAddress.Location = new System.Drawing.Point(113, 14);
             this.textBoxIPAddress.Name = "textBoxIPAddress";
             this.textBoxIPAddress.Size = new System.Drawing.Size(154, 23);
             this.textBoxIPAddress.TabIndex = 0;
@@ -58,7 +58,7 @@ namespace WeatherClient
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(38, 14);
+            this.label1.Location = new System.Drawing.Point(65, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(23, 21);
             this.label1.TabIndex = 1;
@@ -66,7 +66,7 @@ namespace WeatherClient
             // 
             // buttonConnect
             // 
-            this.buttonConnect.Location = new System.Drawing.Point(116, 70);
+            this.buttonConnect.Location = new System.Drawing.Point(143, 72);
             this.buttonConnect.Name = "buttonConnect";
             this.buttonConnect.Size = new System.Drawing.Size(75, 23);
             this.buttonConnect.TabIndex = 2;
@@ -76,23 +76,23 @@ namespace WeatherClient
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(302, 14);
+            this.textBox1.Location = new System.Drawing.Point(334, 14);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(544, 493);
+            this.textBox1.Size = new System.Drawing.Size(512, 493);
             this.textBox1.TabIndex = 3;
             // 
             // textBoxLogin
             // 
-            this.textBoxLogin.Location = new System.Drawing.Point(86, 123);
+            this.textBoxLogin.Location = new System.Drawing.Point(113, 125);
             this.textBoxLogin.Name = "textBoxLogin";
             this.textBoxLogin.Size = new System.Drawing.Size(154, 23);
             this.textBoxLogin.TabIndex = 4;
             // 
             // textBoxPassword
             // 
-            this.textBoxPassword.Location = new System.Drawing.Point(86, 152);
+            this.textBoxPassword.Location = new System.Drawing.Point(113, 154);
             this.textBoxPassword.Name = "textBoxPassword";
             this.textBoxPassword.Size = new System.Drawing.Size(154, 23);
             this.textBoxPassword.TabIndex = 5;
@@ -102,7 +102,7 @@ namespace WeatherClient
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(12, 121);
+            this.label2.Location = new System.Drawing.Point(39, 123);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 21);
             this.label2.TabIndex = 6;
@@ -112,16 +112,16 @@ namespace WeatherClient
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label3.Location = new System.Drawing.Point(3, 150);
+            this.label3.Location = new System.Drawing.Point(30, 152);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(77, 21);
+            this.label3.Size = new System.Drawing.Size(76, 21);
             this.label3.TabIndex = 7;
             this.label3.Text = "Password";
             // 
             // buttonLogin
             // 
             this.buttonLogin.Enabled = false;
-            this.buttonLogin.Location = new System.Drawing.Point(116, 181);
+            this.buttonLogin.Location = new System.Drawing.Point(143, 183);
             this.buttonLogin.Name = "buttonLogin";
             this.buttonLogin.Size = new System.Drawing.Size(75, 23);
             this.buttonLogin.TabIndex = 8;
@@ -131,7 +131,7 @@ namespace WeatherClient
             // 
             // textBoxPort
             // 
-            this.textBoxPort.Location = new System.Drawing.Point(86, 41);
+            this.textBoxPort.Location = new System.Drawing.Point(113, 43);
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(154, 23);
             this.textBoxPort.TabIndex = 9;
@@ -140,15 +140,15 @@ namespace WeatherClient
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label4.Location = new System.Drawing.Point(38, 43);
+            this.label4.Location = new System.Drawing.Point(65, 45);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 21);
+            this.label4.Size = new System.Drawing.Size(38, 21);
             this.label4.TabIndex = 10;
             this.label4.Text = "Port";
             // 
             // textBoxLocation
             // 
-            this.textBoxLocation.Location = new System.Drawing.Point(86, 230);
+            this.textBoxLocation.Location = new System.Drawing.Point(163, 234);
             this.textBoxLocation.Name = "textBoxLocation";
             this.textBoxLocation.Size = new System.Drawing.Size(154, 23);
             this.textBoxLocation.TabIndex = 11;
@@ -159,14 +159,14 @@ namespace WeatherClient
             this.label5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label5.Location = new System.Drawing.Point(3, 232);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(69, 21);
+            this.label5.Size = new System.Drawing.Size(152, 21);
             this.label5.TabIndex = 12;
-            this.label5.Text = "Location";
+            this.label5.Text = "Location eg. Warsaw";
             // 
             // buttonGetWeather
             // 
             this.buttonGetWeather.Enabled = false;
-            this.buttonGetWeather.Location = new System.Drawing.Point(104, 306);
+            this.buttonGetWeather.Location = new System.Drawing.Point(86, 344);
             this.buttonGetWeather.Name = "buttonGetWeather";
             this.buttonGetWeather.Size = new System.Drawing.Size(109, 23);
             this.buttonGetWeather.TabIndex = 13;
@@ -181,13 +181,13 @@ namespace WeatherClient
             this.label6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label6.Location = new System.Drawing.Point(3, 261);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(119, 42);
+            this.label6.Size = new System.Drawing.Size(154, 42);
             this.label6.TabIndex = 15;
-            this.label6.Text = "Date or \r\nnumber of days";
+            this.label6.Text = "Date eg. 30-11-2020\r\n or number of days";
             // 
             // textBoxDate
             // 
-            this.textBoxDate.Location = new System.Drawing.Point(86, 259);
+            this.textBoxDate.Location = new System.Drawing.Point(163, 280);
             this.textBoxDate.Name = "textBoxDate";
             this.textBoxDate.Size = new System.Drawing.Size(154, 23);
             this.textBoxDate.TabIndex = 14;

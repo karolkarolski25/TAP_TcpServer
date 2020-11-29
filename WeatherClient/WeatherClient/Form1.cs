@@ -13,6 +13,7 @@ namespace WeatherClient
         private byte[] buffer;
         private NetworkStream stream;
         private bool connected = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -24,19 +25,10 @@ namespace WeatherClient
         private void ConnectToServer()
         {
             ipAddress = textBoxIPAddress.Text;
-            try
-            {
-                port = int.Parse(textBoxPort.Text);
-            }
-            catch
-            {
-                MessageBox.Show("Wrong IP Address");
-                return;
-            }
 
-            if (port < 1024 || port > 65535)
+            if (!int.TryParse(textBoxPort.Text, out port) || (port < 1024 || port > 65535))
             {
-                MessageBox.Show("Wrong port number");
+                MessageBox.Show("Wrong port number, try again", "Port error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -131,26 +123,25 @@ namespace WeatherClient
         /// <returns>True if user wants to register, false if user don't want to register</returns>
         private bool HandleRegistration()
         {
-            DialogResult dialogResult = MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes)
+            switch(MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
             {
-                buffer = Encoding.ASCII.GetBytes("Y");
-                stream.Write(buffer, 0, buffer.Length);
-                buffer = new byte[85];
-                stream.Read(buffer, 0, buffer.Length);
-                return true;
+                case DialogResult.Yes:
+                    buffer = Encoding.ASCII.GetBytes("Y");
+                    stream.Write(buffer, 0, buffer.Length);
+                    buffer = new byte[85];
+                    stream.Read(buffer, 0, buffer.Length);
+                    return true;
+                case DialogResult.No:
+                    buffer = Encoding.ASCII.GetBytes("N");
+                    stream.Write(buffer, 0, buffer.Length);
+                    buffer = new byte[2];
+                    stream.Write(buffer, 0, 2);
+                    buffer = new byte[85];
+                    stream.Read(buffer, 0, 85);
+                    return false;
+                default:
+                    return false;
             }
-            else if (dialogResult == DialogResult.No)
-            {
-                buffer = Encoding.ASCII.GetBytes("N");
-                stream.Write(buffer, 0, buffer.Length);
-                buffer = new byte[2];
-                stream.Write(buffer, 0, 2);
-                buffer = new byte[85];
-                stream.Read(buffer, 0, 85);
-                return false;
-            }
-            return false;
         }
 
         /// <summary>
@@ -158,31 +149,41 @@ namespace WeatherClient
         /// </summary>
         private void SendLocationAndData()
         {
-            buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
+            string location = textBoxLocation.Text;
+            string daysPeriod = textBoxDate.Text;
 
-            stream.Write(buffer, 0, buffer.Length);
-
-            buffer = new byte[1024];
-            stream.Read(buffer, 0, buffer.Length);
-
-            buffer = Encoding.ASCII.GetBytes(textBoxDate.Text);
-
-            stream.Write(buffer, 0, buffer.Length);
-
-            buffer = new byte[2048];
-            string data = "";
-            do
+            if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(daysPeriod))
             {
-                stream.Read(buffer, 0, buffer.Length);
-                data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-                if (data.Contains("Incorrect weather period, try again"))
-                {
-                    MessageBox.Show("Incorrect weather period, try different formatting");
-                    return;
-                }
-            } while (!data.Contains(textBoxLocation.Text));
+                MessageBox.Show("Weather location and days period cannot be empty", "Empty weather data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
 
-            textBox1.Text = data;
+                stream.Write(buffer, 0, buffer.Length);
+
+                buffer = new byte[1024];
+                stream.Read(buffer, 0, buffer.Length);
+
+                buffer = Encoding.ASCII.GetBytes(daysPeriod);
+
+                stream.Write(buffer, 0, buffer.Length);
+
+                buffer = new byte[2048];
+                string data = "";
+                do
+                {
+                    stream.Read(buffer, 0, buffer.Length);
+                    data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+                    if (data.Contains("Incorrect weather period, try again"))
+                    {
+                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                } while (!data.Contains(location));
+
+                textBox1.Text = data;
+            }
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
