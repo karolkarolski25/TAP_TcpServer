@@ -16,12 +16,6 @@ namespace WeatherClient
         public Form1()
         {
             InitializeComponent();
-            textBoxIPAddress.Text = "127.0.0.1";
-            textBoxPort.Text = "2048";
-            textBoxLogin.Text = "test";
-            textBoxPassword.Text = "123";
-            textBoxLocation.Text = "Warsaw";
-            textBoxDate.Text = "2";
         }
 
         /// <summary>
