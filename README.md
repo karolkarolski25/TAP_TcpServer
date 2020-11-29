@@ -5,7 +5,15 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
 
 <ul>
     <li>
-        Example communication between server and client after data being successfully fetched:
+        Example communication between server and GUI client:
+
+        
+
+ </ul>
+
+<ul>
+    <li>
+        Example communication between server and console client after data being successfully fetched:
 
         Login: test
         Password: test123
@@ -35,7 +43,7 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
  
  <ul>
     <li>
-        Example communication between server and client after data being unsuccessfully fetched:
+        Example communication between server and console client after data being unsuccessfully fetched:
 
         Login: test
         Password: test123
@@ -52,7 +60,7 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
 
  <ul>
     <li>
-        Example communication between server and client after using non ASCII chars:
+        Example communication between server and console client after using non ASCII chars:
 
         Login: test
         Password: test123
