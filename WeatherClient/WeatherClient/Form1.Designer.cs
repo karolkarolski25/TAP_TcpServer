@@ -214,7 +214,7 @@ namespace WeatherClient
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxIPAddress);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Weather Client";
             this.ResumeLayout(false);
             this.PerformLayout();
 

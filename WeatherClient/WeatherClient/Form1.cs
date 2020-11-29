@@ -22,6 +22,7 @@ namespace WeatherClient
             textBoxLogin.Text = "test";
             textBoxPassword.Text = "123";
             textBoxLocation.Text = "Warsaw";
+            textBoxDate.Text = "2";
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
@@ -38,7 +39,15 @@ namespace WeatherClient
                 return;
             }
             ipAddress = textBoxIPAddress.Text;
-            port = int.Parse(textBoxPort.Text);
+            try
+            {
+                port = int.Parse(textBoxPort.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Wrong IP Address");
+                return;
+            }
 
             if (port < 1024 || port > 65535)
             {
@@ -103,8 +112,6 @@ namespace WeatherClient
                     {
                         buffer = Encoding.ASCII.GetBytes("Y");
                         stream.Write(buffer, 0, buffer.Length);
-                        buffer = new byte[2];
-                        stream.Write(buffer, 0, 2);
                         buffer = new byte[85];
                         stream.Read(buffer, 0, buffer.Length);
                     }
@@ -122,7 +129,6 @@ namespace WeatherClient
 
                 buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);
-                string tak = Encoding.ASCII.GetString(buffer);
 
                 textBox1.Text = "Enter Location and number of days or date";
 
@@ -139,7 +145,6 @@ namespace WeatherClient
 
             buffer = new byte[1024];
             stream.Read(buffer, 0, buffer.Length);
-            string tak = Encoding.ASCII.GetString(buffer);
 
             buffer = Encoding.ASCII.GetBytes(textBoxDate.Text);
 
@@ -151,6 +156,11 @@ namespace WeatherClient
             {
                 stream.Read(buffer, 0, buffer.Length);
                 data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+                if(data.Contains("Incorrect weather period, try again"))
+                {
+                    MessageBox.Show("Incorrect weather period, try different formatting");
+                    return;
+                }
             } while (!data.Contains(textBoxLocation.Text));
 
             textBox1.Text = data;
