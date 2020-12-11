@@ -95,6 +95,11 @@ namespace ServerLibrary.Services
                 {
                     return "exit";
                 }
+                else if(location.IndexOf("change") >= 0)
+                {
+                    await HandlePasswordChange(stream, buffer);
+                    return "ok";
+                }
 
                 else if (location.IndexOf("??") < 0)
                 {
@@ -278,7 +283,8 @@ namespace ServerLibrary.Services
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
             badCredentials = false;
-            data = data.Substring(0, data.Length - 1);
+            //Don't know why this was here
+            //data = data.Substring(0, data.Length - 1);
             if (!_loginService.CheckData(data))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
@@ -309,6 +315,29 @@ namespace ServerLibrary.Services
             data = data.Substring(0, data.IndexOf(';'));
             data = "Welcome " + data + "\r\n";
 
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+        }
+
+        private async Task HandlePasswordChange(NetworkStream stream, byte[] signInBuffer)
+        {
+            await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
+            string data = Encoding.ASCII.GetString(signInBuffer);
+            data = data.Replace("\0", "");
+
+            if (_loginService.ChangePassword(data))
+            {
+                Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+
+                data = "Password changed\r\n";
+            }
+            else
+            {
+                Console.WriteLine($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _logger.LogInformation($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+
+                data = "Error password not changed\r\n";
+            }
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 

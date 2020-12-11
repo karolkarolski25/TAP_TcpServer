@@ -66,6 +66,7 @@ namespace WeatherClient
             connected = false;
             buttonLogin.Enabled = false;
             buttonGetWeather.Enabled = false;
+            buttonChangePassword.Enabled = false;
             buffer = new byte[85];
             textBox1.Text = "";
         }
@@ -114,6 +115,7 @@ namespace WeatherClient
 
                 buttonGetWeather.Enabled = true;
                 buttonLogin.Enabled = false;
+                buttonChangePassword.Enabled = true;
             }
         }
 
@@ -186,6 +188,38 @@ namespace WeatherClient
             }
         }
 
+        private void ChangePassword()
+        {
+            ChangePassword cp = new ChangePassword();
+
+            if(cp.ShowDialog(this) == DialogResult.OK)
+            {
+                textBoxPassword.Text = cp.textBoxNewPassword.Text;
+
+                buffer = Encoding.ASCII.GetBytes("change");
+                stream.Write(buffer, 0, buffer.Length);
+
+                buffer = new byte[85];
+
+                buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxPassword.Text);
+                stream.Write(buffer, 0, buffer.Length);
+
+                stream.Read(buffer, 0, buffer.Length);
+                string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+                if (data.Contains("Error"))
+                {
+                    MessageBox.Show("Can't change password, try again", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Password Changed", "Password Changed", MessageBoxButtons.OK);
+                }
+            }
+
+            cp.Dispose();
+        }
+
         private void buttonConnect_Click(object sender, EventArgs e)
         {
             if (connected)
@@ -209,5 +243,9 @@ namespace WeatherClient
             SendLocationAndData();
         }
 
+        private void buttonChangePassword_Click(object sender, EventArgs e)
+        {
+            ChangePassword();
+        }
     }
 }

@@ -45,6 +45,7 @@ namespace WeatherClient
             this.buttonGetWeather = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.textBoxDate = new System.Windows.Forms.TextBox();
+            this.buttonChangePassword = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBoxIPAddress
@@ -114,7 +115,7 @@ namespace WeatherClient
             this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label3.Location = new System.Drawing.Point(30, 152);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(76, 21);
+            this.label3.Size = new System.Drawing.Size(77, 21);
             this.label3.TabIndex = 7;
             this.label3.Text = "Password";
             // 
@@ -142,13 +143,13 @@ namespace WeatherClient
             this.label4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label4.Location = new System.Drawing.Point(65, 45);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 21);
+            this.label4.Size = new System.Drawing.Size(39, 21);
             this.label4.TabIndex = 10;
             this.label4.Text = "Port";
             // 
             // textBoxLocation
             // 
-            this.textBoxLocation.Location = new System.Drawing.Point(163, 234);
+            this.textBoxLocation.Location = new System.Drawing.Point(163, 257);
             this.textBoxLocation.Name = "textBoxLocation";
             this.textBoxLocation.Size = new System.Drawing.Size(154, 23);
             this.textBoxLocation.TabIndex = 11;
@@ -157,16 +158,16 @@ namespace WeatherClient
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label5.Location = new System.Drawing.Point(3, 232);
+            this.label5.Location = new System.Drawing.Point(3, 255);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(152, 21);
+            this.label5.Size = new System.Drawing.Size(153, 21);
             this.label5.TabIndex = 12;
             this.label5.Text = "Location eg. Warsaw";
             // 
             // buttonGetWeather
             // 
             this.buttonGetWeather.Enabled = false;
-            this.buttonGetWeather.Location = new System.Drawing.Point(86, 344);
+            this.buttonGetWeather.Location = new System.Drawing.Point(86, 367);
             this.buttonGetWeather.Name = "buttonGetWeather";
             this.buttonGetWeather.Size = new System.Drawing.Size(109, 23);
             this.buttonGetWeather.TabIndex = 13;
@@ -179,7 +180,7 @@ namespace WeatherClient
             this.label6.AutoSize = true;
             this.label6.BackColor = System.Drawing.Color.Transparent;
             this.label6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label6.Location = new System.Drawing.Point(3, 261);
+            this.label6.Location = new System.Drawing.Point(3, 284);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(154, 42);
             this.label6.TabIndex = 15;
@@ -187,16 +188,28 @@ namespace WeatherClient
             // 
             // textBoxDate
             // 
-            this.textBoxDate.Location = new System.Drawing.Point(163, 280);
+            this.textBoxDate.Location = new System.Drawing.Point(163, 303);
             this.textBoxDate.Name = "textBoxDate";
             this.textBoxDate.Size = new System.Drawing.Size(154, 23);
             this.textBoxDate.TabIndex = 14;
+            // 
+            // buttonChangePassword
+            // 
+            this.buttonChangePassword.Enabled = false;
+            this.buttonChangePassword.Location = new System.Drawing.Point(124, 212);
+            this.buttonChangePassword.Name = "buttonChangePassword";
+            this.buttonChangePassword.Size = new System.Drawing.Size(112, 23);
+            this.buttonChangePassword.TabIndex = 16;
+            this.buttonChangePassword.Text = "Change Password";
+            this.buttonChangePassword.UseVisualStyleBackColor = true;
+            this.buttonChangePassword.Click += new System.EventHandler(this.buttonChangePassword_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(858, 540);
+            this.Controls.Add(this.buttonChangePassword);
             this.Controls.Add(this.textBoxDate);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.buttonGetWeather);
@@ -238,6 +251,7 @@ namespace WeatherClient
         private System.Windows.Forms.Button buttonGetWeather;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBoxDate;
+        private System.Windows.Forms.Button buttonChangePassword;
     }
 }
 
