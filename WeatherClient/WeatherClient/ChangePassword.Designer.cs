@@ -49,6 +49,7 @@ namespace WeatherClient
             this.textBoxNewPassword.Name = "textBoxNewPassword";
             this.textBoxNewPassword.Size = new System.Drawing.Size(154, 23);
             this.textBoxNewPassword.TabIndex = 1;
+            this.textBoxNewPassword.UseSystemPasswordChar = true;
             // 
             // label1
             // 

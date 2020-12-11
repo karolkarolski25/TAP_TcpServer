@@ -97,7 +97,12 @@ namespace ServerLibrary.Services
                 }
                 else if(location.IndexOf("change") >= 0)
                 {
-                    await HandlePasswordChange(stream, buffer);
+                    await HandlePasswordChange(stream);
+
+                    Array.Clear(buffer, 0, buffer.Length);
+
+                    await stream.ReadAsync(buffer, 0, _serverConfiguration.WeatherBufferSize);
+
                     return "ok";
                 }
 
@@ -318,10 +323,11 @@ namespace ServerLibrary.Services
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 
-        private async Task HandlePasswordChange(NetworkStream stream, byte[] signInBuffer)
+        private async Task HandlePasswordChange(NetworkStream stream)
         {
-            await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
-            string data = Encoding.ASCII.GetString(signInBuffer);
+            byte[] changeBuffer = new byte[85];
+            await stream.ReadAsync(changeBuffer, 0, changeBuffer.Length);
+            string data = Encoding.ASCII.GetString(changeBuffer);
             data = data.Replace("\0", "");
 
             if (_loginService.ChangePassword(data))

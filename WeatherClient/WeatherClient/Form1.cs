@@ -182,7 +182,7 @@ namespace WeatherClient
                         MessageBox.Show("Incorrect weather period, try different formatting", "Format error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                } while (!data.Contains(location));
+                } while (!data.Contains("Temperature"));
 
                 textBox1.Text = data;
             }
@@ -203,6 +203,8 @@ namespace WeatherClient
 
                 buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxPassword.Text);
                 stream.Write(buffer, 0, buffer.Length);
+
+                buffer = new byte[1024];
 
                 stream.Read(buffer, 0, buffer.Length);
                 string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
