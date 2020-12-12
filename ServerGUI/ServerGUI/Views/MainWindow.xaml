@@ -1,0 +1,24 @@
+﻿<Window x:Class="ServerGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServerGUI"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#505461"
+        BorderThickness="1"
+        BorderBrush="White"
+        Height="450" Width="800">
+
+    <Grid>
+
+        <Grid.Effect>
+            <DropShadowEffect/>
+        </Grid.Effect>
+        
+        <Button x:Name="CloseButton" Content="X" FontSize="16" HorizontalAlignment="Left" Margin="759,10,0,0" VerticalAlignment="Top" Height="26" Width="26"/>
+        <Button x:Name="MinimiseButton" Content="_" FontSize="16" HorizontalAlignment="Left" Margin="728,10,0,0" VerticalAlignment="Top" Width="26" Height="26"/>
+    </Grid>
+</Window>
