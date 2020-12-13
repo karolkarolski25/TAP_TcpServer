@@ -13,11 +13,15 @@ Client and Server can save weather and server logs to .txt file
    </li>                 
  </ul>
 
+Client
+
  <img src="Assets/Client.png">
  
  Connected client can change it's own password for next login
  
  <img src="Assets/PasswordChange.png">
+ 
+ Server
  
  <img src="Assets/Server.png">
  
