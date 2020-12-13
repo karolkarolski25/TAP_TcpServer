@@ -1,0 +1,51 @@
+﻿<Window x:Class="ServerGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:local="clr-namespace:ServerGUI"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#505461"
+        BorderThickness="1"
+        BorderBrush="White"
+        MouseDown="Window_MouseDown"
+        Height="450" Width="800">
+
+    <Grid>
+        <Grid.Effect>
+            <DropShadowEffect/>
+        </Grid.Effect>
+
+        <Button x:Name="ExitButton" Content="X" FontSize="16" HorizontalAlignment="Left" Margin="759,10,0,0" VerticalAlignment="Top" Height="26" Width="26" Click="ExitButton_Click"/>
+        <Button x:Name="MinimiseButton" Content="_" FontSize="16" HorizontalAlignment="Left" Margin="728,10,0,0" VerticalAlignment="Top" Width="26" Height="26" Click="MinimizeButton_Click"/>
+
+        <Grid Margin="28,153,414,176">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Content="Server IP: " FontSize="16" Foreground="White"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="Server Port: " FontSize="16" Foreground="White"/>
+            <TextBox Text="{Binding ServerIP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" Width="167"/>
+            <TextBox Text="{Binding ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Width="167" RenderTransformOrigin="0.486,0.221"/>
+            <Button Command="{Binding StartServerCommand}" Content="Start server" FontSize="16" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Height="29" Width="102" Grid.Column="0" Grid.Row="2"/>
+            <Label Content="{Binding ServerStatus}" Grid.Row="1" FontSize="16" Foreground="White" Margin="118,39,0,-1" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
+        </Grid>
+        <TextBox Text="{Binding ServerLogs}" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" IsReadOnly="True" Margin="407,84,0,0" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Top" Width="354" Height="345"/>
+        <Label Content="Server log" Foreground="White" FontSize="16" HorizontalAlignment="Left" Margin="563,45,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding CurrentTimeAndDate}" FontSize="25" Foreground="White" HorizontalAlignment="Left" Margin="28,23,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding UserStatus}" FontSize="16" Foreground="White" HorizontalAlignment="Left" Margin="36,319,0,0" VerticalAlignment="Top"/>
+        <Button Command="{Binding ClearServerLogsCommang}" Content="Clear logs" FontSize="16" HorizontalAlignment="Left" Margin="407,51,0,0" VerticalAlignment="Top" Width="113" RenderTransformOrigin="0.841,-0.277"/>
+        <Button Command="{Binding SaveLogsCommand}" Content="Save logs" FontSize="16" HorizontalAlignment="Left" Margin="678,51,0,0" VerticalAlignment="Top" Width="83"/>
+
+    </Grid>
+</Window>
