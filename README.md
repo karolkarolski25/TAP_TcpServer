@@ -5,6 +5,8 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
 
 Both server and client contains exception handling, informing user, asking for decision etc.
 
+Client and Server can save weather and server logs to .txt file
+
 <ul>
     <li>     
         Example communication between GUI server and GUI client:
@@ -25,6 +27,7 @@ Both server and client contains exception handling, informing user, asking for d
  <img src="Assets/WeatherError.png">
  <img src="Assets/WrongConf1.png">
  <img src="Assets/WrongConf2.png">
+ <img src="Assets/ServerLogs.png">
  
 <ul>
     <li>
