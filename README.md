@@ -29,6 +29,10 @@ Client and Server can save weather and server logs to .txt file
  <img src="Assets/WrongConf2.png">
  <img src="Assets/ServerLogs.png">
  
+ Weather forecast saved to .txt file
+ 
+ <img src="Assets/SavedData.png">
+ 
 <ul>
     <li>
         Example communication between server and console client after data being successfully fetched:
