@@ -241,6 +241,39 @@ namespace WeatherClient
             cp.Dispose();
         }
 
+        /// <summary>
+        /// Saves weather data to file
+        /// </summary>
+        private void SaveWeather()
+        {
+            try
+            {
+                SaveFileDialog dlg = new SaveFileDialog
+                {
+                    FileName = "Weather forecast",
+                    DefaultExt = ".text",
+                    Filter = "Text documents (.txt)|*.txt"
+                };
+
+                dlg.ShowDialog();
+
+                string filePath = dlg.FileName;
+
+                using var writer = new StreamWriter(filePath);
+
+                writer.Write(ClientLogTextBox.Text);
+
+                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void ConnectButton_Click(object sender, EventArgs e)
         {
             if (connected)
@@ -272,32 +305,7 @@ namespace WeatherClient
 
         private void SaveWeatherButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                SaveFileDialog dlg = new SaveFileDialog
-                {
-                    FileName = "Weather forecast",
-                    DefaultExt = ".text",
-                    Filter = "Text documents (.txt)|*.txt"
-                };
-
-                dlg.ShowDialog();
-
-                string filePath = dlg.FileName;
-
-                using var writer = new StreamWriter(filePath);
-
-                writer.Write(ClientLogTextBox.Text);
-
-                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            SaveWeather();
         }
     }
 }
