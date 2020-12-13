@@ -12,8 +12,20 @@ Both server and client contains exception handling, informing user, asking for d
  </ul>
 
  <img src="Assets/Client.png">
+ 
+ Connected client can change it's own password for next login
+ 
  <img src="Assets/PasswordChange.png">
+ 
  <img src="Assets/Server.png">
+ 
+ Applications provide some user asking methods or informing about exceptions
+ 
+ <img src="Assets/CreatingNewAccount.png">
+ <img src="Assets/WeatherError.png">
+ <img src="Assets/WrongConf1.png">
+ <img src="Assets/WrongConf2.png">
+ 
 <ul>
     <li>
         Example communication between server and console client after data being successfully fetched:
