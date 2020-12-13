@@ -78,7 +78,7 @@ namespace ServerGUI
         {
             _logger.LogError(ex, "Unhandled exception occured");
 
-            MessageBox.Show("Exception occured\nContact with application developers", "Error",
+            MessageBox.Show($"Exception occured\nContact with application developers\n{ex.Message}", "Error",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
