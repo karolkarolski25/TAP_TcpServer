@@ -1,4 +1,5 @@
-﻿using LoginLibrary.Services;
+﻿using LoginLibrary;
+using LoginLibrary.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,10 @@ using ServerGUI.ViewModels;
 using ServerLibrary;
 using ServerLibrary.Services;
 using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using WeatherLibrary;
 using WeatherLibrary.Services;
 
@@ -26,6 +30,7 @@ namespace ServerGUI
             try
             {
                 _configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
                     .Build();
 
@@ -33,12 +38,33 @@ namespace ServerGUI
                 ConfigureServices(servicesCollection);
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
+
+                DispatcherUnhandledException += OnException;
+                TaskScheduler.UnobservedTaskException += OnException;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error occured during application startup\n{ex.Message}", "ERROR",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void OnException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            OnException(e.Exception);
+        }
+
+        private void OnException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            OnException(e.Exception);
+        }
+
+        private void OnException(Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception occured");
+
+            MessageBox.Show("Exception occured\nContact with application developers", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void ConfigureServices(IServiceCollection servicesCollection)
@@ -56,18 +82,26 @@ namespace ServerGUI
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
-                .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
         }
 
-        private void OnApplicationStartup()
+        protected override void OnStartup(StartupEventArgs e)
         {
             _logger = _serviceProvider.GetService<ILogger<App>>();
 
             _logger.LogDebug("Application startup");
 
-            ////_serviceProvider.GetService<MainWindow>().Show();
+            _serviceProvider.GetService<MainWindow>().Show();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _logger.LogInformation("Application exit");
+
+            _serviceProvider.Dispose();
+
+            base.OnExit(e);
         }
     }
 }
