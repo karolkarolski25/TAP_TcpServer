@@ -32,20 +32,21 @@ namespace WeatherClient
             this.textBoxIPAddress = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonConnect = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.ClientLogTextBox = new System.Windows.Forms.TextBox();
             this.textBoxLogin = new System.Windows.Forms.TextBox();
             this.textBoxPassword = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.buttonLogin = new System.Windows.Forms.Button();
+            this.LoginButton = new System.Windows.Forms.Button();
             this.textBoxPort = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxLocation = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.buttonGetWeather = new System.Windows.Forms.Button();
+            this.GetWeatherButton = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.textBoxDate = new System.Windows.Forms.TextBox();
-            this.buttonChangePassword = new System.Windows.Forms.Button();
+            this.ChangePasswordButton = new System.Windows.Forms.Button();
+            this.SaveWeatherButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBoxIPAddress
@@ -75,14 +76,14 @@ namespace WeatherClient
             this.buttonConnect.UseVisualStyleBackColor = true;
             this.buttonConnect.Click += new System.EventHandler(this.ConnectButton_Click);
             // 
-            // textBox1
+            // ClientLogTextBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(334, 14);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(512, 493);
-            this.textBox1.TabIndex = 3;
+            this.ClientLogTextBox.Location = new System.Drawing.Point(334, 14);
+            this.ClientLogTextBox.Multiline = true;
+            this.ClientLogTextBox.Name = "ClientLogTextBox";
+            this.ClientLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ClientLogTextBox.Size = new System.Drawing.Size(512, 493);
+            this.ClientLogTextBox.TabIndex = 3;
             // 
             // textBoxLogin
             // 
@@ -115,20 +116,20 @@ namespace WeatherClient
             this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label3.Location = new System.Drawing.Point(30, 152);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(77, 21);
+            this.label3.Size = new System.Drawing.Size(76, 21);
             this.label3.TabIndex = 7;
             this.label3.Text = "Password";
             // 
-            // buttonLogin
+            // LoginButton
             // 
-            this.buttonLogin.Enabled = false;
-            this.buttonLogin.Location = new System.Drawing.Point(143, 183);
-            this.buttonLogin.Name = "buttonLogin";
-            this.buttonLogin.Size = new System.Drawing.Size(75, 23);
-            this.buttonLogin.TabIndex = 8;
-            this.buttonLogin.Text = "Login";
-            this.buttonLogin.UseVisualStyleBackColor = true;
-            this.buttonLogin.Click += new System.EventHandler(this.LoginButton_Click);
+            this.LoginButton.Enabled = false;
+            this.LoginButton.Location = new System.Drawing.Point(143, 183);
+            this.LoginButton.Name = "LoginButton";
+            this.LoginButton.Size = new System.Drawing.Size(75, 23);
+            this.LoginButton.TabIndex = 8;
+            this.LoginButton.Text = "Login";
+            this.LoginButton.UseVisualStyleBackColor = true;
+            this.LoginButton.Click += new System.EventHandler(this.LoginButton_Click);
             // 
             // textBoxPort
             // 
@@ -143,7 +144,7 @@ namespace WeatherClient
             this.label4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label4.Location = new System.Drawing.Point(65, 45);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 21);
+            this.label4.Size = new System.Drawing.Size(38, 21);
             this.label4.TabIndex = 10;
             this.label4.Text = "Port";
             // 
@@ -160,20 +161,20 @@ namespace WeatherClient
             this.label5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label5.Location = new System.Drawing.Point(3, 255);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(153, 21);
+            this.label5.Size = new System.Drawing.Size(152, 21);
             this.label5.TabIndex = 12;
             this.label5.Text = "Location eg. Warsaw";
             // 
-            // buttonGetWeather
+            // GetWeatherButton
             // 
-            this.buttonGetWeather.Enabled = false;
-            this.buttonGetWeather.Location = new System.Drawing.Point(86, 367);
-            this.buttonGetWeather.Name = "buttonGetWeather";
-            this.buttonGetWeather.Size = new System.Drawing.Size(109, 23);
-            this.buttonGetWeather.TabIndex = 13;
-            this.buttonGetWeather.Text = "Get Weather";
-            this.buttonGetWeather.UseVisualStyleBackColor = true;
-            this.buttonGetWeather.Click += new System.EventHandler(this.GetWeatherButton_Click);
+            this.GetWeatherButton.Enabled = false;
+            this.GetWeatherButton.Location = new System.Drawing.Point(48, 367);
+            this.GetWeatherButton.Name = "GetWeatherButton";
+            this.GetWeatherButton.Size = new System.Drawing.Size(109, 23);
+            this.GetWeatherButton.TabIndex = 13;
+            this.GetWeatherButton.Text = "Get weather";
+            this.GetWeatherButton.UseVisualStyleBackColor = true;
+            this.GetWeatherButton.Click += new System.EventHandler(this.GetWeatherButton_Click);
             // 
             // label6
             // 
@@ -193,40 +194,52 @@ namespace WeatherClient
             this.textBoxDate.Size = new System.Drawing.Size(154, 23);
             this.textBoxDate.TabIndex = 14;
             // 
-            // buttonChangePassword
+            // ChangePasswordButton
             // 
-            this.buttonChangePassword.Enabled = false;
-            this.buttonChangePassword.Location = new System.Drawing.Point(124, 212);
-            this.buttonChangePassword.Name = "buttonChangePassword";
-            this.buttonChangePassword.Size = new System.Drawing.Size(112, 23);
-            this.buttonChangePassword.TabIndex = 16;
-            this.buttonChangePassword.Text = "Change Password";
-            this.buttonChangePassword.UseVisualStyleBackColor = true;
-            this.buttonChangePassword.Click += new System.EventHandler(this.ChangePasswordButton_Click);
+            this.ChangePasswordButton.Enabled = false;
+            this.ChangePasswordButton.Location = new System.Drawing.Point(124, 212);
+            this.ChangePasswordButton.Name = "ChangePasswordButton";
+            this.ChangePasswordButton.Size = new System.Drawing.Size(112, 23);
+            this.ChangePasswordButton.TabIndex = 16;
+            this.ChangePasswordButton.Text = "Change password";
+            this.ChangePasswordButton.UseVisualStyleBackColor = true;
+            this.ChangePasswordButton.Click += new System.EventHandler(this.ChangePasswordButton_Click);
             // 
-            // Form1
+            // SaveWeatherButton
+            // 
+            this.SaveWeatherButton.Enabled = false;
+            this.SaveWeatherButton.Location = new System.Drawing.Point(182, 367);
+            this.SaveWeatherButton.Name = "SaveWeatherButton";
+            this.SaveWeatherButton.Size = new System.Drawing.Size(103, 23);
+            this.SaveWeatherButton.TabIndex = 17;
+            this.SaveWeatherButton.Text = "Save weather";
+            this.SaveWeatherButton.UseVisualStyleBackColor = true;
+            this.SaveWeatherButton.Click += new System.EventHandler(this.SaveWeatherButton_Click);
+            // 
+            // ClientWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(858, 540);
-            this.Controls.Add(this.buttonChangePassword);
+            this.Controls.Add(this.SaveWeatherButton);
+            this.Controls.Add(this.ChangePasswordButton);
             this.Controls.Add(this.textBoxDate);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.buttonGetWeather);
+            this.Controls.Add(this.GetWeatherButton);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBoxLocation);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textBoxPort);
-            this.Controls.Add(this.buttonLogin);
+            this.Controls.Add(this.LoginButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxPassword);
             this.Controls.Add(this.textBoxLogin);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.ClientLogTextBox);
             this.Controls.Add(this.buttonConnect);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxIPAddress);
-            this.Name = "Form1";
+            this.Name = "ClientWindow";
             this.Text = "Weather Client";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -238,20 +251,21 @@ namespace WeatherClient
         private System.Windows.Forms.TextBox textBoxIPAddress;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonConnect;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox ClientLogTextBox;
         private System.Windows.Forms.TextBox textBoxLogin;
         private System.Windows.Forms.TextBox textBoxPassword;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button buttonLogin;
+        private System.Windows.Forms.Button LoginButton;
         private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBoxLocation;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button buttonGetWeather;
+        private System.Windows.Forms.Button GetWeatherButton;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBoxDate;
-        private System.Windows.Forms.Button buttonChangePassword;
+        private System.Windows.Forms.Button ChangePasswordButton;
+        private System.Windows.Forms.Button SaveWeatherButton;
     }
 }
 

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
-using System.Net.Sockets;
 
 namespace WeatherClient
 {
@@ -28,7 +29,7 @@ namespace WeatherClient
 
             if (!int.TryParse(textBoxPort.Text, out port) || (port < 1024 || port > 65535))
             {
-                MessageBox.Show("Wrong port number, try again", "Port error", 
+                MessageBox.Show("Wrong port number, try again", "Port error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 return;
@@ -40,7 +41,7 @@ namespace WeatherClient
             }
             catch
             {
-                MessageBox.Show("Cannot connect to server", "Connection error", 
+                MessageBox.Show("Cannot connect to server", "Connection error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 return;
@@ -53,8 +54,8 @@ namespace WeatherClient
 
             if (Encoding.ASCII.GetString(buffer).Replace("\0", "") == "Login: ")
             {
-                textBox1.Text = "Log in";
-                buttonLogin.Enabled = true;
+                ClientLogTextBox.Text = "Log in";
+                LoginButton.Enabled = true;
                 buttonConnect.Text = "Disconnect";
                 connected = true;
             }
@@ -68,11 +69,12 @@ namespace WeatherClient
             client.Close();
             buttonConnect.Text = "Connect";
             connected = false;
-            buttonLogin.Enabled = false;
-            buttonGetWeather.Enabled = false;
-            buttonChangePassword.Enabled = false;
+            LoginButton.Enabled = false;
+            GetWeatherButton.Enabled = false;
+            SaveWeatherButton.Enabled = true;
+            ChangePasswordButton.Enabled = false;
             buffer = new byte[85];
-            textBox1.Text = "";
+            ClientLogTextBox.Text = "";
         }
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace WeatherClient
 
                 if (message == "Account not found, do you want to create new account? (Y/N): ")
                 {
-                    if(!HandleRegistration())
+                    if (!HandleRegistration())
                     {
                         return;
                     }
@@ -115,11 +117,12 @@ namespace WeatherClient
                 buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);
 
-                textBox1.Text = "Enter Location and number of days or date";
+                ClientLogTextBox.Text = "Enter Location and number of days or date";
 
-                buttonGetWeather.Enabled = true;
-                buttonLogin.Enabled = false;
-                buttonChangePassword.Enabled = true;
+                GetWeatherButton.Enabled = true;
+                SaveWeatherButton.Enabled = true;
+                LoginButton.Enabled = false;
+                ChangePasswordButton.Enabled = true;
             }
         }
 
@@ -129,7 +132,7 @@ namespace WeatherClient
         /// <returns>True if user wants to register, false if user don't want to register</returns>
         private bool HandleRegistration()
         {
-            switch(MessageBox.Show("Do you want to create new account", "Account not found", 
+            switch (MessageBox.Show("Do you want to create new account", "Account not found",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question))
             {
                 case DialogResult.Yes:
@@ -161,7 +164,7 @@ namespace WeatherClient
 
             if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(daysPeriod))
             {
-                MessageBox.Show("Weather location and days period cannot be empty", "Empty weather data", 
+                MessageBox.Show("Weather location and days period cannot be empty", "Empty weather data",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
@@ -188,14 +191,14 @@ namespace WeatherClient
 
                     if (data.Contains("Incorrect weather period, try again"))
                     {
-                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error", 
+                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         return;
                     }
                 } while (!data.Contains("Temperature"));
 
-                textBox1.Text = data;
+                ClientLogTextBox.Text = data;
             }
         }
 
@@ -206,7 +209,7 @@ namespace WeatherClient
         {
             ChangePassword cp = new ChangePassword();
 
-            if(cp.ShowDialog(this) == DialogResult.OK)
+            if (cp.ShowDialog(this) == DialogResult.OK)
             {
                 textBoxPassword.Text = cp.textBoxNewPassword.Text;
 
@@ -225,12 +228,12 @@ namespace WeatherClient
 
                 if (data.Contains("Error"))
                 {
-                    MessageBox.Show("Can't change password, try again", "Error", 
+                    MessageBox.Show("Can't change password, try again", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    MessageBox.Show("Password Changed", "Password Changed", 
+                    MessageBox.Show("Password Changed", "Password Changed",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -265,6 +268,36 @@ namespace WeatherClient
         private void ChangePasswordButton_Click(object sender, EventArgs e)
         {
             ChangePassword();
+        }
+
+        private void SaveWeatherButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveFileDialog dlg = new SaveFileDialog
+                {
+                    FileName = "Weather forecast",
+                    DefaultExt = ".text",
+                    Filter = "Text documents (.txt)|*.txt"
+                };
+
+                dlg.ShowDialog();
+
+                string filePath = dlg.FileName;
+
+                using var writer = new StreamWriter(filePath);
+
+                writer.Write(ClientLogTextBox.Text);
+
+                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
