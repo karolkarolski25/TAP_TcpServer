@@ -5,12 +5,12 @@ Server fetches weather data from OpenWeatherMap API based on given location eg. 
 
 <ul>
     <li>
-        Example communication between server and GUI client:
+        Example communication between GUI server and GUI client:
    </li>                 
  </ul>
 
- <img src="WeatherClient_si3dpipAmR.png">
-
+ <img src="Assets/Client.png">
+ <img src="Assets/Server.png">
 <ul>
     <li>
         Example communication between server and console client after data being successfully fetched:
