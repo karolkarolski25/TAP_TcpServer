@@ -3,14 +3,29 @@ Asynchronous TCP Server
  
 Server fetches weather data from OpenWeatherMap API based on given location eg. warsaw
 
+Both server and client contains exception handling, informing user, asking for decision etc.
+
 <ul>
-    <li>
+    <li>     
         Example communication between GUI server and GUI client:
    </li>                 
  </ul>
 
  <img src="Assets/Client.png">
+ 
+ Connected client can change it's own password for next login
+ 
+ <img src="Assets/PasswordChange.png">
+ 
  <img src="Assets/Server.png">
+ 
+ Applications provide some user asking methods or informing about exceptions
+ 
+ <img src="Assets/CreatingNewAccount.png">
+ <img src="Assets/WeatherError.png">
+ <img src="Assets/WrongConf1.png">
+ <img src="Assets/WrongConf2.png">
+ 
 <ul>
     <li>
         Example communication between server and console client after data being successfully fetched:
