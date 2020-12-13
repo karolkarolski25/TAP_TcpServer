@@ -22,13 +22,13 @@ namespace ServerGUI.ViewModels
         private readonly IServerService _serverService;
         private readonly IEventAggregator _eventAggregator;
 
-        private int usersConnectedCount = 0;
+        private int usersLoggedInCount = 0;
         private DispatcherTimer dispatcherTimer;
 
         public string ServerIP { get; set; }
         public int ServerPort { get; set; }
         public string ServerStatus { get; set; } = "Server status: Waiting";
-        public string UserStatus { get; set; } = "Users conneted: 0";
+        public string UserStatus { get; set; } = "Users logged in: 0";
         public string CurrentTimeAndDate { get; set; } = "OK";
         public string ServerLogs { get; set; } = string.Empty;
         public bool CanStartServer { get; set; } = true;
@@ -150,7 +150,7 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void UserConnected()
         {
-            UserStatus = $"Users connected: {usersConnectedCount++}";
+            UserStatus = $"Users logged in: {++usersLoggedInCount}";
 
             OnPropertyChanged(nameof(UserStatus));
         }
@@ -160,7 +160,7 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void UserDisconnected()
         {
-            UserStatus = $"Users connected: {usersConnectedCount--}";
+            UserStatus = $"Users logged in: {--usersLoggedInCount}";
 
             OnPropertyChanged(nameof(UserStatus));
         }

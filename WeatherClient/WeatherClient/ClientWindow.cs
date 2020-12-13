@@ -9,7 +9,7 @@ namespace WeatherClient
     {
         private string ipAddress;
         private int port;
-        private TcpClient klient;
+        private TcpClient client;
         private byte[] buffer;
         private NetworkStream stream;
         private bool connected = false;
@@ -36,7 +36,7 @@ namespace WeatherClient
 
             try
             {
-                klient = new TcpClient(ipAddress, port);
+                client = new TcpClient(ipAddress, port);
             }
             catch
             {
@@ -46,7 +46,7 @@ namespace WeatherClient
                 return;
             }
 
-            stream = klient.GetStream();
+            stream = client.GetStream();
 
             buffer = new byte[85];
             stream.Read(buffer, 0, 85);
@@ -65,7 +65,7 @@ namespace WeatherClient
         /// </summary>
         private void DisconnectFromServer()
         {
-            klient.Close();
+            client.Close();
             buttonConnect.Text = "Connect";
             connected = false;
             buttonLogin.Enabled = false;

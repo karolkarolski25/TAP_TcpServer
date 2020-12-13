@@ -411,6 +411,7 @@ namespace ServerLibrary.Services
                             await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
                             await HandleLogin(client.GetStream(), signInBuffer, data);
+
                         } while (badCredentials);
 
                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
