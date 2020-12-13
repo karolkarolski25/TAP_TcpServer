@@ -35,14 +35,15 @@
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Grid.Column="0" Content="Server IP: " FontSize="16" Foreground="White"/>
             <Label Grid.Row="1" Grid.Column="0" Content="Server Port: " FontSize="16" Foreground="White"/>
-            <TextBox Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" Width="167"/>
-            <TextBox Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Width="167" RenderTransformOrigin="0.486,0.221"/>
+            <TextBox Text="{Binding ServerIP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" Width="167"/>
+            <TextBox Text="{Binding ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Foreground="White" Background="Transparent" FontSize="16" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Width="167" RenderTransformOrigin="0.486,0.221"/>
             <Button Command="{Binding StartServerCommand}" Content="Start server" FontSize="16" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Height="29" Width="102" Grid.Column="0" Grid.Row="2"/>
-            <Label Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="White" Content="" Margin="57,39,56,0" Grid.RowSpan="2"/>
+            <Label Content="{Binding ServerStatus}" Grid.Row="1" FontSize="16" Foreground="White" Margin="118,39,0,-1" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
         </Grid>
-        <TextBox HorizontalAlignment="Left" Margin="407,84,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="354" Height="345"/>
+        <TextBox HorizontalAlignment="Left" IsReadOnly="True" Margin="407,84,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="354" Height="345"/>
         <Label Content="Server log" Foreground="White" FontSize="16" HorizontalAlignment="Left" Margin="556,48,0,0" VerticalAlignment="Top"/>
-        <Label Content="Label" FontSize="25" Foreground="White" HorizontalAlignment="Left" Margin="28,23,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding CurrentTimeAndDate}" FontSize="25" Foreground="White" HorizontalAlignment="Left" Margin="28,23,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding UserStatus}" FontSize="16" Foreground="White" HorizontalAlignment="Left" Margin="36,319,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

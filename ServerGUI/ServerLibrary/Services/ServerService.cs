@@ -1,7 +1,8 @@
 ﻿using LoginLibrary.Services;
 using Microsoft.Extensions.Logging;
+using Prism.Events;
+using ServerLibrary.Events;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -16,6 +17,7 @@ namespace ServerLibrary.Services
         private readonly IWeatherService _weatherService;
         private readonly ILoginService _loginService;
         private readonly ILogger<ServerService> _logger;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ServerConfiguration _serverConfiguration;
 
         private bool badCredentials = false;
@@ -30,25 +32,26 @@ namespace ServerLibrary.Services
         private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
-            ILoginService loginService, ILogger<ServerService> logger)
+            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator)
         {
             _weatherService = weatherService;
             _loginService = loginService;
             _serverConfiguration = serverConfiguration;
             _logger = logger;
+            _eventAggregator = eventAggregator;
         }
 
         /// <summary>
         /// Checks if given server configuration is correct
         /// </summary>
         /// <returns>True or false</returns>
-        private (bool result, string message) IsServerConfigurationCorrect()
+        private (bool result, string message) IsServerConfigurationCorrect(string ipAddress, int port)
         {
             string wrongServerConfigurationMessage = string.Empty;
 
             try
             {
-                if (_serverConfiguration.Port < 1024 || _serverConfiguration.Port > 65535)
+                if (port < 1024 || port > 65535)
                 {
                     wrongServerConfigurationMessage += "- Port number is wrong\n";
                 }
@@ -58,7 +61,7 @@ namespace ServerLibrary.Services
                     wrongServerConfigurationMessage += "- Buffer size is incorrect\n";
                 }
 
-                IPAddress.Parse(_serverConfiguration.IpAddress);
+                IPAddress.Parse(ipAddress);
 
                 if (wrongServerConfigurationMessage.Length > 0)
                 {
@@ -352,19 +355,21 @@ namespace ServerLibrary.Services
         /// Starts TCP server
         /// </summary>
         /// <returns>Task for tcp server</returns>
-        public async Task StartServer()
+        public async Task StartServer(string ipAddress, int port)
         {
-            var serverConfigurationResult = IsServerConfigurationCorrect();
+            var serverConfigurationResult = IsServerConfigurationCorrect(ipAddress, port);
 
             if (serverConfigurationResult.result)
             {
-                TcpListener server = new TcpListener(IPAddress.Parse(_serverConfiguration.IpAddress), _serverConfiguration.Port);
+                TcpListener server = new TcpListener(IPAddress.Parse(ipAddress), port);
 
                 server.Start();
 
                 Console.WriteLine($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
 
                 _logger.LogInformation($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
+
+                _eventAggregator.GetEvent<ServerStartedEvent>().Publish();
 
                 while (true)
                 {
@@ -373,6 +378,8 @@ namespace ServerLibrary.Services
                     Console.WriteLine("Client connected");
 
                     _logger.LogInformation("Client connected");
+
+                    _eventAggregator.GetEvent<UserConnectedEvent>().Publish();
 
                     byte[] signInBuffer = new byte[_serverConfiguration.LoginBufferSize];
                     byte[] weatherBuffer = new byte[_serverConfiguration.WeatherBufferSize];
@@ -402,17 +409,22 @@ namespace ServerLibrary.Services
                         {
                             if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
                             {
+                                _eventAggregator.GetEvent<UserDisconnectedEvent>().Publish();
+
                                 client.Close();
                             }
                         }
                     });
                 }
             }
+
             else
             {
                 Console.WriteLine($"Server configuration is wrong, \n{serverConfigurationResult.message}");
 
                 _logger.LogInformation("Server configuration is wrong");
+
+                _eventAggregator.GetEvent<WrongServerConfigurationEvent>().Publish(serverConfigurationResult.message);
             }
         }
     }

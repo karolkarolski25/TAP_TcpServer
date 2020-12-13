@@ -4,6 +4,6 @@ namespace ServerLibrary.Services
 {
     public interface IServerService
     {
-        Task StartServer();
+        Task StartServer(string ipAddress, int port);    
     }
 }

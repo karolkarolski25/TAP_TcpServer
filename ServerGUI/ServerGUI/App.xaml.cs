@@ -3,6 +3,7 @@ using LoginLibrary.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Prism.Events;
 using ServerGUI.ViewModels;
 using ServerLibrary;
 using ServerLibrary.Services;
@@ -83,6 +84,7 @@ namespace ServerGUI
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
+                .AddSingleton<IEventAggregator, EventAggregator>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
         }
 
