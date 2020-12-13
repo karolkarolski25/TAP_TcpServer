@@ -129,18 +129,14 @@ namespace ServerGUI.ViewModels
 
         private void UserConnected()
         {
-            usersConnectedCount++;
-
-            UserStatus = $"Users connected: {usersConnectedCount}";
+            UserStatus = $"Users connected: {usersConnectedCount++}";
 
             OnPropertyChanged(nameof(UserStatus));
         }
 
         private void UserDisconnected()
         {
-            usersConnectedCount--;
-
-            UserStatus = $"Users connected: {usersConnectedCount}";
+            UserStatus = $"Users connected: {usersConnectedCount--}";
 
             OnPropertyChanged(nameof(UserStatus));
         }

@@ -122,6 +122,8 @@ namespace ServerLibrary.Services
 
                         await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
 
+                        _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
+
                         string weatherData = await _weatherService.GetWeather(location, days);
 
                         _logger.LogInformation($"Weather for location: {location} for {days} days: \n {weatherData}\n");
@@ -357,8 +359,10 @@ namespace ServerLibrary.Services
         }
 
         /// <summary>
-        /// Starts TCP server
+        /// Start Tcp server
         /// </summary>
+        /// <param name="ipAddress">Server ip address</param>
+        /// <param name="port">Server port number</param>
         /// <returns>Task for tcp server</returns>
         public async Task StartServer(string ipAddress, int port)
         {
@@ -371,9 +375,9 @@ namespace ServerLibrary.Services
                 server.Start();
 
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Starting Server at ipAddress: " +
-                    $"{_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
+                    $"{ipAddress}, port: {port}");
 
-                _logger.LogInformation($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
+                _logger.LogInformation($"Starting Server at ipAddress: {ipAddress}, port: {port}");
 
                 _eventAggregator.GetEvent<ServerStartedEvent>().Publish();
 
@@ -415,7 +419,10 @@ namespace ServerLibrary.Services
                         {
                             if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
                             {
+                                _logger.LogDebug("Client disconnected");
+
                                 _eventAggregator.GetEvent<UserDisconnectedEvent>().Publish();
+                                _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client disconnected");
 
                                 client.Close();
                             }
