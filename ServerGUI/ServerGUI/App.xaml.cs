@@ -39,47 +39,12 @@ namespace ServerGUI
                 ConfigureServices(servicesCollection);
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
-
-                DispatcherUnhandledException += OnException;
-                TaskScheduler.UnobservedTaskException += OnException;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error occured during application startup\n{ex.Message}", "ERROR",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        /// <summary>
-        /// Handles task exceptions
-        /// </summary>
-        /// <param name="sender">sender</param>
-        /// <param name="e">Exeption</param>
-        private void OnException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            OnException(e.Exception);
-        }
-
-        /// <summary>
-        /// Handles exceptions
-        /// </summary>
-        /// <param name="sender">sender</param>
-        /// <param name="e">Exception</param>
-        private void OnException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            OnException(e.Exception);
-        }
-
-        /// <summary>
-        /// Prints exception message to user
-        /// </summary>
-        /// <param name="ex">Occured exception</param>
-        private void OnException(Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled exception occured");
-
-            MessageBox.Show($"Exception occured\nContact with application developers\n{ex.Message}", "Error",
-                MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
