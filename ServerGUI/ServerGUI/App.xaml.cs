@@ -50,16 +50,30 @@ namespace ServerGUI
             }
         }
 
+        /// <summary>
+        /// Handles task exceptions
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">Exeption</param>
         private void OnException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             OnException(e.Exception);
         }
 
+        /// <summary>
+        /// Handles exceptions
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">Exception</param>
         private void OnException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             OnException(e.Exception);
         }
 
+        /// <summary>
+        /// Prints exception message to user
+        /// </summary>
+        /// <param name="ex">Occured exception</param>
         private void OnException(Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception occured");
@@ -68,6 +82,10 @@ namespace ServerGUI
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        /// <summary>
+        /// Configuring dependiences
+        /// </summary>
+        /// <param name="servicesCollection">services collection</param>
         private void ConfigureServices(IServiceCollection servicesCollection)
         {
             var weatherApiConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
@@ -88,6 +106,10 @@ namespace ServerGUI
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
         }
 
+        /// <summary>
+        /// Method called after application startup
+        /// </summary>
+        /// <param name="e">startup event</param>
         protected override void OnStartup(StartupEventArgs e)
         {
             _logger = _serviceProvider.GetService<ILogger<App>>();
@@ -97,6 +119,10 @@ namespace ServerGUI
             _serviceProvider.GetService<MainWindow>().Show();
         }
 
+        /// <summary>
+        /// Method called before application quits
+        /// </summary>
+        /// <param name="e">Exit event</param>
         protected override void OnExit(ExitEventArgs e)
         {
             _logger.LogInformation("Application exit");

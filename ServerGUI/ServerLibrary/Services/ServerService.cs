@@ -294,8 +294,10 @@ namespace ServerLibrary.Services
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
             badCredentials = false;
+
             //Don't know why this was here
             //data = data.Substring(0, data.Length - 1);
+
             if (!_loginService.CheckData(data))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);

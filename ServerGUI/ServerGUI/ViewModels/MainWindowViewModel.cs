@@ -31,10 +31,11 @@ namespace ServerGUI.ViewModels
         public string UserStatus { get; set; } = "Users conneted: 0";
         public string CurrentTimeAndDate { get; set; } = "OK";
         public string ServerLogs { get; set; } = string.Empty;
+        public bool CanStartServer { get; set; } = true;
 
 
         private DelegateCommand _startServerCommand;
-        public DelegateCommand StartServerCommand => _startServerCommand ??= new DelegateCommand(StartServer);
+        public DelegateCommand StartServerCommand => _startServerCommand ??= new DelegateCommand(StartServer).ObservesCanExecute(() => CanStartServer);
 
         private DelegateCommand _clearServerLogsCommand;
         public DelegateCommand ClearServerLogsCommang => _clearServerLogsCommand ??= new DelegateCommand(ClearLogs);
@@ -65,6 +66,9 @@ namespace ServerGUI.ViewModels
             InitializeTimer();
         }
 
+        /// <summary>
+        /// Save server logs in .txt file
+        /// </summary>
         private void SaveLogs()
         {
             try
@@ -95,6 +99,9 @@ namespace ServerGUI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Clear server logs in GUI
+        /// </summary>
         private void ClearLogs()
         {
             ServerLogs = string.Empty;
@@ -102,6 +109,10 @@ namespace ServerGUI.ViewModels
             OnPropertyChanged(nameof(ServerLogs));
         }
 
+        /// <summary>
+        /// Append new logs into GUI
+        /// </summary>
+        /// <param name="obj">new logs</param>
         private void UpdateServerLogs(string obj)
         {
             ServerLogs += $"{obj}\n";
@@ -109,6 +120,9 @@ namespace ServerGUI.ViewModels
             OnPropertyChanged(nameof(ServerLogs));
         }
 
+        /// <summary>
+        /// Start time and date timer
+        /// </summary>
         private void InitializeTimer()
         {
             dispatcherTimer = new DispatcherTimer(DispatcherPriority.Normal);
@@ -122,11 +136,18 @@ namespace ServerGUI.ViewModels
             dispatcherTimer.Start();
         }
 
+        /// <summary>
+        /// Wrong server configuration occured
+        /// </summary>
+        /// <param name="message">error message</param>
         private void WrongServerConfiguration(string message)
         {
             MessageBox.Show($"Wrong server configuration\n{message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        /// <summary>
+        /// New user connected to server
+        /// </summary>
         private void UserConnected()
         {
             UserStatus = $"Users connected: {usersConnectedCount++}";
@@ -134,6 +155,9 @@ namespace ServerGUI.ViewModels
             OnPropertyChanged(nameof(UserStatus));
         }
 
+        /// <summary>
+        /// Client disconnected from server
+        /// </summary>
         private void UserDisconnected()
         {
             UserStatus = $"Users connected: {usersConnectedCount--}";
@@ -141,18 +165,30 @@ namespace ServerGUI.ViewModels
             OnPropertyChanged(nameof(UserStatus));
         }
 
+        /// <summary>
+        /// Tcp server started
+        /// </summary>
         private void ServerStarted()
         {
             ServerStatus = "Status: Running";
 
             OnPropertyChanged(nameof(ServerStatus));
+
+            CanStartServer = false;
         }
 
+        /// <summary>
+        /// Start tcp server
+        /// </summary>
         private async void StartServer()
         {
             await Task.Run(() => _serverService.StartServer(ServerIP, ServerPort));
         }
 
+        /// <summary>
+        /// Updates GUI components
+        /// </summary>
+        /// <param name="propertyName">Property to update</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
             var handler = PropertyChanged;
