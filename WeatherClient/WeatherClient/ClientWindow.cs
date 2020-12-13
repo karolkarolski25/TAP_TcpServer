@@ -20,7 +20,7 @@ namespace WeatherClient
         }
 
         /// <summary>
-        /// Function that connects to server and receives first message from server
+        /// Connects to server and receives first message from server
         /// </summary>
         private void ConnectToServer()
         {
@@ -61,7 +61,7 @@ namespace WeatherClient
         }
 
         /// <summary>
-        /// Function that disconnects from server
+        /// Disconnects from server
         /// </summary>
         private void DisconnectFromServer()
         {
@@ -76,7 +76,7 @@ namespace WeatherClient
         }
 
         /// <summary>
-        /// Function that sends login and password to server
+        /// Sends login and password to server
         /// </summary>
         private void HandleLogin()
         {
@@ -124,7 +124,7 @@ namespace WeatherClient
         }
 
         /// <summary>
-        /// Function that shows popup message if user wants to register account
+        /// Shows popup message if user wants to register account
         /// </summary>
         /// <returns>True if user wants to register, false if user don't want to register</returns>
         private bool HandleRegistration()
@@ -152,9 +152,9 @@ namespace WeatherClient
         }
 
         /// <summary>
-        /// Function that sends location and data to server
+        /// Sends location and date to server
         /// </summary>
-        private void SendLocationAndData()
+        private void SendLocationAndDate()
         {
             string location = textBoxLocation.Text;
             string daysPeriod = textBoxDate.Text;
@@ -199,6 +199,9 @@ namespace WeatherClient
             }
         }
 
+        /// <summary>
+        /// Shows new window to change password and sends data to server
+        /// </summary>
         private void ChangePassword()
         {
             ChangePassword cp = new ChangePassword();
@@ -256,7 +259,7 @@ namespace WeatherClient
 
         private void GetWeatherButton_Click(object sender, EventArgs e)
         {
-            SendLocationAndData();
+            SendLocationAndDate();
         }
 
         private void ChangePasswordButton_Click(object sender, EventArgs e)

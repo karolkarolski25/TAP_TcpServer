@@ -264,7 +264,7 @@ namespace ServerLibrary.Services
         /// Gets password from user
         /// </summary>
         /// <param name="stream">client stream</param>
-        /// <param name="buffer">buffer for weather data</param>
+        /// <param name="buffer">buffer for password data</param>
         /// <param name="data">current string for sign in</param>
         /// <returns>Password from user</returns>
         private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
@@ -285,11 +285,16 @@ namespace ServerLibrary.Services
             return data;
         }
 
+        /// <summary>
+        /// Checks user data in database and register new user
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <param name="signInBuffer">buffer for data about registering</param>
+        /// <param name="data">account data</param>
+        /// <returns>Task for login</returns>
         private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
         {
             badCredentials = false;
-            //Don't know why this was here
-            //data = data.Substring(0, data.Length - 1);
             if (!_loginService.CheckData(data))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
@@ -323,6 +328,11 @@ namespace ServerLibrary.Services
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 
+        /// <summary>
+        /// Changes password in database
+        /// </summary>
+        /// <param name="stream">client stream</param>
+        /// <returns>Task for changing password</returns>
         private async Task HandlePasswordChange(NetworkStream stream)
         {
             byte[] changeBuffer = new byte[85];
