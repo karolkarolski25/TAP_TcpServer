@@ -305,7 +305,9 @@ namespace ServerLibrary.Services
                 if (response[0] == 'Y' || response[0] == 'y')
                 {
                     _loginService.RegisterAccount(data);
-                    Console.WriteLine($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+
+                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+
                     _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
                 }
                 else if (response[0] == 'N' || response[0] == 'n')
@@ -317,7 +319,8 @@ namespace ServerLibrary.Services
             }
             else
             {
-                Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+
                 _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
             }
 
@@ -336,14 +339,16 @@ namespace ServerLibrary.Services
 
             if (_loginService.ChangePassword(data))
             {
-                Console.WriteLine($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+
                 _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
 
                 data = "Password changed\r\n";
             }
             else
             {
-                Console.WriteLine($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+
                 _logger.LogInformation($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
 
                 data = "Error password not changed\r\n";
@@ -365,7 +370,8 @@ namespace ServerLibrary.Services
 
                 server.Start();
 
-                Console.WriteLine($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Starting Server at ipAddress: " +
+                    $"{_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
 
                 _logger.LogInformation($"Starting Server at ipAddress: {_serverConfiguration.IpAddress}, port: {_serverConfiguration.Port}");
 
@@ -375,7 +381,7 @@ namespace ServerLibrary.Services
                 {
                     TcpClient client = await server.AcceptTcpClientAsync();
 
-                    Console.WriteLine("Client connected");
+                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client connected");
 
                     _logger.LogInformation("Client connected");
 
@@ -420,8 +426,6 @@ namespace ServerLibrary.Services
 
             else
             {
-                Console.WriteLine($"Server configuration is wrong, \n{serverConfigurationResult.message}");
-
                 _logger.LogInformation("Server configuration is wrong");
 
                 _eventAggregator.GetEvent<WrongServerConfigurationEvent>().Publish(serverConfigurationResult.message);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Events;
 using ServerLibrary;
@@ -6,7 +7,8 @@ using ServerLibrary.Events;
 using ServerLibrary.Services;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -28,10 +30,17 @@ namespace ServerGUI.ViewModels
         public string ServerStatus { get; set; } = "Server status: Waiting";
         public string UserStatus { get; set; } = "Users conneted: 0";
         public string CurrentTimeAndDate { get; set; } = "OK";
+        public string ServerLogs { get; set; } = string.Empty;
 
 
         private DelegateCommand _startServerCommand;
         public DelegateCommand StartServerCommand => _startServerCommand ??= new DelegateCommand(StartServer);
+
+        private DelegateCommand _clearServerLogsCommand;
+        public DelegateCommand ClearServerLogsCommang => _clearServerLogsCommand ??= new DelegateCommand(ClearLogs);
+
+        private DelegateCommand _saveLogsCommand;
+        public DelegateCommand SaveLogsCommand => _saveLogsCommand ??= new DelegateCommand(SaveLogs);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -51,8 +60,53 @@ namespace ServerGUI.ViewModels
             _eventAggregator.GetEvent<UserConnectedEvent>().Subscribe(UserConnected);
             _eventAggregator.GetEvent<UserDisconnectedEvent>().Subscribe(UserDisconnected);
             _eventAggregator.GetEvent<WrongServerConfigurationEvent>().Subscribe(WrongServerConfiguration);
+            _eventAggregator.GetEvent<ServerLogsChanged>().Subscribe(UpdateServerLogs);
 
             InitializeTimer();
+        }
+
+        private void SaveLogs()
+        {
+            try
+            {
+                SaveFileDialog dlg = new SaveFileDialog
+                {
+                    FileName = "ServerLogs",
+                    DefaultExt = ".text",
+                    Filter = "Text documents (.txt)|*.txt"
+                };
+
+                if (dlg.ShowDialog() == true)
+                {
+                    string filePath = dlg.FileName;
+
+                    using var writer = new StreamWriter(filePath);
+
+                    writer.Write(ServerLogs);
+
+                    MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ClearLogs()
+        {
+            ServerLogs = string.Empty;
+
+            OnPropertyChanged(nameof(ServerLogs));
+        }
+
+        private void UpdateServerLogs(string obj)
+        {
+            ServerLogs += $"{obj}\n";
+
+            OnPropertyChanged(nameof(ServerLogs));
         }
 
         private void InitializeTimer()
@@ -63,21 +117,9 @@ namespace ServerGUI.ViewModels
             {
                 CurrentTimeAndDate = DateTime.Now.ToString("dddd, dd MMMM, yyyy\n\tHH:mm:ss");
 
-                OnPropertyChanged("CurrentTimeAndDate");
-
-                Trace.WriteLine(CurrentTimeAndDate);
+                OnPropertyChanged(nameof(CurrentTimeAndDate));
             };
             dispatcherTimer.Start();
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
         }
 
         private void WrongServerConfiguration(string message)
@@ -90,6 +132,8 @@ namespace ServerGUI.ViewModels
             usersConnectedCount++;
 
             UserStatus = $"Users connected: {usersConnectedCount}";
+
+            OnPropertyChanged(nameof(UserStatus));
         }
 
         private void UserDisconnected()
@@ -97,16 +141,30 @@ namespace ServerGUI.ViewModels
             usersConnectedCount--;
 
             UserStatus = $"Users connected: {usersConnectedCount}";
+
+            OnPropertyChanged(nameof(UserStatus));
         }
 
         private void ServerStarted()
         {
             ServerStatus = "Status: Running";
+
+            OnPropertyChanged(nameof(ServerStatus));
         }
 
-        private void StartServer()
+        private async void StartServer()
         {
-            _serverService.StartServer(ServerIP, ServerPort).Wait();
+            await Task.Run(() => _serverService.StartServer(ServerIP, ServerPort));
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            var handler = PropertyChanged;
+
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

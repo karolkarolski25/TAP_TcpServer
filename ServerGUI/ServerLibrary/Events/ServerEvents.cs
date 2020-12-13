@@ -11,4 +11,9 @@ namespace ServerLibrary.Events
     {
 
     }
+
+    public class ServerLogsChanged : PubSubEvent<string>
+    {
+
+    }
 }
