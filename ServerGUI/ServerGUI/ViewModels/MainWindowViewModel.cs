@@ -25,6 +25,8 @@ namespace ServerGUI.ViewModels
         private int usersLoggedInCount = 0;
         private DispatcherTimer dispatcherTimer;
 
+        private bool canSaveLogs = false;
+
         public string ServerIP { get; set; }
         public int ServerPort { get; set; }
         public string ServerStatus { get; set; } = "Server status: Waiting";
@@ -71,31 +73,48 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void SaveLogs()
         {
-            try
+            if (canSaveLogs)
             {
-                SaveFileDialog dlg = new SaveFileDialog
+                try
                 {
-                    FileName = "ServerLogs",
-                    DefaultExt = ".text",
-                    Filter = "Text documents (.txt)|*.txt"
-                };
+                    SaveFileDialog dlg = new SaveFileDialog
+                    {
+                        FileName = "Server logs",
+                        DefaultExt = ".text",
+                        Filter = "Text documents (.txt)|*.txt"
+                    };
 
-                if (dlg.ShowDialog() == true)
+                    if (dlg.ShowDialog() == true)
+                    {
+                        string filePath = dlg.FileName;
+
+                        using var writer = new StreamWriter(filePath);
+
+                        writer.Write(ServerLogs);
+
+                        MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    string filePath = dlg.FileName;
-
-                    using var writer = new StreamWriter(filePath);
-
-                    writer.Write(ServerLogs);
-
-                    MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                switch (MessageBox.Show("Cannot save logs when server is stopped\nDo you want to start server?", "Information",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Information))
+                {
+                    case MessageBoxResult.Yes:
+                        StartServer();
+                        break;
+                    case MessageBoxResult.No:
+                    case MessageBoxResult.Cancel:
+                    default:
+                        break;
+                }
             }
         }
 
@@ -170,11 +189,12 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void ServerStarted()
         {
-            ServerStatus = "Status: Running";
+            ServerStatus = "Server status: Running";
 
             OnPropertyChanged(nameof(ServerStatus));
 
             CanStartServer = false;
+            canSaveLogs = true;
         }
 
         /// <summary>
