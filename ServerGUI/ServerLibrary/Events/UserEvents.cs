@@ -2,7 +2,7 @@
 
 namespace ServerLibrary.Events
 {
-    public class UserConnectedEvent : PubSubEvent
+    public class UserLoggedInEvent : PubSubEvent
     {
 
     }

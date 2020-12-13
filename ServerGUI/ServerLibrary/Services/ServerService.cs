@@ -325,6 +325,8 @@ namespace ServerLibrary.Services
             {
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
 
+                _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
+
                 _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
             }
 
@@ -390,8 +392,6 @@ namespace ServerLibrary.Services
                     _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client connected");
 
                     _logger.LogInformation("Client connected");
-
-                    _eventAggregator.GetEvent<UserConnectedEvent>().Publish();
 
                     byte[] signInBuffer = new byte[_serverConfiguration.LoginBufferSize];
                     byte[] weatherBuffer = new byte[_serverConfiguration.WeatherBufferSize];
