@@ -1,7 +1,7 @@
 ﻿
 namespace WeatherClient
 {
-    partial class Form1
+    partial class ClientWindow
     {
         /// <summary>
         ///  Required designer variable.
@@ -73,7 +73,7 @@ namespace WeatherClient
             this.buttonConnect.TabIndex = 2;
             this.buttonConnect.Text = "Connect";
             this.buttonConnect.UseVisualStyleBackColor = true;
-            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
+            this.buttonConnect.Click += new System.EventHandler(this.ConnectButton_Click);
             // 
             // textBox1
             // 
@@ -128,7 +128,7 @@ namespace WeatherClient
             this.buttonLogin.TabIndex = 8;
             this.buttonLogin.Text = "Login";
             this.buttonLogin.UseVisualStyleBackColor = true;
-            this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
+            this.buttonLogin.Click += new System.EventHandler(this.LoginButton_Click);
             // 
             // textBoxPort
             // 
@@ -173,7 +173,7 @@ namespace WeatherClient
             this.buttonGetWeather.TabIndex = 13;
             this.buttonGetWeather.Text = "Get Weather";
             this.buttonGetWeather.UseVisualStyleBackColor = true;
-            this.buttonGetWeather.Click += new System.EventHandler(this.buttonGetWeather_Click);
+            this.buttonGetWeather.Click += new System.EventHandler(this.GetWeatherButton_Click);
             // 
             // label6
             // 
@@ -202,7 +202,7 @@ namespace WeatherClient
             this.buttonChangePassword.TabIndex = 16;
             this.buttonChangePassword.Text = "Change Password";
             this.buttonChangePassword.UseVisualStyleBackColor = true;
-            this.buttonChangePassword.Click += new System.EventHandler(this.buttonChangePassword_Click);
+            this.buttonChangePassword.Click += new System.EventHandler(this.ChangePasswordButton_Click);
             // 
             // Form1
             // 

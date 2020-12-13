@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace WeatherClient
 {
-    public partial class Form1 : Form
+    public partial class ClientWindow : Form
     {
         private string ipAddress;
         private int port;
@@ -14,7 +14,7 @@ namespace WeatherClient
         private NetworkStream stream;
         private bool connected = false;
 
-        public Form1()
+        public ClientWindow()
         {
             InitializeComponent();
         }
@@ -28,7 +28,9 @@ namespace WeatherClient
 
             if (!int.TryParse(textBoxPort.Text, out port) || (port < 1024 || port > 65535))
             {
-                MessageBox.Show("Wrong port number, try again", "Port error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Wrong port number, try again", "Port error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return;
             }
 
@@ -38,7 +40,9 @@ namespace WeatherClient
             }
             catch
             {
-                MessageBox.Show("Can't connect to server");
+                MessageBox.Show("Cannot connect to server", "Connection error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return;
             }
 
@@ -125,7 +129,8 @@ namespace WeatherClient
         /// <returns>True if user wants to register, false if user don't want to register</returns>
         private bool HandleRegistration()
         {
-            switch(MessageBox.Show("Do you want to create new account", "Account not found", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+            switch(MessageBox.Show("Do you want to create new account", "Account not found", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question))
             {
                 case DialogResult.Yes:
                     buffer = Encoding.ASCII.GetBytes("Y");
@@ -156,7 +161,8 @@ namespace WeatherClient
 
             if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(daysPeriod))
             {
-                MessageBox.Show("Weather location and days period cannot be empty", "Empty weather data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Weather location and days period cannot be empty", "Empty weather data", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
@@ -172,14 +178,19 @@ namespace WeatherClient
                 stream.Write(buffer, 0, buffer.Length);
 
                 buffer = new byte[2048];
+
                 string data = "";
+
                 do
                 {
                     stream.Read(buffer, 0, buffer.Length);
                     data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
                     if (data.Contains("Incorrect weather period, try again"))
                     {
-                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                         return;
                     }
                 } while (!data.Contains("Temperature"));
@@ -211,22 +222,25 @@ namespace WeatherClient
 
                 if (data.Contains("Error"))
                 {
-                    MessageBox.Show("Can't change password, try again", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Can't change password, try again", "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    MessageBox.Show("Password Changed", "Password Changed", MessageBoxButtons.OK);
+                    MessageBox.Show("Password Changed", "Password Changed", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
 
             cp.Dispose();
         }
 
-        private void buttonConnect_Click(object sender, EventArgs e)
+        private void ConnectButton_Click(object sender, EventArgs e)
         {
             if (connected)
             {
                 DisconnectFromServer();
+
                 return;
             }
             else
@@ -235,17 +249,17 @@ namespace WeatherClient
             }
         }
 
-        private void buttonLogin_Click(object sender, EventArgs e)
+        private void LoginButton_Click(object sender, EventArgs e)
         {
             HandleLogin();
         }
 
-        private void buttonGetWeather_Click(object sender, EventArgs e)
+        private void GetWeatherButton_Click(object sender, EventArgs e)
         {
             SendLocationAndData();
         }
 
-        private void buttonChangePassword_Click(object sender, EventArgs e)
+        private void ChangePasswordButton_Click(object sender, EventArgs e)
         {
             ChangePassword();
         }

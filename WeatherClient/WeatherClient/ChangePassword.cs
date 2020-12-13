@@ -13,6 +13,7 @@ namespace WeatherClient
         public ChangePassword()
         {
             InitializeComponent();
+
             buttonChange.DialogResult = DialogResult.OK;
         }
     }
