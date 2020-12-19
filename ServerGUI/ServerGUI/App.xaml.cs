@@ -56,6 +56,7 @@ namespace ServerGUI
             var weatherApiConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
             var serverConfiguration = _configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>();
             var cryptoConfiguration = _configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
+            //var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
 
             servicesCollection
                 .AddSingleton(_configuration)
