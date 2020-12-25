@@ -8,14 +8,14 @@ namespace StorageLibrary.Mappers
     {
         public void Configure(EntityTypeBuilder<UserData> builder)
         {
+            builder.HasIndex(p => p.Usernane)
+                .IsUnique();
+
             builder.Property(p => p.Usernane)
                 .IsRequired();
 
             builder.Property(p => p.Password)
                 .IsRequired();
-
-            builder.HasIndex(p => p.Usernane)
-                .IsUnique();
         }
     }
 }
