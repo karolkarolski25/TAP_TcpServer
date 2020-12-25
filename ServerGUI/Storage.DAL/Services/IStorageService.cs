@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StorageLibrary.Services
+namespace Storage.DAL.Servies
 {
     public interface IStorageService
     {

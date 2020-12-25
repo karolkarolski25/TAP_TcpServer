@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StorageLibrary.Services
+namespace Storage.DAL.Servies
 {
     public class StorageService : IStorageService
     {

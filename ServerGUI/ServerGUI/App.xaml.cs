@@ -7,9 +7,9 @@ using Prism.Events;
 using ServerGUI.ViewModels;
 using ServerLibrary;
 using ServerLibrary.Services;
+using Storage.DAL;
 using StorageLibrary;
 using StorageLibrary.Context;
-using StorageLibrary.Services;
 using System;
 using System.IO;
 using System.Windows;
@@ -54,25 +54,21 @@ namespace ServerGUI
         /// <param name="servicesCollection">services collection</param>
         private void ConfigureServices(IServiceCollection servicesCollection)
         {
-            var weatherApiConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
-            var serverConfiguration = _configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>();
-            var cryptoConfiguration = _configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
-            var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
-
             servicesCollection
                 .AddSingleton(_configuration)
-                .AddSingleton(weatherApiConfiguration)
-                .AddSingleton(serverConfiguration)
-                .AddSingleton(cryptoConfiguration)
+                .AddSingleton(_configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>())
+                .AddSingleton(_configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>())
+                .AddSingleton(_configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>())
+                .AddSingleton(_configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>())
                 .AddSingleton<MainWindow>()
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
                 .AddSingleton<IEventAggregator, EventAggregator>()
-                .AddSingleton<IStorageService, StorageService>()
-                .AddDbContext<IUserDataContext, UserDataContext>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
+
+            servicesCollection.RegisterDALDependencies();
         }
 
         /// <summary>
