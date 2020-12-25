@@ -7,11 +7,12 @@ using Prism.Events;
 using ServerGUI.ViewModels;
 using ServerLibrary;
 using ServerLibrary.Services;
+using StorageLibrary;
+using StorageLibrary.Context;
+using StorageLibrary.Services;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 using WeatherLibrary;
 using WeatherLibrary.Services;
 
@@ -56,7 +57,7 @@ namespace ServerGUI
             var weatherApiConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
             var serverConfiguration = _configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>();
             var cryptoConfiguration = _configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
-            //var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
+            var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
 
             servicesCollection
                 .AddSingleton(_configuration)
@@ -69,6 +70,8 @@ namespace ServerGUI
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
                 .AddSingleton<IEventAggregator, EventAggregator>()
+                .AddSingleton<IStorageService, StorageService>()
+                .AddDbContext<IUserDataContext, UserDataContext>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
         }
 
