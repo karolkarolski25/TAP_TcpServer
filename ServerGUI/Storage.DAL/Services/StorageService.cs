@@ -90,7 +90,7 @@ namespace Storage.DAL
 
             try
             {
-                await _userDataContext.DatabaseFacade.MigrateAsync();
+                await _userDataContext.Database.MigrateAsync();
             }
             finally
             {

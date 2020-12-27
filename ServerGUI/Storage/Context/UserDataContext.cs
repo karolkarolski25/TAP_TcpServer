@@ -9,8 +9,6 @@ namespace Storage.Context
     {
         public DbSet<UserData> UserDatas { get; set; }
 
-        public DatabaseFacade DatabaseFacade { get; }
-
         private readonly DatabaseConfiguration _databaseConfiguration;
 
         public UserDataContext(DatabaseConfiguration databaseConfiguration,
@@ -28,6 +26,7 @@ namespace Storage.Context
             if (!dbContextOptionsBuilder.IsConfigured)
             {
                 dbContextOptionsBuilder.UseSqlServer(_databaseConfiguration.ConnectionString);
+                base.OnConfiguring(dbContextOptionsBuilder);
             }
         }
 

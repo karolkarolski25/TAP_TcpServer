@@ -10,7 +10,6 @@ using ServerGUI.ViewModels;
 using Storage;
 using Storage.DAL;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,19 +41,7 @@ namespace ServerGUI
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
 
-                Task.Run(async () =>
-                {
-                    var storageService = _serviceProvider.GetRequiredService<IStorageService>();
-
-                    try
-                    {
-                        await storageService.MigrateAsync();
-                    }
-                    catch
-                    {
-                        Trace.WriteLine("ERROR");
-                    }
-                });
+                Task.Run(async () => await _serviceProvider.GetRequiredService<IStorageService>().MigrateAsync());
             }
             catch (Exception ex)
             {
@@ -97,11 +84,11 @@ namespace ServerGUI
         /// <param name="e">startup event</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            _logger = _serviceProvider.GetService<ILogger<App>>();
+            _logger = _serviceProvider.GetRequiredService<ILogger<App>>();
 
             _logger.LogDebug("Application startup");
 
-            _serviceProvider.GetService<MainWindow>().Show();
+            _serviceProvider.GetRequiredService<MainWindow>().Show();
         }
 
         /// <summary>
