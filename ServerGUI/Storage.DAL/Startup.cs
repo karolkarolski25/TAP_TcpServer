@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using StorageLibrary.Context;
+using Storage.Context;
 
 namespace Storage.DAL
 {

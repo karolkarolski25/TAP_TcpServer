@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using StorageLibrary.Context;
-using StorageLibrary.Models;
+using Storage.Context;
+using Storage.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -138,7 +138,7 @@ namespace Storage.DAL
         public void UpdateData(UserData userData)
         {
             UserDatas.Usernane = userData.Usernane;
-            UserDatas.Password = UserDatas.Password;
+            UserDatas.Password = userData.Password;
         }
     }
 }

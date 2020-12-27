@@ -1,20 +1,21 @@
-﻿using LoginLibrary;
-using LoginLibrary.Services;
+﻿using Login;
+using Login.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
+using Server;
+using Server.Services;
 using ServerGUI.ViewModels;
-using ServerLibrary;
-using ServerLibrary.Services;
+using Storage;
 using Storage.DAL;
-using StorageLibrary;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using WeatherLibrary;
-using WeatherLibrary.Services;
+using Weather;
+using Weather.Services;
 
 namespace ServerGUI
 {
@@ -51,7 +52,7 @@ namespace ServerGUI
                     }
                     catch
                     {
-                        Console.WriteLine("ERROR");
+                        Trace.WriteLine("ERROR");
                     }
                 });
             }

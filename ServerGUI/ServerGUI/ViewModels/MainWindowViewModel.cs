@@ -2,9 +2,9 @@
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Events;
-using ServerLibrary;
-using ServerLibrary.Events;
-using ServerLibrary.Services;
+using Server;
+using Server.Events;
+using Server.Services;
 using System;
 using System.ComponentModel;
 using System.IO;

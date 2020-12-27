@@ -33,11 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LoginLibrary\Login.csproj" />
-    <ProjectReference Include="..\ServerLibrary\Server.csproj" />
+    <ProjectReference Include="..\Login\Login.csproj" />
+    <ProjectReference Include="..\Server\Server.csproj" />
     <ProjectReference Include="..\Storage.DAL\Storage.DAL.csproj" />
-    <ProjectReference Include="..\StorageLibrary\Storage.csproj" />
-    <ProjectReference Include="..\WeatherLibrary\Weather.csproj" />
+    <ProjectReference Include="..\Storage\Storage.csproj" />
+    <ProjectReference Include="..\Weather\Weather.csproj" />
   </ItemGroup>
 
   <ItemGroup>
