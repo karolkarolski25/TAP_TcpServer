@@ -48,9 +48,10 @@ namespace Storage.DAL
 
             if (userToEdit != null)
             {
-                _logger.LogInformation($"Changed password for user: {userToEdit.Usernane}");
+                _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Usernane}");
 
-                userToEdit.Password = UserDatas.Password;
+                userToEdit.Password = UserDatas?.Password;
+                userToEdit.FavouriteLocation = UserDatas?.FavouriteLocation;
 
                 await SaveChangesAsync();
             }
@@ -139,6 +140,7 @@ namespace Storage.DAL
         {
             UserDatas.Usernane = userData.Usernane;
             UserDatas.Password = userData.Password;
+            UserDatas.FavouriteLocation = userData?.FavouriteLocation;
         }
     }
 }
