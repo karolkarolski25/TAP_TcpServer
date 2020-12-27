@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LoginLibrary\LoginLibrary.csproj" />
-    <ProjectReference Include="..\WeatherLibrary\WeatherLibrary.csproj" />
+    <ProjectReference Include="..\LoginLibrary\Login.csproj" />
+    <ProjectReference Include="..\WeatherLibrary\Weather.csproj" />
   </ItemGroup>
 
 </Project>

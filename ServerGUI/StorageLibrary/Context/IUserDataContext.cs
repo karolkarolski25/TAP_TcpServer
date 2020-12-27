@@ -9,7 +9,7 @@ namespace StorageLibrary.Context
     public interface IUserDataContext
     {
         DbSet<UserData> UserDatas { get; set; }
-        DatabaseFacade Database { get; }
+        DatabaseFacade DatabaseFacade { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

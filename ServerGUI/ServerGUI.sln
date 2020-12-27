@@ -5,15 +5,15 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerGUI", "ServerGUI\ServerGUI.csproj", "{45004A0E-0FF7-4746-A3E8-BC64F645DD90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoginLibrary", "LoginLibrary\LoginLibrary.csproj", "{AB0730BB-E582-4635-A6EC-B600D7B6A273}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Login", "LoginLibrary\Login.csproj", "{AB0730BB-E582-4635-A6EC-B600D7B6A273}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherLibrary", "WeatherLibrary\WeatherLibrary.csproj", "{E55B04D0-3F36-438E-B324-211B4698D9A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weather", "WeatherLibrary\Weather.csproj", "{E55B04D0-3F36-438E-B324-211B4698D9A6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerLibrary", "ServerLibrary\ServerLibrary.csproj", "{E9790173-B341-4070-AB0C-EEC27EEF5CC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "ServerLibrary\Server.csproj", "{E9790173-B341-4070-AB0C-EEC27EEF5CC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StorageLibrary", "StorageLibrary\StorageLibrary.csproj", "{D835B323-661B-44DD-8BBB-9853744FB966}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "StorageLibrary\Storage.csproj", "{D835B323-661B-44DD-8BBB-9853744FB966}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.DAL", "Storage.DAL\Storage.DAL.csproj", "{1C87E846-0628-4FC6-90BC-19EDF3BB712B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.DAL", "Storage.DAL\Storage.DAL.csproj", "{B8370B71-9DD0-4D65-87D3-74245468A31B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{D835B323-661B-44DD-8BBB-9853744FB966}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D835B323-661B-44DD-8BBB-9853744FB966}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D835B323-661B-44DD-8BBB-9853744FB966}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1C87E846-0628-4FC6-90BC-19EDF3BB712B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C87E846-0628-4FC6-90BC-19EDF3BB712B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1C87E846-0628-4FC6-90BC-19EDF3BB712B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C87E846-0628-4FC6-90BC-19EDF3BB712B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8370B71-9DD0-4D65-87D3-74245468A31B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8370B71-9DD0-4D65-87D3-74245468A31B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8370B71-9DD0-4D65-87D3-74245468A31B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8370B71-9DD0-4D65-87D3-74245468A31B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

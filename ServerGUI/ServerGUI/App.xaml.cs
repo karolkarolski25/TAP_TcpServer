@@ -9,9 +9,9 @@ using ServerLibrary;
 using ServerLibrary.Services;
 using Storage.DAL;
 using StorageLibrary;
-using StorageLibrary.Context;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using WeatherLibrary;
 using WeatherLibrary.Services;
@@ -40,6 +40,20 @@ namespace ServerGUI
                 ConfigureServices(servicesCollection);
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
+
+                Task.Run(async () =>
+                {
+                    var storageService = _serviceProvider.GetRequiredService<IStorageService>();
+
+                    try
+                    {
+                        await storageService.MigrateAsync();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("ERROR");
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -54,12 +68,17 @@ namespace ServerGUI
         /// <param name="servicesCollection">services collection</param>
         private void ConfigureServices(IServiceCollection servicesCollection)
         {
+            var weatherConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
+            var serverConfiguration = _configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>();
+            var cryptoConfiguration = _configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
+            var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
+
             servicesCollection
                 .AddSingleton(_configuration)
-                .AddSingleton(_configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>())
-                .AddSingleton(_configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>())
-                .AddSingleton(_configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>())
-                .AddSingleton(_configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>())
+                .AddSingleton(weatherConfiguration)
+                .AddSingleton(serverConfiguration)
+                .AddSingleton(cryptoConfiguration)
+                .AddSingleton(databaseConfiguration)
                 .AddSingleton<MainWindow>()
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<IWeatherService, WeatherService>()
@@ -68,7 +87,7 @@ namespace ServerGUI
                 .AddSingleton<IEventAggregator, EventAggregator>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
 
-            servicesCollection.RegisterDALDependencies();
+            servicesCollection.RegisterDALDependiences();
         }
 
         /// <summary>

@@ -7,11 +7,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.DAL.Servies
+namespace Storage.DAL
 {
     public class StorageService : IStorageService
     {
-        public UserData UserData { get; set; }
+        public UserData UserDatas { get; set; }
 
         private readonly ILogger<StorageService> _logger;
         private readonly IUserDataContext _userDataContext;
@@ -23,9 +23,13 @@ namespace Storage.DAL.Servies
             _userDataContext = userDataContext;
             _logger = logger;
 
-            UserData = new UserData();
+            UserDatas = new UserData();
         }
 
+        /// <summary>
+        /// Add new user to database
+        /// </summary>
+        /// <param name="userData">new user data</param>
         public async void AddUserDataAsync(UserData userData)
         {
             _userDataContext.UserDatas.Add(userData);
@@ -35,24 +39,31 @@ namespace Storage.DAL.Servies
             await SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Edit user or add new
+        /// </summary>
         public async void EditData()
         {
-            var userToEdit = _userDataContext.UserDatas.FirstOrDefault(d => d.Usernane == UserData.Usernane);
+            var userToEdit = _userDataContext.UserDatas.FirstOrDefault(d => d.Usernane == UserDatas.Usernane);
 
             if (userToEdit != null)
             {
                 _logger.LogInformation($"Changed password for user: {userToEdit.Usernane}");
 
-                userToEdit.Password = UserData.Password;
+                userToEdit.Password = UserDatas.Password;
 
                 await SaveChangesAsync();
             }
             else
             {
-                AddUserDataAsync(UserData);
+                AddUserDataAsync(UserDatas);
             }
         }
 
+        /// <summary>
+        /// Get all users
+        /// </summary>
+        /// <returns>List containing all users</returns>
         public async Task<List<UserData>> GetUserDataAsync()
         {
             await semaphoreSlim.WaitAsync();
@@ -69,13 +80,17 @@ namespace Storage.DAL.Servies
             return _userDataContext.UserDatas.Local.ToList();
         }
 
+        /// <summary>
+        /// Apply migrations
+        /// </summary>
+        /// <returns>Task</returns>
         public async Task MigrateAsync()
         {
             await semaphoreSlim.WaitAsync();
 
             try
             {
-                await _userDataContext.Database.MigrateAsync();
+                await _userDataContext.DatabaseFacade.MigrateAsync();
             }
             finally
             {
@@ -83,7 +98,11 @@ namespace Storage.DAL.Servies
             }
         }
 
-        public async void RemoveUserDataAsynv(UserData userData)
+        /// <summary>
+        /// Remove specified user from database
+        /// </summary>
+        /// <param name="userData">User to delete</param>
+        public async void RemoveUserDataAsync(UserData userData)
         {
             _userDataContext.UserDatas.Remove(userData);
 
@@ -92,6 +111,10 @@ namespace Storage.DAL.Servies
             await SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Save pending data to database
+        /// </summary>
+        /// <returns>Task</returns>
         public async Task SaveChangesAsync()
         {
             await semaphoreSlim.WaitAsync();
@@ -108,10 +131,14 @@ namespace Storage.DAL.Servies
             }
         }
 
+        /// <summary>
+        /// Updates specified user
+        /// </summary>
+        /// <param name="userData"></param>
         public void UpdateData(UserData userData)
         {
-            UserData.Usernane = userData.Usernane;
-            UserData.Password = UserData.Password;
+            UserDatas.Usernane = userData.Usernane;
+            UserDatas.Password = UserDatas.Password;
         }
     }
 }

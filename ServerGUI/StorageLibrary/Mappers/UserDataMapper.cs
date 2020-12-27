@@ -6,6 +6,10 @@ namespace StorageLibrary.Mappers
 {
     public class UserDataMapper : IEntityTypeConfiguration<UserData>
     {
+        /// <summary>
+        /// Configures database
+        /// </summary>
+        /// <param name="builder">Database scheme</param>
         public void Configure(EntityTypeBuilder<UserData> builder)
         {
             builder.HasIndex(p => p.Usernane)

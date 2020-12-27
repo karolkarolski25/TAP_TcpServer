@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using StorageLibrary.Mappers;
 using StorageLibrary.Models;
 
@@ -8,6 +9,8 @@ namespace StorageLibrary.Context
     {
         public DbSet<UserData> UserDatas { get; set; }
 
+        public DatabaseFacade DatabaseFacade { get; }
+
         private readonly DatabaseConfiguration _databaseConfiguration;
 
         public UserDataContext(DatabaseConfiguration databaseConfiguration,
@@ -16,12 +19,22 @@ namespace StorageLibrary.Context
             _databaseConfiguration = databaseConfiguration;
         }
 
+        /// <summary>
+        /// Configure database
+        /// </summary>
+        /// <param name="dbContextOptionsBuilder">database options</param>
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
         {
-            dbContextOptionsBuilder.UseSqlServer(_databaseConfiguration.ConnectionString);
-            //dbContextOptionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = UserDataDb; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False");
+            if (!dbContextOptionsBuilder.IsConfigured)
+            {
+                dbContextOptionsBuilder.UseSqlServer(_databaseConfiguration.ConnectionString);
+            }
         }
 
+        /// <summary>
+        /// Apply database configuration
+        /// </summary>
+        /// <param name="modelBuilder">Database builder</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserDataMapper());
