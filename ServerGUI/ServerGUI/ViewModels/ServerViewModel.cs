@@ -14,9 +14,9 @@ using System.Windows.Threading;
 
 namespace ServerGUI.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class ServerViewModel : INotifyPropertyChanged
     {
-        private readonly ILogger<MainWindowViewModel> _logger;
+        private readonly ILogger<ServerViewModel> _logger;
         private readonly ServerConfiguration _serverConfiguration;
         private readonly IServiceProvider _serviceProvider;
         private readonly IServerService _serverService;
@@ -47,7 +47,7 @@ namespace ServerGUI.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public MainWindowViewModel(ILogger<MainWindowViewModel> logger, IServiceProvider serviceProvider,
+        public ServerViewModel(ILogger<ServerViewModel> logger, IServiceProvider serviceProvider,
             IServerService serverService, ServerConfiguration serverConfiguration, IEventAggregator eventAggregator)
         {
             _logger = logger;

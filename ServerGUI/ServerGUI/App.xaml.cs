@@ -68,7 +68,7 @@ namespace ServerGUI
                 .AddSingleton(cryptoConfiguration)
                 .AddSingleton(databaseConfiguration)
                 .AddSingleton<MainWindow>()
-                .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<ServerViewModel>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()

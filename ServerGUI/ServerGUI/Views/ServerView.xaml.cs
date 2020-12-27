@@ -9,7 +9,7 @@ namespace ServerGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(MainWindowViewModel mainWindowViewModel)
+        public MainWindow(ServerViewModel mainWindowViewModel)
         {
             DataContext = mainWindowViewModel;
 
