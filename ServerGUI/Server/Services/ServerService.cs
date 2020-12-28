@@ -257,13 +257,7 @@ namespace Server.Services
 
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
-            string data = Encoding.ASCII.GetString(buffer);
-
-            data = data.Replace("\0", "");
-
-            data += ";";
-
-            return data;
+            return Encoding.ASCII.GetString(buffer).Replace("\0", "");
         }
 
         /// <summary>
@@ -273,7 +267,7 @@ namespace Server.Services
         /// <param name="buffer">buffer for weather data</param>
         /// <param name="data">current string for sign in</param>
         /// <returns>Password from user</returns>
-        private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer, string data)
+        private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer)
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
@@ -284,21 +278,17 @@ namespace Server.Services
 
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
-            data += Encoding.ASCII.GetString(buffer);
-
-            data = data.Replace("\0", "");
-
-            return data;
+            return Encoding.ASCII.GetString(buffer).Replace("\0", "");
         }
 
-        private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string data)
+        private async Task HandleLogin(NetworkStream stream, byte[] signInBuffer, string login, string password)
         {
             badCredentials = false;
 
             //Don't know why this was here
             //data = data.Substring(0, data.Length - 1);
 
-            if (!_loginService.CheckData(data))
+            if (! await _loginService.CheckData(login, password))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
 
@@ -308,11 +298,11 @@ namespace Server.Services
 
                 if (response[0] == 'Y' || response[0] == 'y')
                 {
-                    _loginService.RegisterAccount(data);
+                    _loginService.RegisterAccount(login, password);
 
-                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {login} registered");
 
-                    _logger.LogInformation($"New user: {data.Substring(0, data.IndexOf(';'))} registered");
+                    _logger.LogInformation($"New user: {login} registered");
                 }
                 else if (response[0] == 'N' || response[0] == 'n')
                 {
@@ -323,15 +313,14 @@ namespace Server.Services
             }
             else
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} logged in");
 
                 _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
-                _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} logged in");
+                _logger.LogInformation($"User: {login} logged in");
             }
 
-            data = data.Substring(0, data.IndexOf(';'));
-            data = "Welcome " + data + "\r\n";
+            string data = "Welcome " + login + "\r\n";
 
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
@@ -343,7 +332,10 @@ namespace Server.Services
             string data = Encoding.ASCII.GetString(changeBuffer);
             data = data.Replace("\0", "");
 
-            if (_loginService.ChangePassword(data))
+            string login = data.Substring(0, data.IndexOf(';'));
+            string password = data.Substring(login.Length);
+
+            if (await _loginService.ChangePassword(login, password))
             {
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
 
@@ -398,39 +390,39 @@ namespace Server.Services
 
                     string data = string.Empty;
 
-                    Task.Run(async () =>
-                    {
-                        do
-                        {
-                            data = await GetLoginString(client.GetStream(), signInBuffer);
+                    await Task.Run(async () =>
+                     {
+                         do
+                         {
+                             var login = await GetLoginString(client.GetStream(), signInBuffer);
 
-                            await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                             await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                            data = await GetPasswordString(client.GetStream(), signInBuffer, data);
+                             var password = await GetPasswordString(client.GetStream(), signInBuffer);
 
-                            await client.GetStream().ReadAsync(signInBuffer, 0, 2);
+                             await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
-                            await HandleLogin(client.GetStream(), signInBuffer, data);
+                             await HandleLogin(client.GetStream(), signInBuffer, login, password);
 
-                        } while (badCredentials);
+                         } while (badCredentials);
 
-                        await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
 
-                        await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
+                         await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
 
-                        while (true)
-                        {
-                            if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
-                            {
-                                _logger.LogDebug("Client disconnected");
+                         while (true)
+                         {
+                             if (await ProcessWeatherCommunication(client.GetStream(), weatherBuffer) == "exit")
+                             {
+                                 _logger.LogDebug("Client disconnected");
 
-                                _eventAggregator.GetEvent<UserDisconnectedEvent>().Publish();
-                                _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client disconnected");
+                                 _eventAggregator.GetEvent<UserDisconnectedEvent>().Publish();
+                                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client disconnected");
 
-                                client.Close();
-                            }
-                        }
-                    });
+                                 client.Close();
+                             }
+                         }
+                     });
                 }
             }
 

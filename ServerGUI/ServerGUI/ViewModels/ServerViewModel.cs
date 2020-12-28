@@ -5,6 +5,8 @@ using Prism.Events;
 using Server;
 using Server.Events;
 using Server.Services;
+using Storage.DAL;
+using Storage.Models;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -21,6 +23,7 @@ namespace ServerGUI.ViewModels
         private readonly IServiceProvider _serviceProvider;
         private readonly IServerService _serverService;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IStorageService _storageService;
 
         private int usersLoggedInCount = 0;
         private DispatcherTimer dispatcherTimer;
@@ -48,13 +51,14 @@ namespace ServerGUI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ServerViewModel(ILogger<ServerViewModel> logger, IServiceProvider serviceProvider,
-            IServerService serverService, ServerConfiguration serverConfiguration, IEventAggregator eventAggregator)
+            IServerService serverService, ServerConfiguration serverConfiguration, IEventAggregator eventAggregator, IStorageService storageService)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _serverService = serverService;
             _serverConfiguration = serverConfiguration;
             _eventAggregator = eventAggregator;
+            _storageService = storageService;
 
             ServerIP = _serverConfiguration.IpAddress;
             ServerPort = _serverConfiguration.Port;
@@ -202,6 +206,8 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private async void StartServer()
         {
+            
+
             await Task.Run(() => _serverService.StartServer(ServerIP, ServerPort));
         }
 

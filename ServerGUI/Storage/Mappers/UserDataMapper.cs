@@ -12,10 +12,10 @@ namespace Storage.Mappers
         /// <param name="builder">Database scheme</param>
         public void Configure(EntityTypeBuilder<UserData> builder)
         {
-            builder.HasIndex(p => p.Usernane)
+            builder.HasIndex(p => p.Login)
                 .IsUnique();
 
-            builder.Property(p => p.Usernane)
+            builder.Property(p => p.Login)
                 .IsRequired();
 
             builder.Property(p => p.Password)

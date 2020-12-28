@@ -1,9 +1,11 @@
-﻿namespace Login.Services
+﻿using System.Threading.Tasks;
+
+namespace Login.Services
 {
     public interface ILoginService
     {
-        bool RegisterAccount(string data);
-        bool CheckData(string data);
-        bool ChangePassword(string data);
+        Task<bool> RegisterAccount(string login, string password);
+        Task<bool> CheckData(string login, string password);
+        Task<bool> ChangePassword(string login, string password);
     }
 }

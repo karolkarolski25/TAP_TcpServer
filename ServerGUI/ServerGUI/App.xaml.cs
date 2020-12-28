@@ -89,6 +89,8 @@ namespace ServerGUI
             _logger.LogDebug("Application startup");
 
             _serviceProvider.GetRequiredService<MainWindow>().Show();
+
+            //_serviceProvider.GetRequiredService<ILoginService>().RegisterAccount("qwe;qwe");
         }
 
         /// <summary>

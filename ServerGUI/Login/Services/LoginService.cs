@@ -3,7 +3,9 @@ using Storage.DAL;
 using Storage.Models;
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Login.Services
 {
@@ -30,69 +32,43 @@ namespace Login.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns>True if operation was succesfull</returns>
-        public bool ChangePassword(string data)
+        public async Task<bool> ChangePassword(string login, string password)
         {
-            FileStream fileStream = null;
-            CryptoStream cryptoStream = null;
-            StreamReader streamReader = null;
-            string dbData;
-            data += "|";
-            try
-            {
-                fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Read);
-                streamReader = new StreamReader(cryptoStream);
-                dbData = streamReader.ReadToEnd();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+            byte[] encryptedPassword;
 
-                _logger.LogInformation(e.Message);
-
+            if (!(await _storageService.GetUserDataAsync()).Any(u => u.Login == login))
+            {
                 return false;
             }
-            finally
-            {
-                streamReader.Close();
-                cryptoStream.Close();
-                fileStream.Close();
-            }
-
-            string login = data.Substring(0, data.IndexOf(";"));
-            int position = dbData.IndexOf(login);
-
-            dbData = dbData.Remove(position, dbData.IndexOf("|", position));
-
-            dbData = dbData + data;
 
             try
             {
-                fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Write);
-
-                byte[] binaryData = new byte[dbData.Length];
-
-                for (int i = 0; i < dbData.Length; i++)
+                using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    binaryData[i] = (byte)dbData[i];
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(cryptoConfiguration.Key, 
+                        cryptoConfiguration.IV), CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(password);
+                        }
+                        encryptedPassword = msEncrypt.ToArray();
+                    }
                 }
 
-                cryptoStream.Write(binaryData, 0, binaryData.Length);
+                _storageService.UpdateData(new UserData()
+                {
+                    Login = login,
+                    Password = encryptedPassword
+                });
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-
                 _logger.LogInformation(e.Message);
 
                 return false;
             }
-            finally
-            {
-                cryptoStream.Close();
-                fileStream.Close();
-            }
+
             return true;
         }
 
@@ -101,50 +77,41 @@ namespace Login.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns>Information if user is in database</returns>
-        public bool CheckData(string data)
+        public async Task<bool> CheckData(string login, string password)
         {
+            string decryptedPassword;
+
+            var encryptedPassword = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login).Password;
+
+            if (encryptedPassword == null)
+            {
+                return false;
+            }
+
             try
             {
-                FileStream fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-
-                CryptoStream cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(cryptoConfiguration.Key,
-                    cryptoConfiguration.IV), CryptoStreamMode.Read);
-
-                StreamReader streamReader = new StreamReader(cryptoStream);
-
-                string dbData;
-
-                try
+                using (MemoryStream msDecrypt = new MemoryStream(encryptedPassword))
                 {
-                    dbData = streamReader.ReadToEnd();
-
-                    foreach (var line in dbData.Split('|'))
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, aes.CreateDecryptor(cryptoConfiguration.Key,
+                        cryptoConfiguration.IV), CryptoStreamMode.Read))
                     {
-                        if (line == data)
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
-                            return true;
+                            decryptedPassword = srDecrypt.ReadToEnd();
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
 
-                    _logger.LogInformation(e.Message);
-                }
-                finally
+                if (decryptedPassword == password)
                 {
-                    streamReader.Close();
-                    cryptoStream.Close();
-                    fileStream.Close();
+                    return true;
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-
                 _logger.LogInformation(e.Message);
             }
+
             return false;
         }
 
@@ -153,63 +120,43 @@ namespace Login.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns>Status of registration</returns>
-        public bool RegisterAccount(string data)
+        public async Task<bool> RegisterAccount(string login, string password)
         {
-            FileStream fileStream = null;
-            CryptoStream cryptoStream = null;
-            StreamReader streamReader = null;
-            string dbData;
-            data += "|";
-            try
-            {
-                fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Read);
-                streamReader = new StreamReader(cryptoStream);
-                dbData = streamReader.ReadToEnd();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+            byte[] encryptedPassword;
 
-                _logger.LogInformation(e.Message);
-
+            if ((await _storageService.GetUserDataAsync()).Any(u => u.Login == login))
+            {
                 return false;
             }
-            finally
-            {
-                streamReader.Close();
-                cryptoStream.Close();
-                fileStream.Close();
-            }
-            dbData = dbData + data;
 
             try
             {
-                fileStream = new FileStream("NotPasswords.bin", FileMode.OpenOrCreate);
-                cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(cryptoConfiguration.Key, cryptoConfiguration.IV), CryptoStreamMode.Write);
-
-                byte[] binaryData = new byte[dbData.Length];
-
-                for (int i = 0; i < dbData.Length; i++)
+                using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    binaryData[i] = (byte)dbData[i];
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(cryptoConfiguration.Key, 
+                        cryptoConfiguration.IV), CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(password);
+                        }
+                        encryptedPassword = msEncrypt.ToArray();
+                    }
                 }
 
-                cryptoStream.Write(binaryData, 0, binaryData.Length);
+                _storageService.UpdateData(new UserData()
+                {
+                    Login = login,
+                    Password = encryptedPassword
+                });
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-
                 _logger.LogInformation(e.Message);
 
                 return false;
             }
-            finally
-            {
-                cryptoStream.Close();
-                fileStream.Close();
-            }
+
             return true;
         }
     }

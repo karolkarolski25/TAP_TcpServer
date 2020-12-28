@@ -34,7 +34,7 @@ namespace Storage.DAL
         {
             _userDataContext.UserDatas.Add(userData);
 
-            _logger.LogInformation($"Added new user: {userData.Usernane}");
+            _logger.LogInformation($"Added new user: {userData.Login}");
 
             await SaveChangesAsync();
         }
@@ -44,14 +44,13 @@ namespace Storage.DAL
         /// </summary>
         public async void EditData()
         {
-            var userToEdit = _userDataContext.UserDatas.FirstOrDefault(d => d.Usernane == UserDatas.Usernane);
+            var userToEdit = _userDataContext.UserDatas.FirstOrDefault(d => d.Login == UserDatas.Login);
 
             if (userToEdit != null)
             {
-                _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Usernane}");
+                _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Login}");
 
-                userToEdit.Password = UserDatas?.Password;
-                userToEdit.FavouriteLocation = UserDatas?.FavouriteLocation;
+                UserDatas.Password = userToEdit.Password;
 
                 await SaveChangesAsync();
             }
@@ -59,6 +58,18 @@ namespace Storage.DAL
             {
                 AddUserDataAsync(UserDatas);
             }
+        }
+
+        /// <summary>
+        /// Updates specified user
+        /// </summary>
+        /// <param name="userData"></param>
+        public void UpdateData(UserData userData)
+        {
+            UserDatas.Login = userData.Login;
+            UserDatas.Password = userData.Password;
+
+            EditData();
         }
 
         /// <summary>
@@ -107,7 +118,7 @@ namespace Storage.DAL
         {
             _userDataContext.UserDatas.Remove(userData);
 
-            _logger.LogInformation($"Removed user: {userData.Usernane}");
+            _logger.LogInformation($"Removed user: {userData.Login}");
 
             await SaveChangesAsync();
         }
@@ -130,17 +141,6 @@ namespace Storage.DAL
             {
                 semaphoreSlim.Release();
             }
-        }
-
-        /// <summary>
-        /// Updates specified user
-        /// </summary>
-        /// <param name="userData"></param>
-        public void UpdateData(UserData userData)
-        {
-            UserDatas.Usernane = userData.Usernane;
-            UserDatas.Password = userData.Password;
-            UserDatas.FavouriteLocation = userData?.FavouriteLocation;
         }
     }
 }
