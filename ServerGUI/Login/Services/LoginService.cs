@@ -12,16 +12,16 @@ namespace Login.Services
     public class LoginService : ILoginService
     {
         private readonly Aes aes;
-        private readonly CryptoConfiguration cryptoConfiguration;
+        private readonly CryptoConfiguration _cryptoConfiguration;
 
         private readonly ILogger<LoginService> _logger;
         private readonly IStorageService _storageService;
 
-        public LoginService(CryptoConfiguration _cryptoConfiguration, ILogger<LoginService> logger,
+        public LoginService(CryptoConfiguration cryptoConfiguration, ILogger<LoginService> logger,
             IStorageService storageService)
         {
             _logger = logger;
-            cryptoConfiguration = _cryptoConfiguration;
+            _cryptoConfiguration = cryptoConfiguration;
             _storageService = storageService;
 
             aes = Aes.Create();
@@ -45,8 +45,8 @@ namespace Login.Services
             {
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(cryptoConfiguration.Key, 
-                        cryptoConfiguration.IV), CryptoStreamMode.Write))
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(_cryptoConfiguration.Key, 
+                        _cryptoConfiguration.IV), CryptoStreamMode.Write))
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
@@ -92,8 +92,8 @@ namespace Login.Services
             {
                 using (MemoryStream msDecrypt = new MemoryStream(encryptedPassword))
                 {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, aes.CreateDecryptor(cryptoConfiguration.Key,
-                        cryptoConfiguration.IV), CryptoStreamMode.Read))
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, aes.CreateDecryptor(_cryptoConfiguration.Key,
+                        _cryptoConfiguration.IV), CryptoStreamMode.Read))
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
@@ -133,8 +133,8 @@ namespace Login.Services
             {
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(cryptoConfiguration.Key, 
-                        cryptoConfiguration.IV), CryptoStreamMode.Write))
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(_cryptoConfiguration.Key, 
+                        _cryptoConfiguration.IV), CryptoStreamMode.Write))
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
