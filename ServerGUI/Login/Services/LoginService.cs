@@ -81,7 +81,7 @@ namespace Login.Services
         {
             string decryptedPassword;
 
-            var encryptedPassword = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login).Password;
+            var encryptedPassword = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login);
 
             if (encryptedPassword == null)
             {
@@ -90,7 +90,7 @@ namespace Login.Services
 
             try
             {
-                using (MemoryStream msDecrypt = new MemoryStream(encryptedPassword))
+                using (MemoryStream msDecrypt = new MemoryStream(encryptedPassword.Password))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, aes.CreateDecryptor(_cryptoConfiguration.Key,
                         _cryptoConfiguration.IV), CryptoStreamMode.Read))

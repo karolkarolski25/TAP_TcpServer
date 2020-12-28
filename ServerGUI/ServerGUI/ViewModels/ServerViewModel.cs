@@ -206,8 +206,6 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private async void StartServer()
         {
-            
-
             await Task.Run(() => _serverService.StartServer(ServerIP, ServerPort));
         }
 

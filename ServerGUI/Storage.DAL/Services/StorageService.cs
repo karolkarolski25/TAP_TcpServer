@@ -50,7 +50,7 @@ namespace Storage.DAL
             {
                 _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Login}");
 
-                UserDatas.Password = userToEdit.Password;
+                userToEdit.Password = UserDatas.Password;
 
                 await SaveChangesAsync();
             }

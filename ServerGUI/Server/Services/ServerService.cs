@@ -288,7 +288,7 @@ namespace Server.Services
             //Don't know why this was here
             //data = data.Substring(0, data.Length - 1);
 
-            if (! await _loginService.CheckData(login, password))
+            if (!await _loginService.CheckData(login, password))
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
 
@@ -296,15 +296,15 @@ namespace Server.Services
 
                 string response = Encoding.ASCII.GetString(signInBuffer);
 
-                if (response[0] == 'Y' || response[0] == 'y')
+                if (char.ToUpper(response[0]) == 'Y')
                 {
-                    _loginService.RegisterAccount(login, password);
+                    await _loginService.RegisterAccount(login, password);
 
                     _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {login} registered");
 
                     _logger.LogInformation($"New user: {login} registered");
                 }
-                else if (response[0] == 'N' || response[0] == 'n')
+                else if (char.ToUpper(response[0]) == 'N')
                 {
                     badCredentials = true;
                     await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
@@ -333,7 +333,7 @@ namespace Server.Services
             data = data.Replace("\0", "");
 
             string login = data.Substring(0, data.IndexOf(';'));
-            string password = data.Substring(login.Length);
+            string password = data.Substring(data.IndexOf(';') + 1);
 
             if (await _loginService.ChangePassword(login, password))
             {
@@ -390,7 +390,7 @@ namespace Server.Services
 
                     string data = string.Empty;
 
-                    await Task.Run(async () =>
+                    Task.Run(async () =>
                      {
                          do
                          {
