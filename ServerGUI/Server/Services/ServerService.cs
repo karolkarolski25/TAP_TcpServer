@@ -250,10 +250,7 @@ namespace Server.Services
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
 
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = 0;
-            }
+            Array.Clear(buffer, 0, buffer.Length);
 
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
@@ -271,10 +268,7 @@ namespace Server.Services
         {
             await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
 
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = 0;
-            }
+            Array.Clear(buffer, 0, buffer.Length);
 
             await stream.ReadAsync(buffer, 0, buffer.Length);
 
@@ -320,7 +314,7 @@ namespace Server.Services
                 _logger.LogInformation($"User: {login} logged in");
             }
 
-            string data = "Welcome " + login + "\r\n";
+            string data = $"Welcome {login}\r\n";
 
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
