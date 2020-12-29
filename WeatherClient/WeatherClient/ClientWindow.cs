@@ -113,6 +113,13 @@ namespace WeatherClient
                         return;
                     }
                 }
+                else if(message == "Bad password, try again")
+                {
+                    MessageBox.Show("Bad password, try again", "Bad password", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    buffer = new byte[85];
+                    stream.Read(buffer, 0, 85);
+                    return;
+                }
 
                 buffer = new byte[1024];
                 stream.Read(buffer, 0, buffer.Length);

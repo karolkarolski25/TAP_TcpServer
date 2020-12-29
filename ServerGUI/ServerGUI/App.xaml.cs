@@ -1,19 +1,20 @@
-﻿using LoginLibrary;
-using LoginLibrary.Services;
+﻿using Login;
+using Login.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
+using Server;
+using Server.Services;
 using ServerGUI.ViewModels;
-using ServerLibrary;
-using ServerLibrary.Services;
+using Storage;
+using Storage.DAL;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
-using WeatherLibrary;
-using WeatherLibrary.Services;
+using Weather;
+using Weather.Services;
 
 namespace ServerGUI
 {
@@ -39,6 +40,8 @@ namespace ServerGUI
                 ConfigureServices(servicesCollection);
 
                 _serviceProvider = servicesCollection.BuildServiceProvider();
+
+                Task.Run(async () => await _serviceProvider.GetRequiredService<IStorageService>().MigrateAsync());
             }
             catch (Exception ex)
             {
@@ -53,22 +56,26 @@ namespace ServerGUI
         /// <param name="servicesCollection">services collection</param>
         private void ConfigureServices(IServiceCollection servicesCollection)
         {
-            var weatherApiConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
+            var weatherConfiguration = _configuration.GetSection("WeatherApi").Get<WeatherApiConfiguration>();
             var serverConfiguration = _configuration.GetSection("ServerConfiguration").Get<ServerConfiguration>();
             var cryptoConfiguration = _configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
+            var databaseConfiguration = _configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
 
             servicesCollection
                 .AddSingleton(_configuration)
-                .AddSingleton(weatherApiConfiguration)
+                .AddSingleton(weatherConfiguration)
                 .AddSingleton(serverConfiguration)
                 .AddSingleton(cryptoConfiguration)
+                .AddSingleton(databaseConfiguration)
                 .AddSingleton<MainWindow>()
-                .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<ServerViewModel>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
                 .AddSingleton<IEventAggregator, EventAggregator>()
                 .AddLogging(builder => builder.AddFile(_configuration.GetSection("Logs")));
+
+            servicesCollection.RegisterDALDependiences();
         }
 
         /// <summary>
@@ -77,11 +84,11 @@ namespace ServerGUI
         /// <param name="e">startup event</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            _logger = _serviceProvider.GetService<ILogger<App>>();
+            _logger = _serviceProvider.GetRequiredService<ILogger<App>>();
 
             _logger.LogDebug("Application startup");
 
-            _serviceProvider.GetService<MainWindow>().Show();
+            _serviceProvider.GetRequiredService<MainWindow>().Show();
         }
 
         /// <summary>
