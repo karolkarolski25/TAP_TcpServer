@@ -208,10 +208,11 @@ namespace WeatherClient
                 buffer = new byte[2048];
 
                 string data = "";
+                int locationsCount = location.Where(c => c == ',').Count() + 1;
 
                 ClientLogTextBox.Clear();
 
-                for (int i = 0; i < location.Where(c => c == ',').Sum(c => c) + 1; i++)
+                for (int i = 0; i < locationsCount; i++)
                 {
                     do
                     {

@@ -106,7 +106,7 @@ namespace Server.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fetching data from API\r\n.
+        ///   Looks up a localized string similar to Fetching data from API.
         /// </summary>
         internal static string FethcingDataFromAPIMessage {
             get {
