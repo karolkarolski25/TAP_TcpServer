@@ -79,7 +79,7 @@ namespace Server.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login:.
+        ///   Looks up a localized string similar to Login: .
         /// </summary>
         internal static string EnterLoginMessage {
             get {
@@ -88,7 +88,7 @@ namespace Server.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Password:.
+        ///   Looks up a localized string similar to Password: .
         /// </summary>
         internal static string EnterPasswordMessage {
             get {

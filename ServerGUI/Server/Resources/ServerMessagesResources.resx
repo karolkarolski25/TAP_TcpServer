@@ -124,10 +124,10 @@
     <value>Enter location (Only english letters, exit to disconnect):</value>
   </data>
   <data name="EnterLoginMessage" xml:space="preserve">
-    <value>Login:</value>
+    <value>Login: </value>
   </data>
   <data name="EnterPasswordMessage" xml:space="preserve">
-    <value>Password:</value>
+    <value>Password: </value>
   </data>
   <data name="EnterTimePeriodMessage" xml:space="preserve">
     <value>Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020):</value>
