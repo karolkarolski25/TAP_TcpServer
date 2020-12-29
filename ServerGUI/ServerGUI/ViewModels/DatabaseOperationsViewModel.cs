@@ -152,19 +152,16 @@ namespace ServerGUI.ViewModels
                 MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
-
-                    var userToRemove = SelectedUser;
-
-                    if (userToRemove != null)
+                    if (SelectedUser != null)
                     {
-                        _storageService.RemoveUserDataAsync(userToRemove);
+                        _storageService.RemoveUserDataAsync(SelectedUser);
 
-                        UsersDataView.Remove(userToRemove);
+                        UsersDataView.Remove(SelectedUser);
 
-                        MessageBox.Show($"User {userToRemove.Login} sucessfully deleted", "Deletion complete",
+                        MessageBox.Show($"User {SelectedUser.Login} sucessfully deleted", "Deletion complete",
                             MessageBoxButton.OK, MessageBoxImage.Information);
 
-                        _logger.LogInformation($"User {userToRemove.Login} sucessfully deleted");
+                        _logger.LogInformation($"User {SelectedUser.Login} sucessfully deleted");
 
                         canEditUser = false;
                         OnPropertyChanged(nameof(canEditUser));
