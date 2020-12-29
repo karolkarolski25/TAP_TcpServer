@@ -97,7 +97,8 @@ namespace ServerGUI.ViewModels
 
                     _logger.LogInformation($"User {NewLogin} added with default password: 1234");
 
-                    UsersDataView.Add(newUser);
+                    UsersDataView = new ObservableCollection<UserData>(await _storageService.GetUserDataAsync());
+                    OnPropertyChanged(nameof(UsersDataView));
 
                     NewUserVisibility = Visibility.Collapsed;
                     OnPropertyChanged(nameof(NewUserVisibility));
@@ -156,12 +157,12 @@ namespace ServerGUI.ViewModels
                     {
                         _storageService.RemoveUserDataAsync(SelectedUser);
 
-                        UsersDataView.Remove(SelectedUser);
-
                         MessageBox.Show($"User {SelectedUser.Login} sucessfully deleted", "Deletion complete",
                             MessageBoxButton.OK, MessageBoxImage.Information);
 
                         _logger.LogInformation($"User {SelectedUser.Login} sucessfully deleted");
+
+                        UsersDataView.Remove(SelectedUser);
 
                         canEditUser = false;
                         OnPropertyChanged(nameof(canEditUser));
