@@ -228,6 +228,8 @@ namespace WeatherClient
                     } while (!data.Contains("Temperature"));
 
                     ClientLogTextBox.Text += data;
+
+                    Array.Clear(buffer, 0, buffer.Length);
                 }
             }
         }

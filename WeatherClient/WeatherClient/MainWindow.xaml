@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WeatherClient"
         mc:Ignorable="d"
-        Title="Weather Client" Height="400" Width="705">
+        Title="Weather Client" Height="420" Width="705">
     <Grid >
-        <TextBox x:Name="ClientLogTextBox" Margin="338,24,44,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="336"/>
+        <TextBox x:Name="ClientLogTextBox" Margin="338,24,30,0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Top" Height="336"/>
 
         <Label Content="IP" HorizontalAlignment="Left" Margin="28,24,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="textBoxIPAddress" HorizontalAlignment="Left" Margin="95,28,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="150"/>
