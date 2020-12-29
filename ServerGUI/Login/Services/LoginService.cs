@@ -84,7 +84,7 @@ namespace Login.Services
 
             var user = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login);
 
-            if (user.Login == null)
+            if (user == null)
             {
                 return UserLoginSettings.UserNotExists;
             }
