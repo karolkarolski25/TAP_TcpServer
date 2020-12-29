@@ -72,6 +72,7 @@ namespace ServerGUI
                 .AddSingleton<ServerViewModel>()
                 .AddTransient<DatabaseOperationsView>()
                 .AddSingleton<DatabaseOperationsViewModel>()
+                .AddSingleton<ICryptoService, CryptoService>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()

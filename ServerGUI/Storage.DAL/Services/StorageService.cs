@@ -90,7 +90,7 @@ namespace Storage.DAL
                 semaphoreSlim.Release();
             }
 
-            return _userDataContext.UserDatas.Local.ToList();
+            return _userDataContext.UserDatas.ToList();
         }
 
         /// <summary>

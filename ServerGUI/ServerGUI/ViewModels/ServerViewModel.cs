@@ -8,7 +8,6 @@ using Server.Events;
 using Server.Services;
 using ServerGUI.Views;
 using Storage.DAL;
-using Storage.Models;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -215,6 +214,8 @@ namespace ServerGUI.ViewModels
 
             CanStartServer = false;
             canSaveLogs = true;
+
+            OnPropertyChanged(nameof(CanStartServer));
         }
 
         /// <summary>
