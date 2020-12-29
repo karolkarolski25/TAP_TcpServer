@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace WeatherClient
@@ -10,7 +12,7 @@ namespace WeatherClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Client : Window
     {
         private string ipAddress;
         private int port;
@@ -19,9 +21,21 @@ namespace WeatherClient
         private NetworkStream stream;
         private bool connected = false;
 
-        public MainWindow()
+        public Client()
         {
             InitializeComponent();
+
+#if DEBUG
+            textBoxIPAddress.Text = "127.0.0.1";
+            textBoxPort.Text = "2048";
+
+            textBoxLogin.Text = "qwe";
+            textBoxPassword.Text = "qwe";
+
+            textBoxLocation.Text = "Warsaw,Berlin";
+            textBoxDate.Text = "3";
+#endif
+
         }
 
         /// <summary>
@@ -84,7 +98,7 @@ namespace WeatherClient
         /// <summary>
         /// Sends login and password to server
         /// </summary>
-        private void HandleLogin()
+        private async void HandleLogin()
         {
             buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text);
 
@@ -93,7 +107,7 @@ namespace WeatherClient
 
             buffer = new byte[85];
 
-            stream.Read(buffer, 0, 85);
+            await stream.ReadAsync(buffer, 0, 85);
 
             string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
@@ -101,18 +115,18 @@ namespace WeatherClient
             {
                 buffer = Encoding.ASCII.GetBytes(textBoxPassword.Text);
 
-                stream.Write(buffer, 0, buffer.Length);
-                stream.Write(buffer, 0, 2);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer, 0, 2);
 
                 buffer = new byte[85];
 
-                stream.Read(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 string message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
                 if (message == "Account not found, do you want to create new account? (Y/N): ")
                 {
-                    if (!HandleRegistration())
+                    if (!await HandleRegistration())
                     {
                         return;
                     }
@@ -121,12 +135,12 @@ namespace WeatherClient
                 {
                     MessageBox.Show("Bad password, try again", "Bad password", MessageBoxButton.OK, MessageBoxImage.Error);
                     buffer = new byte[85];
-                    stream.Read(buffer, 0, 85);
+                    await stream.ReadAsync(buffer, 0, 85);
                     return;
                 }
 
                 buffer = new byte[1024];
-                stream.Read(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 ClientLogTextBox.Text = "Enter Location and number of days or date";
 
@@ -141,24 +155,24 @@ namespace WeatherClient
         /// Shows popup message if user wants to register account
         /// </summary>
         /// <returns>True if user wants to register, false if user don't want to register</returns>
-        private bool HandleRegistration()
+        private async Task<bool> HandleRegistration()
         {
             switch (MessageBox.Show("Do you want to create new account", "Account not found",
                 MessageBoxButton.YesNo, MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
                     buffer = Encoding.ASCII.GetBytes("Y");
-                    stream.Write(buffer, 0, buffer.Length);
+                    await stream.WriteAsync(buffer, 0, buffer.Length);
                     buffer = new byte[85];
-                    stream.Read(buffer, 0, buffer.Length);
+                    await stream.ReadAsync(buffer, 0, buffer.Length);
                     return true;
                 case MessageBoxResult.No:
                     buffer = Encoding.ASCII.GetBytes("N");
-                    stream.Write(buffer, 0, buffer.Length);
+                    await stream.WriteAsync(buffer, 0, buffer.Length);
                     buffer = new byte[2];
-                    stream.Write(buffer, 0, 2);
+                    await stream.WriteAsync(buffer, 0, 2);
                     buffer = new byte[85];
-                    stream.Read(buffer, 0, 85);
+                    await stream.ReadAsync(buffer, 0, 85);
                     return false;
                 default:
                     return false;
@@ -168,7 +182,7 @@ namespace WeatherClient
         /// <summary>
         /// Sends location and date to server
         /// </summary>
-        private void SendLocationAndDate()
+        private async void SendLocationAndDate()
         {
             string location = textBoxLocation.Text;
             string daysPeriod = textBoxDate.Text;
@@ -180,43 +194,51 @@ namespace WeatherClient
             }
             else
             {
-                buffer = Encoding.ASCII.GetBytes(textBoxLocation.Text);
+                buffer = Encoding.ASCII.GetBytes(location);
 
-                stream.Write(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[1024];
-                stream.Read(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 buffer = Encoding.ASCII.GetBytes(daysPeriod);
 
-                stream.Write(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[2048];
 
                 string data = "";
+                int locationsCount = location.Where(c => c == ',').Count() + 1;
 
-                do
+                ClientLogTextBox.Clear();
+
+                for (int i = 0; i < locationsCount; i++)
                 {
-                    stream.Read(buffer, 0, buffer.Length);
-                    data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-
-                    if (data.Contains("Incorrect weather period, try again"))
+                    do
                     {
-                        MessageBox.Show("Incorrect weather period, try different formatting", "Format error",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        await stream.ReadAsync(buffer, 0, buffer.Length);
+                        data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
-                        return;
-                    }
-                } while (!data.Contains("Temperature"));
+                        if (data.Contains("Incorrect weather period, try again"))
+                        {
+                            MessageBox.Show("Incorrect weather period, try different formatting", "Format error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
 
-                ClientLogTextBox.Text = data;
+                            return;
+                        }
+                    } while (!data.Contains("Temperature"));
+
+                    ClientLogTextBox.Text += data;
+
+                    Array.Clear(buffer, 0, buffer.Length);
+                }
             }
         }
 
         /// <summary>
         /// Shows new window to change password and sends data to server
         /// </summary>
-        private void ChangePassword()
+        private async void ChangePassword()
         {
             ChangePassword cp = new ChangePassword();
 
@@ -227,16 +249,16 @@ namespace WeatherClient
                 textBoxPassword.Text = cp.textBoxNewPassword.Text;
 
                 buffer = Encoding.ASCII.GetBytes("change");
-                stream.Write(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[85];
 
                 buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxPassword.Text);
-                stream.Write(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[1024];
 
-                stream.Read(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length);
                 string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
                 if (data.Contains("Error"))
@@ -255,7 +277,7 @@ namespace WeatherClient
         /// <summary>
         /// Saves weather data to file
         /// </summary>
-        private void SaveWeather()
+        private async void SaveWeather()
         {
             try
             {
@@ -272,7 +294,7 @@ namespace WeatherClient
 
                 using var writer = new StreamWriter(filePath);
 
-                writer.Write(ClientLogTextBox.Text);
+                await writer.WriteAsync(ClientLogTextBox.Text);
 
                 MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
                     MessageBoxButton.OK, MessageBoxImage.Information);
@@ -317,6 +339,11 @@ namespace WeatherClient
         private void SaveWeatherButton_Click(object sender, RoutedEventArgs e)
         {
             SaveWeather();
+        }
+
+        private void ClearWeatherForecast_Click(object sender, RoutedEventArgs e)
+        {
+            ClientLogTextBox.Clear();
         }
     }
 }
