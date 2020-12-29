@@ -86,13 +86,13 @@ namespace Server.Services
         {
             try
             {
-                string location = Encoding.ASCII.GetString(buffer);
+                string receivedData = Encoding.ASCII.GetString(buffer);
 
-                if (location.IndexOf("exit") >= 0)
+                if (receivedData.IndexOf("exit") >= 0)
                 {
                     return "exit";
                 }
-                else if (location.IndexOf("change") >= 0)
+                else if (receivedData.IndexOf("change") >= 0)
                 {
                     await HandlePasswordChange(stream);
 
@@ -103,11 +103,11 @@ namespace Server.Services
                     return "ok";
                 }
 
-                else if (location.IndexOf("??") < 0)
+                else if (receivedData.IndexOf("??") < 0)
                 {
-                    if (location.IndexOf("\r\n") < 0)
+                    if (receivedData.IndexOf("\r\n") < 0)
                     {
-                        location = new string(location.Where(c => c != '\0').ToArray());
+                        string[] locations = new string(receivedData.Where(c => c != '\0').ToArray()).Split(',');
 
                         var daysPeriodBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
@@ -116,11 +116,11 @@ namespace Server.Services
                         await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FethcingDataFromAPIMessage), 
                             0, ServerMessagesResources.FethcingDataFromAPIMessage.Length);
 
-                        _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
+                        _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {receivedData} for {days} day(s)");
 
-                        string weatherData = await _weatherService.GetWeather(location, days);
+                        string weatherData = await _weatherService.GetWeather(receivedData, days);
 
-                        _logger.LogInformation($"Weather for location: {location} for {days} days: \n {weatherData}\n");
+                        _logger.LogInformation($"Weather for location: {receivedData} for {days} days: \n {weatherData}\n");
 
                         byte[] weather = Encoding.ASCII.GetBytes(weatherData);
 
@@ -133,7 +133,7 @@ namespace Server.Services
                     Array.Clear(buffer, 0, buffer.Length);
                 }
 
-                else if (location.IndexOf("??") >= 0)
+                else if (receivedData.IndexOf("??") >= 0)
                 {
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.NonAsciiCharsMessage), 
                         0, ServerMessagesResources.NonAsciiCharsMessage.Length);
