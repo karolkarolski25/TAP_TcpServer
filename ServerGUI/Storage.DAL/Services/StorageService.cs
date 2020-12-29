@@ -68,6 +68,7 @@ namespace Storage.DAL
         {
             UserDatas.Login = userData.Login;
             UserDatas.Password = userData.Password;
+            UserDatas.FavouriteLocation = userData.FavouriteLocation;
 
             EditData();
         }

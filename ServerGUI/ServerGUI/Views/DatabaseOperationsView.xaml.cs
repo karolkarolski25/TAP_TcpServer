@@ -5,25 +5,25 @@ using System.Windows.Input;
 namespace ServerGUI.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for DatabaseOperationsView.xaml
     /// </summary>
-    public partial class ServerView : Window
+    public partial class DatabaseOperationsView : Window
     {
-        public ServerView(ServerViewModel mainWindowViewModel)
+        public DatabaseOperationsView(DatabaseOperationsViewModel databaseOperationsViewModel)
         {
-            DataContext = mainWindowViewModel;
+            DataContext = databaseOperationsViewModel;
 
             InitializeComponent();
         }
 
         /// <summary>
-        /// Quits server application
+        /// Quits database content window
         /// </summary>
         /// <param name="sender">button object</param>
         /// <param name="e">button event</param>
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (MessageBox.Show("Are you sure?", "Closing application", 
+            switch (MessageBox.Show("Are you sure?", "Closing database window",
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
@@ -34,16 +34,6 @@ namespace ServerGUI.Views
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// Minimizes application
-        /// </summary>
-        /// <param name="sender">button object</param>
-        /// <param name="e">button event</param>
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
         }
 
         /// <summary>

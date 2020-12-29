@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Events;
 using Server;
 using Server.Events;
 using Server.Services;
+using ServerGUI.Views;
 using Storage.DAL;
 using Storage.Models;
 using System;
@@ -48,6 +50,9 @@ namespace ServerGUI.ViewModels
         private DelegateCommand _saveLogsCommand;
         public DelegateCommand SaveLogsCommand => _saveLogsCommand ??= new DelegateCommand(SaveLogs);
 
+        private DelegateCommand _openDatabaseWindowCommand;
+        public DelegateCommand OpenDatabaseWindowCommand => _openDatabaseWindowCommand ??= new DelegateCommand(OpenDatabaseWindow);
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ServerViewModel(ILogger<ServerViewModel> logger, IServiceProvider serviceProvider,
@@ -70,6 +75,17 @@ namespace ServerGUI.ViewModels
             _eventAggregator.GetEvent<ServerLogsChanged>().Subscribe(UpdateServerLogs);
 
             InitializeTimer();
+        }
+
+        /// <summary>
+        /// Open database content
+        /// </summary>
+        private async void OpenDatabaseWindow()
+        {
+            _serviceProvider.GetRequiredService<DatabaseOperationsViewModel>()
+                .SetDatabaseContent(await _storageService.GetUserDataAsync());
+
+            _serviceProvider.GetRequiredService<DatabaseOperationsView>().ShowDialog();
         }
 
         /// <summary>
