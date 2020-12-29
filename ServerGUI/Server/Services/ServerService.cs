@@ -1,4 +1,5 @@
-﻿using Login.Services;
+﻿using Login.Enums;
+using Login.Services;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Server.Events;
@@ -23,13 +24,14 @@ namespace Server.Services
         private bool badCredentials = false;
 
         private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
-        private readonly string nonAsciiCharsMessage = "\r\nNon ASCII char detected (use only english letters, exit to disconnect), try again\r\n\n";
-        private readonly string fethcingDataFromAPIMessage = "\r\nFetching data from API\r\n";
+        private readonly string nonAsciiCharsMessage = "Non ASCII char detected (use only english letters, exit to disconnect), try again";
+        private readonly string fethcingDataFromAPIMessage = "Fetching data from API";
         private readonly string enterLoginMessage = "Login: ";
         private readonly string enterPasswordMessage = "Password: ";
         private readonly string enterTimePeriodMessage = "Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020): ";
-        private readonly string wrongTimePeriodMessage = "\r\nIncorrect weather period, try again\r\n\n";
+        private readonly string wrongTimePeriodMessage = "Incorrect weather period, try again";
         private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
+        private readonly string badPasswordMessage = "Bad password, try again";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
             ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator)
@@ -279,10 +281,9 @@ namespace Server.Services
         {
             badCredentials = false;
 
-            //Don't know why this was here
-            //data = data.Substring(0, data.Length - 1);
+            var userCheck = await _loginService.CheckData(login, password);
 
-            if (!await _loginService.CheckData(login, password))
+            if (userCheck == UserLoginSettings.UserNotExists)
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
 
@@ -302,16 +303,28 @@ namespace Server.Services
                 {
                     badCredentials = true;
                     await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
+
                     return;
                 }
             }
-            else
+            else if (userCheck == UserLoginSettings.LoggedIn)
             {
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} logged in");
 
                 _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
                 _logger.LogInformation($"User: {login} logged in");
+            }
+            else
+            {
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} bad password");
+                _logger.LogInformation($"User: {login} bad password");
+
+                badCredentials = true;
+
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(badPasswordMessage), 0, badPasswordMessage.Length);
+
+                return;
             }
 
             string data = $"Welcome {login}\r\n";

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Login.Enums;
+using Microsoft.Extensions.Logging;
 using Storage.DAL;
 using Storage.Models;
 using System;
@@ -77,20 +78,20 @@ namespace Login.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns>Information if user is in database</returns>
-        public async Task<bool> CheckData(string login, string password)
+        public async Task<UserLoginSettings> CheckData(string login, string password)
         {
             string decryptedPassword;
 
-            var encryptedPassword = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login);
+            var user = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == login);
 
-            if (encryptedPassword == null)
+            if (user.Login == null)
             {
-                return false;
+                return UserLoginSettings.UserNotExists;
             }
 
             try
             {
-                using (MemoryStream msDecrypt = new MemoryStream(encryptedPassword.Password))
+                using (MemoryStream msDecrypt = new MemoryStream(user.Password))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, aes.CreateDecryptor(_cryptoConfiguration.Key,
                         _cryptoConfiguration.IV), CryptoStreamMode.Read))
@@ -104,7 +105,7 @@ namespace Login.Services
 
                 if (decryptedPassword == password)
                 {
-                    return true;
+                    return UserLoginSettings.LoggedIn;
                 }
             }
             catch (Exception e)
@@ -112,7 +113,7 @@ namespace Login.Services
                 _logger.LogInformation(e.Message);
             }
 
-            return false;
+            return UserLoginSettings.BadPassword;
         }
 
         /// <summary>
