@@ -337,5 +337,10 @@ namespace WeatherClient
         {
             SaveWeather();
         }
+
+        private void ClearWeatherForecast_Click(object sender, RoutedEventArgs e)
+        {
+            ClientLogTextBox.Clear();
+        }
     }
 }
