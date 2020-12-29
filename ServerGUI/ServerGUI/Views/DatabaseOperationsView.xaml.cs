@@ -21,20 +21,7 @@ namespace ServerGUI.Views
         /// </summary>
         /// <param name="sender">button object</param>
         /// <param name="e">button event</param>
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            switch (MessageBox.Show("Are you sure?", "Closing database window",
-                MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
-            {
-                case MessageBoxResult.Yes:
-                    Close();
-                    break;
-                case MessageBoxResult.No:
-                case MessageBoxResult.Cancel:
-                default:
-                    break;
-            }
-        }
+        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
 
         /// <summary>
         /// Event occurs after pressing left mouse button
