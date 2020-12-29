@@ -3,6 +3,7 @@ using Login.Services;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Server.Events;
+using Server.Resources;
 using System;
 using System.Linq;
 using System.Net;
@@ -22,16 +23,6 @@ namespace Server.Services
         private readonly ServerConfiguration _serverConfiguration;
 
         private bool badCredentials = false;
-
-        private readonly string enterLocationMessage = "Enter location (Only english letters, exit to disconnect): ";
-        private readonly string nonAsciiCharsMessage = "Non ASCII char detected (use only english letters, exit to disconnect), try again";
-        private readonly string fethcingDataFromAPIMessage = "Fetching data from API";
-        private readonly string enterLoginMessage = "Login: ";
-        private readonly string enterPasswordMessage = "Password: ";
-        private readonly string enterTimePeriodMessage = "Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020): ";
-        private readonly string wrongTimePeriodMessage = "Incorrect weather period, try again";
-        private readonly string registerMessage = "Account not found, do you want to create new account? (Y/N): ";
-        private readonly string badPasswordMessage = "Bad password, try again";
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
             ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator)
@@ -122,7 +113,8 @@ namespace Server.Services
 
                         int days = await GetWeatherPeriod(stream, daysPeriodBuffer);
 
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(fethcingDataFromAPIMessage), 0, fethcingDataFromAPIMessage.Length);
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FethcingDataFromAPIMessage), 
+                            0, ServerMessagesResources.FethcingDataFromAPIMessage.Length);
 
                         _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
 
@@ -134,7 +126,8 @@ namespace Server.Services
 
                         await stream.WriteAsync(weather, 0, weather.Length);
 
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                            0, ServerMessagesResources.EnterLocationMessage.Length);
                     }
 
                     Array.Clear(buffer, 0, buffer.Length);
@@ -142,9 +135,11 @@ namespace Server.Services
 
                 else if (location.IndexOf("??") >= 0)
                 {
-                    await stream.WriteAsync(Encoding.ASCII.GetBytes(nonAsciiCharsMessage), 0, nonAsciiCharsMessage.Length);
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.NonAsciiCharsMessage), 
+                        0, ServerMessagesResources.NonAsciiCharsMessage.Length);
 
-                    await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                        0, ServerMessagesResources.EnterLocationMessage.Length);
 
                     _logger.LogInformation("Non ASCII char detected in location");
 
@@ -168,7 +163,8 @@ namespace Server.Services
         /// <returns>dates period eg. 3</returns>
         private async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage), 
+                0, ServerMessagesResources.EnterTimePeriodMessage.Length);
 
             do
             {
@@ -204,9 +200,11 @@ namespace Server.Services
 
             while (days < 1 || days > 6)
             {
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(wrongTimePeriodMessage), 0, wrongTimePeriodMessage.Length);
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.WrongTimePeriodMessage),
+                    0, ServerMessagesResources.WrongTimePeriodMessage.Length);
 
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(enterTimePeriodMessage), 0, enterTimePeriodMessage.Length);
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage), 
+                    0, ServerMessagesResources.EnterTimePeriodMessage.Length);
 
                 do
                 {
@@ -250,7 +248,8 @@ namespace Server.Services
         /// <returns>Login from user</returns>
         private async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterLoginMessage), 0, enterLoginMessage.Length);
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLoginMessage), 
+                0, ServerMessagesResources.EnterLoginMessage.Length);
 
             Array.Clear(buffer, 0, buffer.Length);
 
@@ -268,7 +267,8 @@ namespace Server.Services
         /// <returns>Password from user</returns>
         private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(enterPasswordMessage), 0, enterPasswordMessage.Length);
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterPasswordMessage), 
+                0, ServerMessagesResources.EnterPasswordMessage.Length);
 
             Array.Clear(buffer, 0, buffer.Length);
 
@@ -285,7 +285,8 @@ namespace Server.Services
 
             if (userCheck == UserLoginSettings.UserNotExists)
             {
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(registerMessage), 0, registerMessage.Length);
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.RegisterMessage), 
+                    0, ServerMessagesResources.RegisterMessage.Length);
 
                 await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
 
@@ -322,7 +323,8 @@ namespace Server.Services
 
                 badCredentials = true;
 
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(badPasswordMessage), 0, badPasswordMessage.Length);
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.BadPasswordMessage), 
+                    0, ServerMessagesResources.BadPasswordMessage.Length);
 
                 return;
             }
@@ -413,7 +415,8 @@ namespace Server.Services
 
                          } while (badCredentials);
 
-                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(enterLocationMessage), 0, enterLocationMessage.Length);
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                             0, ServerMessagesResources.EnterLocationMessage.Length);
 
                          await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
 
