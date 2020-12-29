@@ -12,7 +12,7 @@ namespace WeatherClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Client : Window
     {
         private string ipAddress;
         private int port;
@@ -21,7 +21,7 @@ namespace WeatherClient
         private NetworkStream stream;
         private bool connected = false;
 
-        public MainWindow()
+        public Client()
         {
             InitializeComponent();
 
