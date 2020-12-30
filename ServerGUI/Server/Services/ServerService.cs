@@ -86,13 +86,13 @@ namespace Server.Services
         {
             try
             {
-                string location = Encoding.ASCII.GetString(buffer);
+                string receivedData = Encoding.ASCII.GetString(buffer);
 
-                if (location.IndexOf("exit") >= 0)
+                if (receivedData.IndexOf("exit") >= 0)
                 {
                     return "exit";
                 }
-                else if (location.IndexOf("change") >= 0)
+                else if (receivedData.IndexOf("change") >= 0)
                 {
                     await HandlePasswordChange(stream);
 
@@ -103,42 +103,45 @@ namespace Server.Services
                     return "ok";
                 }
 
-                else if (location.IndexOf("??") < 0)
+                else if (receivedData.IndexOf("??") < 0)
                 {
-                    if (location.IndexOf("\r\n") < 0)
+                    if (receivedData.IndexOf("\r\n") < 0)
                     {
-                        location = new string(location.Where(c => c != '\0').ToArray());
+                        string[] locations = new string(receivedData.Where(c => c != '\0').ToArray()).Split(',');
 
                         var daysPeriodBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                         int days = await GetWeatherPeriod(stream, daysPeriodBuffer);
 
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FethcingDataFromAPIMessage), 
-                            0, ServerMessagesResources.FethcingDataFromAPIMessage.Length);
+                        foreach (var location in locations)
+                        {
+                            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FethcingDataFromAPIMessage),
+                               0, ServerMessagesResources.FethcingDataFromAPIMessage.Length);
 
-                        _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
+                            _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
 
-                        string weatherData = await _weatherService.GetWeather(location, days);
+                            string weatherData = await _weatherService.GetWeather(location, days);
 
-                        _logger.LogInformation($"Weather for location: {location} for {days} days: \n {weatherData}\n");
+                            _logger.LogInformation($"Weather for location: {location} for {days} days: \n {weatherData}\n");
 
-                        byte[] weather = Encoding.ASCII.GetBytes(weatherData);
+                            byte[] weather = Encoding.ASCII.GetBytes(weatherData);
 
-                        await stream.WriteAsync(weather, 0, weather.Length);
+                            await stream.WriteAsync(weather, 0, weather.Length);
+                        }
 
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                             0, ServerMessagesResources.EnterLocationMessage.Length);
                     }
 
                     Array.Clear(buffer, 0, buffer.Length);
                 }
 
-                else if (location.IndexOf("??") >= 0)
+                else if (receivedData.IndexOf("??") >= 0)
                 {
-                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.NonAsciiCharsMessage), 
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.NonAsciiCharsMessage),
                         0, ServerMessagesResources.NonAsciiCharsMessage.Length);
 
-                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                    await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                         0, ServerMessagesResources.EnterLocationMessage.Length);
 
                     _logger.LogInformation("Non ASCII char detected in location");
@@ -163,7 +166,7 @@ namespace Server.Services
         /// <returns>dates period eg. 3</returns>
         private async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage), 
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage),
                 0, ServerMessagesResources.EnterTimePeriodMessage.Length);
 
             do
@@ -203,7 +206,7 @@ namespace Server.Services
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.WrongTimePeriodMessage),
                     0, ServerMessagesResources.WrongTimePeriodMessage.Length);
 
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage), 
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage),
                     0, ServerMessagesResources.EnterTimePeriodMessage.Length);
 
                 do
@@ -248,7 +251,7 @@ namespace Server.Services
         /// <returns>Login from user</returns>
         private async Task<string> GetLoginString(NetworkStream stream, byte[] buffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLoginMessage), 
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLoginMessage),
                 0, ServerMessagesResources.EnterLoginMessage.Length);
 
             Array.Clear(buffer, 0, buffer.Length);
@@ -267,7 +270,7 @@ namespace Server.Services
         /// <returns>Password from user</returns>
         private async Task<string> GetPasswordString(NetworkStream stream, byte[] buffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterPasswordMessage), 
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterPasswordMessage),
                 0, ServerMessagesResources.EnterPasswordMessage.Length);
 
             Array.Clear(buffer, 0, buffer.Length);
@@ -285,7 +288,7 @@ namespace Server.Services
 
             if (userCheck == UserLoginSettings.UserNotExists)
             {
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.RegisterMessage), 
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.RegisterMessage),
                     0, ServerMessagesResources.RegisterMessage.Length);
 
                 await stream.ReadAsync(signInBuffer, 0, signInBuffer.Length);
@@ -323,7 +326,7 @@ namespace Server.Services
 
                 badCredentials = true;
 
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.BadPasswordMessage), 
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.BadPasswordMessage),
                     0, ServerMessagesResources.BadPasswordMessage.Length);
 
                 return;
@@ -415,7 +418,7 @@ namespace Server.Services
 
                          } while (badCredentials);
 
-                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage), 
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                              0, ServerMessagesResources.EnterLocationMessage.Length);
 
                          await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
