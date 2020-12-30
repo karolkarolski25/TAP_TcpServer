@@ -28,10 +28,6 @@ namespace ServerGUI.ViewModels
         public ObservableCollection<UserData> SelectedUserDetails { get; set; } = new ObservableCollection<UserData>();
         public UserData SelectedUser { get; set; }
 
-        private DelegateCommand _changePasswordCommand;
-        public DelegateCommand ChangePasswordCommand => _changePasswordCommand ??= new DelegateCommand(ChangePassword)
-            .ObservesCanExecute(() => canEditUser);
-
         private DelegateCommand _removeUserCommand;
         public DelegateCommand RemoveUserCommand => _removeUserCommand ??= new DelegateCommand(RemoveUser)
             .ObservesCanExecute(() => canEditUser);
@@ -176,13 +172,9 @@ namespace ServerGUI.ViewModels
         }
 
         /// <summary>
-        /// Change selected user's password
+        /// Update GUI content
         /// </summary>
-        private void ChangePassword() //TODO
-        {
-
-        }
-
+        /// <param name="propertyName">Property to update</param>
         protected void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
