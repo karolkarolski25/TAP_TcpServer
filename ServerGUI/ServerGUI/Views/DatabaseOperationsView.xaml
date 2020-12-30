@@ -88,10 +88,8 @@
         <Grid Margin="408,224,36,195">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding ChangePasswordCommand}" FontSize="16" Grid.Column="1" Content="Change password" HorizontalAlignment="Center" VerticalAlignment="Center" Width="140"/>
             <Button Command="{Binding RemoveUserCommand}" FontSize="16" Grid.Column="0" Content="Remove" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80"/>
             <Button Command="{Binding ShowAddNewUserFieldsCommand}" FontSize="16" Grid.Column="2" Content="Add new user" HorizontalAlignment="Center" VerticalAlignment="Center" Width="122"/>
         </Grid>
