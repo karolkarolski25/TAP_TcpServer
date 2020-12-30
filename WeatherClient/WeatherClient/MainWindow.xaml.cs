@@ -22,6 +22,17 @@ namespace WeatherClient
         public MainWindow()
         {
             InitializeComponent();
+
+#if DEBUG
+            textBoxIPAddress.Text = "127.0.0.1";
+            textBoxPort.Text = "2048";
+
+            textBoxLogin.Text = "qwe";
+            textBoxPassword.Text = "qwe";
+
+            textBoxLocation.Text = "Warsaw,Berlin,Szczecin";
+            textBoxDate.Text = "3";
+#endif
         }
 
         /// <summary>
