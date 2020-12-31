@@ -66,6 +66,7 @@ namespace Storage.DAL
         /// <param name="userData"></param>
         public void UpdateData(UserData userData)
         {
+            UserDatas.Id = 0;
             UserDatas.Login = userData.Login;
             UserDatas.Password = userData.Password;
             UserDatas.FavouriteLocation = userData.FavouriteLocation;
