@@ -123,7 +123,7 @@ namespace WeatherClient
 
                 string message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
-                if (message == "Account not found, do you want to create new account? (Y/N): ")
+                if (message == "Account not found, do you want to create new account? (Y/N):")
                 {
                     if (!await HandleRegistration())
                     {
