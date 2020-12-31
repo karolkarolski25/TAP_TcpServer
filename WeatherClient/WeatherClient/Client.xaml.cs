@@ -32,10 +32,9 @@ namespace WeatherClient
             textBoxLogin.Text = "qwe";
             textBoxPassword.Text = "qwe";
 
-            textBoxLocation.Text = "Warsaw,Berlin";
+            textBoxLocation.Text = "Warsaw,Berlin,Szczecin";
             textBoxDate.Text = "3";
 #endif
-
         }
 
         /// <summary>
@@ -124,7 +123,7 @@ namespace WeatherClient
 
                 string message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
-                if (message == "Account not found, do you want to create new account? (Y/N): ")
+                if (message == "Account not found, do you want to create new account? (Y/N):")
                 {
                     if (!await HandleRegistration())
                     {

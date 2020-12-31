@@ -7,6 +7,7 @@ using Prism.Events;
 using Server;
 using Server.Services;
 using ServerGUI.ViewModels;
+using ServerGUI.Views;
 using Storage;
 using Storage.DAL;
 using System;
@@ -67,8 +68,11 @@ namespace ServerGUI
                 .AddSingleton(serverConfiguration)
                 .AddSingleton(cryptoConfiguration)
                 .AddSingleton(databaseConfiguration)
-                .AddSingleton<MainWindow>()
+                .AddSingleton<ServerView>()
                 .AddSingleton<ServerViewModel>()
+                .AddTransient<DatabaseOperationsView>()
+                .AddSingleton<DatabaseOperationsViewModel>()
+                .AddSingleton<ICryptoService, CryptoService>()
                 .AddSingleton<IWeatherService, WeatherService>()
                 .AddSingleton<ILoginService, LoginService>()
                 .AddSingleton<IServerService, ServerService>()
@@ -88,7 +92,7 @@ namespace ServerGUI
 
             _logger.LogDebug("Application startup");
 
-            _serviceProvider.GetRequiredService<MainWindow>().Show();
+            _serviceProvider.GetRequiredService<ServerView>().Show();
         }
 
         /// <summary>

@@ -68,6 +68,7 @@ namespace Storage.DAL
         {
             UserDatas.Login = userData.Login;
             UserDatas.Password = userData.Password;
+            UserDatas.FavouriteLocation = userData.FavouriteLocation;
 
             EditData();
         }
@@ -89,7 +90,7 @@ namespace Storage.DAL
                 semaphoreSlim.Release();
             }
 
-            return _userDataContext.UserDatas.Local.ToList();
+            return _userDataContext.UserDatas.ToList();
         }
 
         /// <summary>

@@ -29,8 +29,5 @@
         <Button x:Name="GetWeatherButton" Content="Get weather" HorizontalAlignment="Left" Margin="70,303,0,0" VerticalAlignment="Top" Width="95" IsEnabled="False" Click="GetWeatherButton_Click"/>
         <Button x:Name="SaveWeatherButton" Content="Save weather" HorizontalAlignment="Left" Margin="190,303,0,0" VerticalAlignment="Top" Width="95" IsEnabled="False" Click="SaveWeatherButton_Click"/>
         <Button x:Name="ClearWeatherForecast" Content="Clear logs" HorizontalAlignment="Left" Margin="130,340,0,0" VerticalAlignment="Top" Click="ClearWeatherForecast_Click" Width="90"/>
-
-
-
     </Grid>
 </Window>

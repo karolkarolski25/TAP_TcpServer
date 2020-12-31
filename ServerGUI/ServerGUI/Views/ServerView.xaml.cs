@@ -2,14 +2,14 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace ServerGUI
+namespace ServerGUI.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ServerView : Window
     {
-        public MainWindow(ServerViewModel mainWindowViewModel)
+        public ServerView(ServerViewModel mainWindowViewModel)
         {
             DataContext = mainWindowViewModel;
 
@@ -23,7 +23,8 @@ namespace ServerGUI
         /// <param name="e">button event</param>
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (MessageBox.Show("Are you sure?", "Closing application", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+            switch (MessageBox.Show("Are you sure?", "Closing application", 
+                MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
                     Close();
