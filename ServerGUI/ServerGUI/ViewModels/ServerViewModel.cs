@@ -10,6 +10,7 @@ using ServerGUI.Views;
 using Storage.DAL;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -113,6 +114,8 @@ namespace ServerGUI.ViewModels
 
                         MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
                             MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        OpenTxtFile(filePath);
                     }
                 }
                 catch (Exception ex)
@@ -238,6 +241,21 @@ namespace ServerGUI.ViewModels
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        /// <summary>
+        /// Start txt file after saving logs
+        /// </summary>
+        /// <param name="filePath">Log file path</param>
+        private static void OpenTxtFile(string filePath)
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            };
+
+            Process.Start(processStartInfo);
         }
     }
 }
