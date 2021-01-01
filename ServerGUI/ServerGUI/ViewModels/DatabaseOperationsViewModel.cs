@@ -28,9 +28,9 @@ namespace ServerGUI.ViewModels
 
         public Visibility NewUserVisibility { get; set; } = Visibility.Collapsed;
 
-        public ObservableCollection<UserData> UsersDataView { get; set; }
-        public ObservableCollection<UserData> SelectedUserDetails { get; set; } = new ObservableCollection<UserData>();
-        public UserData SelectedUser { get; set; }
+        public ObservableCollection<User> UsersDataView { get; set; }
+        public ObservableCollection<User> SelectedUserDetails { get; set; } = new ObservableCollection<User>();
+        public User SelectedUser { get; set; }
 
         private DelegateCommand _removeUserCommand;
         public DelegateCommand RemoveUserCommand => _removeUserCommand ??= new DelegateCommand(RemoveUser)
@@ -91,7 +91,7 @@ namespace ServerGUI.ViewModels
         /// Export database content to *.csv file
         /// </summary>
         /// <param name="databaseContent">databae content</param>
-        private async void ExportDatabaseContent(IEnumerable<UserData> databaseContent)
+        private async void ExportDatabaseContent(IEnumerable<User> databaseContent)
         {
             SaveFileDialog dlg = new SaveFileDialog
             {
@@ -161,7 +161,7 @@ namespace ServerGUI.ViewModels
             {
                 if (!(await _storageService.GetUserDataAsync()).Any(u => u.Login == NewLogin))
                 {
-                    var newUser = new UserData()
+                    var newUser = new User()
                     {
                         Login = NewLogin,
                         Password = await _cryptoService.EncryptPassword("1234"),
@@ -175,7 +175,7 @@ namespace ServerGUI.ViewModels
 
                     _logger.LogInformation($"User {NewLogin} added with default password: 1234");
 
-                    UsersDataView = new ObservableCollection<UserData>(await _storageService.GetUserDataAsync());
+                    UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
                     OnPropertyChanged(nameof(UsersDataView));
 
                     NewUserVisibility = Visibility.Collapsed;
@@ -223,9 +223,9 @@ namespace ServerGUI.ViewModels
         /// Update data from database
         /// </summary>
         /// <param name="users">List from database</param>
-        public void SetDatabaseContent(List<UserData> users)
+        public void SetDatabaseContent(List<User> users)
         {
-            UsersDataView = new ObservableCollection<UserData>(users);
+            UsersDataView = new ObservableCollection<User>(users);
         }
 
         /// <summary>

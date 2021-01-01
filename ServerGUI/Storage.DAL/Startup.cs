@@ -8,7 +8,7 @@ namespace Storage.DAL
         public static void RegisterDALDependiences(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IStorageService, StorageService>();
-            serviceCollection.AddDbContext<IUserDataContext, UserDataContext>(ServiceLifetime.Transient);
+            serviceCollection.AddDbContext<IUserContext, UserContext>(ServiceLifetime.Transient);
         }
     }
 }

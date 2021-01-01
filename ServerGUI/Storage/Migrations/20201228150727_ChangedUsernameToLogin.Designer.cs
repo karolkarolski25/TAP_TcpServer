@@ -9,7 +9,7 @@ using Storage.Context;
 
 namespace Storage.Migrations
 {
-    [DbContext(typeof(UserDataContext))]
+    [DbContext(typeof(UserContext))]
     [Migration("20201228150727_ChangedUsernameToLogin")]
     partial class ChangedUsernameToLogin
     {
