@@ -20,7 +20,7 @@
         <Button x:Name="ExitButton" Content="X" FontSize="16" HorizontalAlignment="Left" Margin="759,10,0,0" VerticalAlignment="Top" Height="26" Width="26" Click="ExitButton_Click"/>
         <Button x:Name="MinimiseButton" Content="_" FontSize="16" HorizontalAlignment="Left" Margin="728,10,0,0" VerticalAlignment="Top" Width="26" Height="26" Click="MinimizeButton_Click"/>
 
-        <TextBox x:Name="ClientLogTextBox" Margin="345,50,30,0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Top" Height="370" FontSize="16"/>
+        <TextBox x:Name="ClientLogTextBox" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="345,50,30,0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Top" Height="370" FontSize="16"/>
 
         <Label Content="IP" HorizontalAlignment="Left" Margin="25,28,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <TextBox x:Name="textBoxIPAddress" HorizontalAlignment="Left" Margin="120,28,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Foreground="White" Background="Transparent" FontSize="16"/>
