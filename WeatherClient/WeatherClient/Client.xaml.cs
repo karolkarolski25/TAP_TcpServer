@@ -320,11 +320,10 @@ namespace WeatherClient
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
-                    try
+                    if (connected)
                     {
                         client.Close();
                     }
-                    catch { }
                     Close();
                     break;
                 case MessageBoxResult.No:
