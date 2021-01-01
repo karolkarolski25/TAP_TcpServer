@@ -8,12 +8,12 @@ namespace Storage.DAL
     {
         Task MigrateAsync();
         Task SaveChangesAsync();
-        Task<List<UserData>> GetUserDataAsync();
-        void AddUserDataAsync(UserData userData);
-        void RemoveUserDataAsync(UserData userData);
-        void UpdateData(UserData userData);
+        Task<List<User>> GetUserDataAsync();
+        void AddUserDataAsync(User userData);
+        void RemoveUserDataAsync(User userData);
+        void UpdateData(User userData);
         void EditData();
 
-        UserData UserDatas { get; set; }
+        User Users { get; set; }
     }
 }

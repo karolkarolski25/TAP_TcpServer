@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Storage.Context
 {
-    public interface IUserDataContext
+    public interface IUserContext
     {
-        DbSet<UserData> UserDatas { get; set; }
+        DbSet<User> Users { get; set; }
         DatabaseFacade Database { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

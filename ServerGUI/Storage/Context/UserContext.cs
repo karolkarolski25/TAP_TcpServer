@@ -5,14 +5,14 @@ using Storage.Models;
 
 namespace Storage.Context
 {
-    public class UserDataContext : DbContext, IUserDataContext
+    public class UserContext : DbContext, IUserContext
     {
-        public DbSet<UserData> UserDatas { get; set; }
+        public DbSet<User> Users { get; set; }
 
         private readonly DatabaseConfiguration _databaseConfiguration;
 
-        public UserDataContext(DatabaseConfiguration databaseConfiguration,
-            DbContextOptions<UserDataContext> dbContextOptions) : base(dbContextOptions)
+        public UserContext(DatabaseConfiguration databaseConfiguration,
+            DbContextOptions<UserContext> dbContextOptions) : base(dbContextOptions)
         {
             _databaseConfiguration = databaseConfiguration;
         }
@@ -36,7 +36,7 @@ namespace Storage.Context
         /// <param name="modelBuilder">Database builder</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new UserDataMapper());
+            modelBuilder.ApplyConfiguration(new UserMapper());
         }
     }
 }

@@ -9,7 +9,7 @@ using Storage.Context;
 
 namespace Storage.Migrations
 {
-    [DbContext(typeof(UserDataContext))]
+    [DbContext(typeof(UserContext))]
     [Migration("20201228151424_AddedFavouriteLocationEntry")]
     partial class AddedFavouriteLocationEntry
     {

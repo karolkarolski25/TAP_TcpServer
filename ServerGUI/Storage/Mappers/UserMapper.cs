@@ -4,13 +4,13 @@ using Storage.Models;
 
 namespace Storage.Mappers
 {
-    public class UserDataMapper : IEntityTypeConfiguration<UserData>
+    public class UserMapper : IEntityTypeConfiguration<User>
     {
         /// <summary>
         /// Configures database
         /// </summary>
         /// <param name="builder">Database scheme</param>
-        public void Configure(EntityTypeBuilder<UserData> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasIndex(p => p.Login)
                 .IsUnique();
