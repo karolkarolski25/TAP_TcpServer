@@ -1,11 +1,15 @@
 ﻿using Login.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Prism.Commands;
 using Storage.DAL;
 using Storage.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -41,6 +45,10 @@ namespace ServerGUI.ViewModels
         private DelegateCommand _confirmAddNewUserCommand;
         public DelegateCommand ConfirmAddNewUserCommand => _confirmAddNewUserCommand ??= new DelegateCommand(ConfirmAddNewUser);
 
+        private DelegateCommand _exportDatabaseContentCommand;
+        public DelegateCommand ExportDatabaseContentCommand => _exportDatabaseContentCommand ??= new DelegateCommand(ExportDatabaseContent);
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
 
@@ -50,6 +58,81 @@ namespace ServerGUI.ViewModels
             _storageService = storageService;
             _logger = logger;
             _cryptoService = cryptoService;
+        }
+
+        /// <summary>
+        /// Check database content
+        /// </summary>
+        private async void ExportDatabaseContent()
+        {
+            var databaseContent = await _storageService.GetUserDataAsync();
+
+            if (databaseContent.Any())
+            {
+                ExportDatabaseContent(databaseContent);
+            }
+            else
+            {
+                switch (MessageBox.Show("Database is empty\nDo you want to export it anyway?", "Question",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                {
+                    case MessageBoxResult.Yes:
+                        ExportDatabaseContent(databaseContent);
+                        break;
+                    case MessageBoxResult.No:
+                    case MessageBoxResult.Cancel:
+                    default:
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Export database content to *.csv file
+        /// </summary>
+        /// <param name="databaseContent">databae content</param>
+        private async void ExportDatabaseContent(IEnumerable<UserData> databaseContent)
+        {
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                FileName = "Weather server database",
+                DefaultExt = ".csv",
+                Filter = "CSV file (.csv)|*.csv"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                string filePath = dlg.FileName;
+
+                using var writer = new StreamWriter(filePath);
+
+                await writer.WriteLineAsync("ID,Login,FavouriteLocation");
+
+                foreach (var user in databaseContent)
+                {
+                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocation}");
+                }
+
+                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                OpenCsvFile(filePath);
+            }
+        }
+
+        /// <summary>
+        /// Start csv file after saving logs
+        /// </summary>
+        /// <param name="filePath">database content file path</param>
+        private void OpenCsvFile(string filePath)
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            };
+
+            Process.Start(processStartInfo);
         }
 
         /// <summary>
@@ -97,6 +180,12 @@ namespace ServerGUI.ViewModels
 
                     NewUserVisibility = Visibility.Collapsed;
                     OnPropertyChanged(nameof(NewUserVisibility));
+
+                    NewLogin = string.Empty;
+                    OnPropertyChanged(nameof(NewLogin));
+
+                    NewFavouriteLocation = string.Empty;
+                    OnPropertyChanged(nameof(NewFavouriteLocation));
                 }
                 else
                 {
