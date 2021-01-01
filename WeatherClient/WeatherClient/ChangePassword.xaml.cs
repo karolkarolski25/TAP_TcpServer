@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace WeatherClient
 {
@@ -16,6 +17,15 @@ namespace WeatherClient
         {
             DialogResult = true;
             this.Close();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch { }
         }
     }
 }
