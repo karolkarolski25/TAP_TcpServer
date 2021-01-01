@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -301,12 +302,29 @@ namespace WeatherClient
                 MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
+                OpenTxtFile(filePath);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>
+        /// Start txt file after saving logs
+        /// </summary>
+        /// <param name="filePath">Log file path</param>
+        private static void OpenTxtFile(string filePath)
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            };
+
+            Process.Start(processStartInfo);
         }
 
         /// <summary>
