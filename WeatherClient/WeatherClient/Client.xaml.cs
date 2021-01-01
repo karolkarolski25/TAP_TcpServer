@@ -41,7 +41,7 @@ namespace WeatherClient
         /// <summary>
         /// Connects to server and receives first message from server
         /// </summary>
-        private void ConnectToServer()
+        private async void ConnectToServer()
         {
             ipAddress = textBoxIPAddress.Text;
 
@@ -55,7 +55,9 @@ namespace WeatherClient
 
             try
             {
-                client = new TcpClient(ipAddress, port);
+                client = new TcpClient();
+
+                await client.ConnectAsync(ipAddress, port);
             }
             catch
             {
@@ -102,8 +104,8 @@ namespace WeatherClient
         {
             buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text);
 
-            stream.Write(buffer, 0, buffer.Length);
-            stream.Write(buffer, 0, 2);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, 2);
 
             buffer = new byte[85];
 
