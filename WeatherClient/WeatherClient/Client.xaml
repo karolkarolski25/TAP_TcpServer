@@ -11,7 +11,7 @@
         BorderThickness="1"
         BorderBrush="White"
         MouseDown="Window_MouseDown"
-        Height="440" Width="800">
+        Height="460" Width="800">
     <Grid >
         <Grid.Effect>
             <DropShadowEffect/>
@@ -20,7 +20,7 @@
         <Button x:Name="ExitButton" Content="X" FontSize="16" HorizontalAlignment="Left" Margin="759,10,0,0" VerticalAlignment="Top" Height="26" Width="26" Click="ExitButton_Click"/>
         <Button x:Name="MinimiseButton" Content="_" FontSize="16" HorizontalAlignment="Left" Margin="728,10,0,0" VerticalAlignment="Top" Width="26" Height="26" Click="MinimizeButton_Click"/>
 
-        <TextBox x:Name="ClientLogTextBox" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="345,50,30,0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Top" Height="370" FontSize="16"/>
+        <TextBox x:Name="ClientLogTextBox" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="345,50,30,0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Top" Height="390" FontSize="16"/>
 
         <Label Content="IP" HorizontalAlignment="Left" Margin="25,28,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <TextBox x:Name="textBoxIPAddress" HorizontalAlignment="Left" Margin="120,28,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Foreground="White" Background="Transparent" FontSize="16"/>
@@ -41,6 +41,7 @@
         <TextBox x:Name="textBoxDate" HorizontalAlignment="Left" Margin="180,305,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Foreground="White" Background="Transparent" FontSize="16"/>
         <Button x:Name="GetWeatherButton" Content="Get weather" FontSize="16" HorizontalAlignment="Left" Margin="70,350,0,0" VerticalAlignment="Top" Width="100" IsEnabled="False" Click="GetWeatherButton_Click"/>
         <Button x:Name="SaveWeatherButton" Content="Save weather" FontSize="16" HorizontalAlignment="Left" Margin="190,350,0,0" VerticalAlignment="Top" Width="103" IsEnabled="False" Click="SaveWeatherButton_Click"/>
-        <Button x:Name="ClearWeatherForecast" Content="Clear logs" FontSize="16" HorizontalAlignment="Left" Margin="130,390,0,0" VerticalAlignment="Top" Click="ClearWeatherForecast_Click" Width="90"/>
+        <Button x:Name="SaveFavouriteLocationButton" Content="Save favourite location" FontSize="16" HorizontalAlignment="Left" Margin="95,386,0,0" VerticalAlignment="Top" Width="180" IsEnabled="False" Click="SaveFavouriteLocationButton_Click"/>
+        <Button x:Name="ClearWeatherForecast" Content="Clear logs" FontSize="16" HorizontalAlignment="Left" Margin="145,420,0,0" VerticalAlignment="Top" Click="ClearWeatherForecast_Click" Width="90"/>
     </Grid>
 </Window>

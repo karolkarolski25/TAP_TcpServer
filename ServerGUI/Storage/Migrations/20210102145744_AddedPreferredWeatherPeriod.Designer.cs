@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.Context;
 
 namespace Storage.Migrations
 {
     [DbContext(typeof(UserContext))]
-    partial class UserDataContextModelSnapshot : ModelSnapshot
+    [Migration("20210102145744_AddedPreferredWeatherPeriod")]
+    partial class AddedPreferredWeatherPeriod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

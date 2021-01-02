@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Server.Events;
 using Server.Resources;
+using Storage.DAL;
+using Storage.Models;
 using System;
 using System.Linq;
 using System.Net;
@@ -18,20 +20,23 @@ namespace Server.Services
     {
         private readonly IWeatherService _weatherService;
         private readonly ILoginService _loginService;
-        private readonly ILogger<ServerService> _logger;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IStorageService _storageService;
+        private readonly ILogger<ServerService> _logger;
         private readonly ServerConfiguration _serverConfiguration;
 
         private bool badCredentials = false;
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
-            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator)
+            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator, 
+            IStorageService storageService)
         {
             _weatherService = weatherService;
             _loginService = loginService;
             _serverConfiguration = serverConfiguration;
             _logger = logger;
             _eventAggregator = eventAggregator;
+            _storageService = storageService;
         }
 
         /// <summary>
@@ -95,6 +100,16 @@ namespace Server.Services
                 else if (receivedData.IndexOf("change") >= 0)
                 {
                     await HandlePasswordChange(stream);
+
+                    Array.Clear(buffer, 0, buffer.Length);
+
+                    await stream.ReadAsync(buffer, 0, _serverConfiguration.WeatherBufferSize);
+
+                    return "ok";
+                }
+                else if (receivedData.IndexOf("favourite") >= 0)
+                {
+                    await HandleFavouriteLocationSave(stream);
 
                     Array.Clear(buffer, 0, buffer.Length);
 
@@ -300,6 +315,7 @@ namespace Server.Services
                     await _loginService.RegisterAccount(login, password);
 
                     _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {login} registered");
+                    _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
                     _logger.LogInformation($"New user: {login} registered");
                 }
@@ -349,21 +365,63 @@ namespace Server.Services
 
             if (await _loginService.ChangePassword(login, password))
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} changed password");
 
-                _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _logger.LogInformation($"User: {login} changed password");
 
                 data = "Password changed\r\n";
             }
             else
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {login} password");
 
-                _logger.LogInformation($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _logger.LogInformation($"Error while changing User: {login} password");
 
                 data = "Error password not changed\r\n";
             }
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+        }
+
+        private async Task HandleFavouriteLocationSave(NetworkStream stream)
+        {
+            byte[] locationBuffer = new byte[256];
+            await stream.ReadAsync(locationBuffer, 0, locationBuffer.Length);
+            string data = Encoding.ASCII.GetString(locationBuffer);
+            data = data.Replace("\0", "");
+
+            //string login = data.Substring(0, data.IndexOf(';'));
+            //string locations = data.Substring(data.IndexOf(';') + 1);
+
+            string[] clientData = data.Split(';');
+
+            try
+            {
+                _storageService.UpdateData(new User()
+                {
+                    Login = clientData[0],
+                    FavouriteLocations = clientData[1],
+                    PreferredWeatherPeriod = clientData[2]
+                });
+
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {clientData[0]} saved favourite location(s) " +
+                    $"({clientData[1]}, {clientData[2]} days)");
+
+                _logger.LogInformation($"User: {clientData[0]} saved favourite location(s) ({clientData[1]}, {clientData[2]} days)");
+
+                data = "Favourite location saved\r\n";
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {clientData[0]} favourite location(s)");
+
+                _logger.LogInformation($"Error while saving User: {clientData[0]} favourite location(s) ({ex.Message})");
+
+                data = "Error favourite location not saved\r\n";
+            }
+            finally
+            {
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+            }
         }
 
         /// <summary>
@@ -401,12 +459,13 @@ namespace Server.Services
                     byte[] weatherBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     string data = string.Empty;
+                    string login = string.Empty;
 
                     Task.Run(async () =>
                      {
                          do
                          {
-                             var login = await GetLoginString(client.GetStream(), signInBuffer);
+                             login = await GetLoginString(client.GetStream(), signInBuffer);
 
                              await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
@@ -417,6 +476,8 @@ namespace Server.Services
                              await HandleLogin(client.GetStream(), signInBuffer, login, password);
 
                          } while (badCredentials);
+
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes($"fav{await _storageService.GetFavouriteLocations(login)}"));
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                              0, ServerMessagesResources.EnterLocationMessage.Length);

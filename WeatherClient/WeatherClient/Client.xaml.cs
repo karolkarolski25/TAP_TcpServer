@@ -94,8 +94,16 @@ namespace WeatherClient
             GetWeatherButton.IsEnabled = false;
             SaveWeatherButton.IsEnabled = true;
             ChangePasswordButton.IsEnabled = false;
+            SaveFavouriteLocationButton.IsEnabled = false;
             buffer = new byte[85];
             ClientLogTextBox.Text = "";
+
+#if RELEASE
+            textBoxLogin.Clear();
+            textBoxPassword.Clear();
+            textBoxLocation.Clear();
+            textBoxDate.Clear();
+#endif
         }
 
         /// <summary>
@@ -145,12 +153,26 @@ namespace WeatherClient
                 buffer = new byte[1024];
                 await stream.ReadAsync(buffer, 0, buffer.Length);
 
+                message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+                if (message.Contains("fav"))
+                {
+                    var weatherPreferences = message.Substring(3).Split(';');
+
+                    textBoxLocation.Text = weatherPreferences[0];
+                    textBoxDate.Text = weatherPreferences[1];
+
+                    buffer = new byte[1024];
+                    await stream.ReadAsync(buffer, 0, buffer.Length);
+                }
+
                 ClientLogTextBox.Text = "Enter Location and number of days or date";
 
                 GetWeatherButton.IsEnabled = true;
                 SaveWeatherButton.IsEnabled = true;
                 LoginButton.IsEnabled = false;
                 ChangePasswordButton.IsEnabled = true;
+                SaveFavouriteLocationButton.IsEnabled = true;
             }
         }
 
@@ -352,6 +374,65 @@ namespace WeatherClient
         }
 
         /// <summary>
+        /// Check if weather period is a date or days number
+        /// </summary>
+        private void CheckDateForSaving()
+        {
+            var weatherPeriod = textBoxDate.Text;
+
+            if (weatherPeriod.Contains('-'))
+            {
+                switch (MessageBox.Show("Weather period is a date\nIt will expire\nWould you like to save it anyway?",
+                    "Potential date issue", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                {
+                    case MessageBoxResult.Yes:
+                        SaveLocationAndTime(weatherPeriod);
+                        break;
+                    case MessageBoxResult.No:
+                    case MessageBoxResult.Cancel:
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                SaveLocationAndTime(weatherPeriod);
+            }
+
+        }
+
+        /// <summary>
+        /// Save date and favourite location na server's database
+        /// </summary>
+        /// <param name="weatherPeriod"></param>
+        private async void SaveLocationAndTime(string weatherPeriod)
+        {
+            buffer = Encoding.ASCII.GetBytes("favourite");
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+
+            buffer = new byte[85];
+
+            buffer = Encoding.ASCII.GetBytes($"{textBoxLogin.Text};{textBoxLocation.Text};{weatherPeriod}");
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+
+            buffer = new byte[1024];
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+            string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+            if (data.Contains("Error"))
+            {
+                MessageBox.Show("Can't save favourite location, try again", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show("Favourite location saved", "Location saved",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        /// <summary>
         /// Minimizes application
         /// </summary>
         /// <param name="sender">button object</param>
@@ -407,6 +488,11 @@ namespace WeatherClient
         private void SaveWeatherButton_Click(object sender, RoutedEventArgs e)
         {
             SaveWeather();
+        }
+
+        private void SaveFavouriteLocationButton_Click(object sender, RoutedEventArgs e)
+        {
+            CheckDateForSaving();
         }
 
         private void ClearWeatherForecast_Click(object sender, RoutedEventArgs e)
