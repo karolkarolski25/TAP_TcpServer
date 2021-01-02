@@ -1,11 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace WeatherClient
 {
@@ -30,7 +32,7 @@ namespace WeatherClient
             textBoxPort.Text = "2048";
 
             textBoxLogin.Text = "qwe";
-            textBoxPassword.Text = "qwe";
+            textBoxPassword.Password = "qwe";
 
             textBoxLocation.Text = "Warsaw,Berlin,Szczecin";
             textBoxDate.Text = "3";
@@ -40,7 +42,7 @@ namespace WeatherClient
         /// <summary>
         /// Connects to server and receives first message from server
         /// </summary>
-        private void ConnectToServer()
+        private async void ConnectToServer()
         {
             ipAddress = textBoxIPAddress.Text;
 
@@ -54,7 +56,9 @@ namespace WeatherClient
 
             try
             {
-                client = new TcpClient(ipAddress, port);
+                client = new TcpClient();
+
+                await client.ConnectAsync(ipAddress, port);
             }
             catch
             {
@@ -101,8 +105,8 @@ namespace WeatherClient
         {
             buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text);
 
-            stream.Write(buffer, 0, buffer.Length);
-            stream.Write(buffer, 0, 2);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, 2);
 
             buffer = new byte[85];
 
@@ -112,7 +116,7 @@ namespace WeatherClient
 
             if (Encoding.ASCII.GetString(buffer).Replace("\0", "") == "Password: ")
             {
-                buffer = Encoding.ASCII.GetBytes(textBoxPassword.Text);
+                buffer = Encoding.ASCII.GetBytes(textBoxPassword.Password);
 
                 await stream.WriteAsync(buffer, 0, buffer.Length);
                 await stream.WriteAsync(buffer, 0, 2);
@@ -245,14 +249,14 @@ namespace WeatherClient
 
             if (cp.DialogResult.Value)
             {
-                textBoxPassword.Text = cp.textBoxNewPassword.Text;
+                textBoxPassword.Password = cp.textBoxNewPassword.Password;
 
                 buffer = Encoding.ASCII.GetBytes("change");
                 await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[85];
 
-                buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxPassword.Text);
+                buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxPassword.Password);
                 await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[1024];
@@ -298,12 +302,77 @@ namespace WeatherClient
                 MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
+                OpenTxtFile(filePath);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error during saving file\n{ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>
+        /// Start txt file after saving logs
+        /// </summary>
+        /// <param name="filePath">Log file path</param>
+        private static void OpenTxtFile(string filePath)
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            };
+
+            Process.Start(processStartInfo);
+        }
+
+        /// <summary>
+        /// Quits client application
+        /// </summary>
+        /// <param name="sender">button object</param>
+        /// <param name="e">button event</param>
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (MessageBox.Show("Are you sure?", "Closing application",
+                MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+            {
+                case MessageBoxResult.Yes:
+                    if (connected)
+                    {
+                        client.Close();
+                    }
+                    Close();
+                    break;
+                case MessageBoxResult.No:
+                case MessageBoxResult.Cancel:
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Minimizes application
+        /// </summary>
+        /// <param name="sender">button object</param>
+        /// <param name="e">button event</param>
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        /// <summary>
+        /// Event occurs after pressing left mouse button
+        /// </summary>
+        /// <param name="sender">Mouse object</param>
+        /// <param name="e">Mouse event event</param>
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch { }
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)

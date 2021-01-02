@@ -36,7 +36,7 @@ namespace Login.Services
 
             try
             {
-                _storageService.UpdateData(new UserData()
+                _storageService.UpdateData(new User()
                 {
                     Login = login,
                     Password = await _cryptoService.EncryptPassword(password)
@@ -95,7 +95,7 @@ namespace Login.Services
 
             try
             {
-                _storageService.UpdateData(new UserData()
+                _storageService.UpdateData(new User()
                 {
                     Login = login,
                     Password = await _cryptoService.EncryptPassword(password)

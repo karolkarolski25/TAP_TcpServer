@@ -1,13 +1,17 @@
 ﻿using Login.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Events;
 using Storage.DAL;
 using Storage.Events;
 using Storage.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -26,9 +30,9 @@ namespace ServerGUI.ViewModels
 
         public Visibility NewUserVisibility { get; set; } = Visibility.Collapsed;
 
-        public ObservableCollection<UserData> UsersDataView { get; set; }
-        public ObservableCollection<UserData> SelectedUserDetails { get; set; } = new ObservableCollection<UserData>();
-        public UserData SelectedUser { get; set; }
+        public ObservableCollection<User> UsersDataView { get; set; }
+        public ObservableCollection<User> SelectedUserDetails { get; set; } = new ObservableCollection<User>();
+        public User SelectedUser { get; set; }
 
         private DelegateCommand _removeUserCommand;
         public DelegateCommand RemoveUserCommand => _removeUserCommand ??= new DelegateCommand(RemoveUser)
@@ -143,6 +147,81 @@ namespace ServerGUI.ViewModels
         }
 
         /// <summary>
+        /// Check database content
+        /// </summary>
+        private async void ExportDatabaseContent()
+        {
+            var databaseContent = await _storageService.GetUserDataAsync();
+
+            if (databaseContent.Any())
+            {
+                ExportDatabaseContent(databaseContent);
+            }
+            else
+            {
+                switch (MessageBox.Show("Database is empty\nDo you want to export it anyway?", "Question",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                {
+                    case MessageBoxResult.Yes:
+                        ExportDatabaseContent(databaseContent);
+                        break;
+                    case MessageBoxResult.No:
+                    case MessageBoxResult.Cancel:
+                    default:
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Export database content to *.csv file
+        /// </summary>
+        /// <param name="databaseContent">databae content</param>
+        private async void ExportDatabaseContent(IEnumerable<User> databaseContent)
+        {
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                FileName = "Weather server database",
+                DefaultExt = ".csv",
+                Filter = "CSV file (.csv)|*.csv"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                string filePath = dlg.FileName;
+
+                using var writer = new StreamWriter(filePath);
+
+                await writer.WriteLineAsync("ID,Login,FavouriteLocation");
+
+                foreach (var user in databaseContent)
+                {
+                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocation}");
+                }
+
+                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                OpenCsvFile(filePath);
+            }
+        }
+
+        /// <summary>
+        /// Start csv file after saving logs
+        /// </summary>
+        /// <param name="filePath">database content file path</param>
+        private void OpenCsvFile(string filePath)
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            };
+
+            Process.Start(processStartInfo);
+        }
+
+        /// <summary>
         /// Show fileds to add new user
         /// </summary>
         private void ShowAddNewUserFields()
@@ -168,7 +247,7 @@ namespace ServerGUI.ViewModels
             {
                 if (!(await _storageService.GetUserDataAsync()).Any(u => u.Login == NewLogin))
                 {
-                    var newUser = new UserData()
+                    var newUser = new User()
                     {
                         Login = NewLogin,
                         Password = await _cryptoService.EncryptPassword("1234"),
@@ -182,11 +261,17 @@ namespace ServerGUI.ViewModels
 
                     _logger.LogInformation($"User {NewLogin} added with default password: 1234");
 
-                    UsersDataView = new ObservableCollection<UserData>(await _storageService.GetUserDataAsync());
+                    UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
                     OnPropertyChanged(nameof(UsersDataView));
 
                     NewUserVisibility = Visibility.Collapsed;
                     OnPropertyChanged(nameof(NewUserVisibility));
+
+                    NewLogin = string.Empty;
+                    OnPropertyChanged(nameof(NewLogin));
+
+                    NewFavouriteLocation = string.Empty;
+                    OnPropertyChanged(nameof(NewFavouriteLocation));
                 }
                 else
                 {
@@ -224,9 +309,9 @@ namespace ServerGUI.ViewModels
         /// Update data from database
         /// </summary>
         /// <param name="users">List from database</param>
-        public void SetDatabaseContent(List<UserData> users)
+        public void SetDatabaseContent(List<User> users)
         {
-            UsersDataView = new ObservableCollection<UserData>(users);
+            UsersDataView = new ObservableCollection<User>(users);
         }
 
         /// <summary>

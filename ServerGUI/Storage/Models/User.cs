@@ -1,6 +1,6 @@
 ﻿namespace Storage.Models
 {
-    public class UserData
+    public class User
     {
         public long Id { get; set; }
         public string Login { get; set; }

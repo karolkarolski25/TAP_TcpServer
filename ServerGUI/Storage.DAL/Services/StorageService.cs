@@ -13,14 +13,13 @@ namespace Storage.DAL
 {
     public class StorageService : IStorageService
     {
-        public UserData UserDatas { get; set; }
+        public User Users { get; set; }
 
         private readonly ILogger<StorageService> _logger;
-        private readonly IUserDataContext _userDataContext;
+        private readonly IUserContext _userDataContext;
         private readonly IEventAggregator _eventAggregator;
 
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
-
 
         public StorageService(IUserContext userDataContext, ILogger<StorageService> logger, 
             IEventAggregator eventAggregator)
@@ -29,16 +28,16 @@ namespace Storage.DAL
             _logger = logger;
             _eventAggregator = eventAggregator;
 
-            UserDatas = new UserData();
+            Users = new User();
         }
 
         /// <summary>
         /// Add new user to database
         /// </summary>
         /// <param name="userData">new user data</param>
-        public async void AddUserDataAsync(UserData userData)
+        public async void AddUserDataAsync(User userData)
         {
-            _userDataContext.UserDatas.Add(userData);
+            _userDataContext.Users.Add(userData);
 
             _logger.LogInformation($"Added new user: {userData.Login}");
 
@@ -52,19 +51,19 @@ namespace Storage.DAL
         /// </summary>
         public async void EditData()
         {
-            var userToEdit = _userDataContext.UserDatas.FirstOrDefault(d => d.Login == UserDatas.Login);
+            var userToEdit = _userDataContext.Users.FirstOrDefault(d => d.Login == Users.Login);
 
             if (userToEdit != null)
             {
                 _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Login}");
 
-                userToEdit.Password = UserDatas.Password;
+                userToEdit.Password = Users.Password;
 
                 await SaveChangesAsync();
             }
             else
             {
-                AddUserDataAsync(UserDatas);
+                AddUserDataAsync(Users);
             }
         }
 
@@ -72,12 +71,12 @@ namespace Storage.DAL
         /// Updates specified user
         /// </summary>
         /// <param name="userData"></param>
-        public void UpdateData(UserData userData)
+        public void UpdateData(User userData)
         {
-            UserDatas.Id = 0;
-            UserDatas.Login = userData.Login;
-            UserDatas.Password = userData.Password;
-            UserDatas.FavouriteLocation = userData.FavouriteLocation;
+            Users.Id = 0;
+            Users.Login = userData.Login;
+            Users.Password = userData.Password;
+            Users.FavouriteLocation = userData.FavouriteLocation;
 
             EditData();
         }
@@ -86,20 +85,20 @@ namespace Storage.DAL
         /// Get all users
         /// </summary>
         /// <returns>List containing all users</returns>
-        public async Task<List<UserData>> GetUserDataAsync()
+        public async Task<List<User>> GetUserDataAsync()
         {
             await semaphoreSlim.WaitAsync();
 
             try
             {
-                await _userDataContext.UserDatas.LoadAsync();
+                await _userDataContext.Users.LoadAsync();
             }
             finally
             {
                 semaphoreSlim.Release();
             }
 
-            return _userDataContext.UserDatas.ToList();
+            return _userDataContext.Users.ToList();
         }
 
         /// <summary>
@@ -124,9 +123,9 @@ namespace Storage.DAL
         /// Remove specified user from database
         /// </summary>
         /// <param name="userData">User to delete</param>
-        public async void RemoveUserDataAsync(UserData userData)
+        public async void RemoveUserDataAsync(User userData)
         {
-            _userDataContext.UserDatas.Remove(userData);
+            _userDataContext.Users.Remove(userData);
 
             _logger.LogInformation($"Removed user: {userData.Login}");
 
