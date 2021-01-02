@@ -81,7 +81,7 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void ConfirmEditUserUser()
         {
-            if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}") 
+            if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
                 || string.IsNullOrEmpty(NewWeatherPeriod))
             {
                 _storageService.UpdateData(new User()
@@ -108,7 +108,7 @@ namespace ServerGUI.ViewModels
             }
             else
             {
-                MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error", 
+                MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -260,35 +260,44 @@ namespace ServerGUI.ViewModels
             {
                 if (!(await _storageService.GetUserDataAsync()).Any(u => u.Login == NewLogin))
                 {
-                    var newUser = new User()
+                    if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
+                          || string.IsNullOrEmpty(NewWeatherPeriod))
                     {
-                        Login = NewLogin,
-                        Password = await _cryptoService.EncryptPassword("1234"),
-                        FavouriteLocations = NewFavouriteLocation,
-                        PreferredWeatherPeriod = NewWeatherPeriod
-                    };
+                        var newUser = new User()
+                        {
+                            Login = NewLogin,
+                            Password = await _cryptoService.EncryptPassword("1234"),
+                            FavouriteLocations = NewFavouriteLocation,
+                            PreferredWeatherPeriod = NewWeatherPeriod
+                        };
 
-                    _storageService.UpdateData(newUser);
+                        _storageService.UpdateData(newUser);
 
-                    MessageBox.Show($"User {NewLogin} added with default password: 1234", "New user added",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"User {NewLogin} added with default password: 1234", "New user added",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    _logger.LogInformation($"User {NewLogin} added with default password: 1234");
+                        _logger.LogInformation($"User {NewLogin} added with default password: 1234");
 
-                    UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
-                    OnPropertyChanged(nameof(UsersDataView));
+                        UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
+                        OnPropertyChanged(nameof(UsersDataView));
 
-                    NewUserVisibility = Visibility.Collapsed;
-                    OnPropertyChanged(nameof(NewUserVisibility));
+                        NewUserVisibility = Visibility.Collapsed;
+                        OnPropertyChanged(nameof(NewUserVisibility));
 
-                    NewLogin = string.Empty;
-                    OnPropertyChanged(nameof(NewLogin));
+                        NewLogin = string.Empty;
+                        OnPropertyChanged(nameof(NewLogin));
 
-                    NewFavouriteLocation = string.Empty;
-                    OnPropertyChanged(nameof(NewFavouriteLocation));
+                        NewFavouriteLocation = string.Empty;
+                        OnPropertyChanged(nameof(NewFavouriteLocation));
 
-                    NewWeatherPeriod = string.Empty;
-                    OnPropertyChanged(nameof(NewWeatherPeriod));
+                        NewWeatherPeriod = string.Empty;
+                        OnPropertyChanged(nameof(NewWeatherPeriod));
+                    }
+                    else
+                    {
+                        MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {

@@ -34,7 +34,7 @@ namespace Weather.Services
         {
             int days;
 
-            if (Regex.IsMatch(weatherDate, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}"))
+            if (Regex.IsMatch(weatherDate, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))"))
             {
                 DateTime date;
 

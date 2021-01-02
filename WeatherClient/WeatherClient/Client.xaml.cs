@@ -381,10 +381,10 @@ namespace WeatherClient
         {
             var weatherPeriod = textBoxDate.Text;
 
-            if (int.TryParse(weatherPeriod, out _) || Regex.IsMatch(weatherPeriod, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}")
+            if (int.TryParse(weatherPeriod, out _) || Regex.IsMatch(weatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
                 || string.IsNullOrEmpty(weatherPeriod))
             {
-                if (Regex.IsMatch(weatherPeriod, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}"))
+                if (Regex.IsMatch(weatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))"))
                 {
                     switch (MessageBox.Show("Weather period is a date\nIt will expire\nWould you like to save it anyway?",
                         "Potential date issue", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
