@@ -4,9 +4,8 @@ using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Events;
 using Storage.DAL;
-using Storage.Events;
+using Storage.DAL.Events;
 using Storage.Models;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,6 +26,7 @@ namespace ServerGUI.ViewModels
 
         public string NewLogin { get; set; } = string.Empty;
         public string NewFavouriteLocation { get; set; } = string.Empty;
+        public string NewWeatherPeriod { get; set; } = string.Empty;
 
         public Visibility NewUserVisibility { get; set; } = Visibility.Collapsed;
 
@@ -64,7 +64,7 @@ namespace ServerGUI.ViewModels
             _eventAggregator = eventAggregator;
 
             _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(UpdateListViewCollection);
-            _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection); 
+            _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection);
         }
 
         /// <summary>
@@ -182,7 +182,8 @@ namespace ServerGUI.ViewModels
                     {
                         Login = NewLogin,
                         Password = await _cryptoService.EncryptPassword("1234"),
-                        FavouriteLocations = NewFavouriteLocation
+                        FavouriteLocations = NewFavouriteLocation,
+                        PreferredWeatherPeriod = NewWeatherPeriod
                     };
 
                     _storageService.UpdateData(newUser);
@@ -203,6 +204,9 @@ namespace ServerGUI.ViewModels
 
                     NewFavouriteLocation = string.Empty;
                     OnPropertyChanged(nameof(NewFavouriteLocation));
+
+                    NewWeatherPeriod = string.Empty;
+                    OnPropertyChanged(nameof(NewWeatherPeriod));
                 }
                 else
                 {

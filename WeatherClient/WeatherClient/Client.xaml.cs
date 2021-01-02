@@ -97,6 +97,13 @@ namespace WeatherClient
             SaveFavouriteLocationButton.IsEnabled = false;
             buffer = new byte[85];
             ClientLogTextBox.Text = "";
+
+#if RELEASE
+            textBoxLogin.Clear();
+            textBoxPassword.Clear();
+            textBoxLocation.Clear();
+            textBoxDate.Clear();
+#endif
         }
 
         /// <summary>
@@ -150,7 +157,10 @@ namespace WeatherClient
 
                 if (message.Contains("fav"))
                 {
-                    textBoxLocation.Text = message.Substring(3);
+                    var weatherPreferences = message.Substring(3).Split(';');
+
+                    textBoxLocation.Text = weatherPreferences[0];
+                    textBoxDate.Text = weatherPreferences[1];
 
                     buffer = new byte[1024];
                     await stream.ReadAsync(buffer, 0, buffer.Length);
@@ -363,15 +373,46 @@ namespace WeatherClient
             }
         }
 
+        /// <summary>
+        /// Check if weather period is a date or days number
+        /// </summary>
+        private void CheckDateForSaving()
+        {
+            var weatherPeriod = textBoxDate.Text;
 
-        private async void SaveFavouriteLocation()
+            if (weatherPeriod.Contains('-'))
+            {
+                switch (MessageBox.Show("Weather period is a date\nIt will expire\nWould you like to save it anyway?",
+                    "Potential date issue", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                {
+                    case MessageBoxResult.Yes:
+                        SaveLocationAndTime(weatherPeriod);
+                        break;
+                    case MessageBoxResult.No:
+                    case MessageBoxResult.Cancel:
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                SaveLocationAndTime(weatherPeriod);
+            }
+
+        }
+
+        /// <summary>
+        /// Save date and favourite location na server's database
+        /// </summary>
+        /// <param name="weatherPeriod"></param>
+        private async void SaveLocationAndTime(string weatherPeriod)
         {
             buffer = Encoding.ASCII.GetBytes("favourite");
             await stream.WriteAsync(buffer, 0, buffer.Length);
 
             buffer = new byte[85];
 
-            buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxLocation.Text);
+            buffer = Encoding.ASCII.GetBytes($"{textBoxLogin.Text};{textBoxLocation.Text};{weatherPeriod}");
             await stream.WriteAsync(buffer, 0, buffer.Length);
 
             buffer = new byte[1024];
@@ -451,7 +492,7 @@ namespace WeatherClient
 
         private void SaveFavouriteLocationButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveFavouriteLocation();
+            CheckDateForSaving();
         }
 
         private void ClearWeatherForecast_Click(object sender, RoutedEventArgs e)

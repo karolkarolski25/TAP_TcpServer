@@ -1,6 +1,6 @@
 ﻿using Prism.Events;
 
-namespace Storage.Events
+namespace Storage.DAL.Events
 {
     public class NewUserRegistered : PubSubEvent
     {

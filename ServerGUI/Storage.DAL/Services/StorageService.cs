@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Storage.Context;
-using Storage.Events;
+using Storage.DAL.Events;
 using Storage.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,10 +57,11 @@ namespace Storage.DAL
 
             if (userToEdit != null)
             {
-                _logger.LogInformation($"Changed password or favourite location for user: {userToEdit.Login}");
+                _logger.LogInformation($"Updated user: {userToEdit.Login}");
 
                 userToEdit.Password = Users.Password ?? userToEdit.Password;
                 userToEdit.FavouriteLocations = Users.FavouriteLocations ?? userToEdit.FavouriteLocations;
+                userToEdit.PreferredWeatherPeriod = Users.PreferredWeatherPeriod ?? userToEdit.PreferredWeatherPeriod;
 
                 await SaveChangesAsync();
 
@@ -81,6 +82,7 @@ namespace Storage.DAL
             Users.Login = userData.Login;
             Users.Password = userData.Password ?? Users.Password;
             Users.FavouriteLocations = userData.FavouriteLocations;
+            Users.PreferredWeatherPeriod = userData.PreferredWeatherPeriod;
 
             EditData();
         }
@@ -107,7 +109,9 @@ namespace Storage.DAL
 
         public async Task<string> GetFavouriteLocations(string login)
         {
-            return (await GetUserDataAsync()).FirstOrDefault(d => d.Login == login).FavouriteLocations;
+            var user = (await GetUserDataAsync()).FirstOrDefault(d => d.Login == login);
+
+            return $"{user.FavouriteLocations};{user.PreferredWeatherPeriod}";
         }
 
         /// <summary>

@@ -389,28 +389,32 @@ namespace Server.Services
             string data = Encoding.ASCII.GetString(locationBuffer);
             data = data.Replace("\0", "");
 
-            string login = data.Substring(0, data.IndexOf(';'));
-            string locations = data.Substring(data.IndexOf(';') + 1);
+            //string login = data.Substring(0, data.IndexOf(';'));
+            //string locations = data.Substring(data.IndexOf(';') + 1);
+
+            string[] clientData = data.Split(';');
 
             try
             {
                 _storageService.UpdateData(new User()
                 {
-                    Login = login,
-                    FavouriteLocations = locations
+                    Login = clientData[0],
+                    FavouriteLocations = clientData[1],
+                    PreferredWeatherPeriod = clientData[2]
                 });
 
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} saved favourite location(s) ({locations})");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {clientData[0]} saved favourite location(s) " +
+                    $"({clientData[1]}, {clientData[2]} days)");
 
-                _logger.LogInformation($"User: {login} saved favourite location(s) ({locations})");
+                _logger.LogInformation($"User: {clientData[0]} saved favourite location(s) ({clientData[1]}, {clientData[2]} days)");
 
                 data = "Favourite location saved\r\n";
             }
             catch (Exception ex)
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {login} favourite location(s)");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {clientData[0]} favourite location(s)");
 
-                _logger.LogInformation($"Error while saving User: {login} favourite location(s) ({ex.Message})");
+                _logger.LogInformation($"Error while saving User: {clientData[0]} favourite location(s) ({ex.Message})");
 
                 data = "Error favourite location not saved\r\n";
             }
@@ -473,7 +477,7 @@ namespace Server.Services
 
                          } while (badCredentials);
 
-                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes("fav" + await _storageService.GetFavouriteLocations(login)));
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes($"fav{await _storageService.GetFavouriteLocations(login)}"));
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                              0, ServerMessagesResources.EnterLocationMessage.Length);
