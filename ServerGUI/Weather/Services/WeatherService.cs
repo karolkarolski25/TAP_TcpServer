@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -22,6 +23,40 @@ namespace Weather.Services
             _weatherApiConfiguration = weatherApiConfiguration;
 
             weatherUrl = weatherUrl.Replace("@api@", _weatherApiConfiguration.ApiKey);
+        }
+
+        /// <summary>
+        /// Calculates weather period
+        /// </summary>
+        /// <param name="weatherDate">Date</param>
+        /// <returns>Days naumber between today and given date</returns>
+        public int CalculateWeatherPeriod(string weatherDate)
+        {
+            int days;
+
+            if (Regex.IsMatch(weatherDate, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))"))
+            {
+                DateTime date;
+
+                if (DateTime.TryParse(weatherDate, out date))
+                {
+                    var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+                    days = (int)(date - currentDate).TotalDays + 1;
+                }
+                else
+                {
+                    days = -1;
+                }
+            }
+            else
+            {
+                if (!int.TryParse(weatherDate, out days))
+                {
+                    days = -1;
+                }
+            }
+
+            return days;
         }
 
         /// <summary>

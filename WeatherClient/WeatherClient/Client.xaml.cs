@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -380,25 +381,33 @@ namespace WeatherClient
         {
             var weatherPeriod = textBoxDate.Text;
 
-            if (weatherPeriod.Contains('-'))
+            if (int.TryParse(weatherPeriod, out _) || Regex.IsMatch(weatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
+                || string.IsNullOrEmpty(weatherPeriod))
             {
-                switch (MessageBox.Show("Weather period is a date\nIt will expire\nWould you like to save it anyway?",
-                    "Potential date issue", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                if (Regex.IsMatch(weatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))"))
                 {
-                    case MessageBoxResult.Yes:
-                        SaveLocationAndTime(weatherPeriod);
-                        break;
-                    case MessageBoxResult.No:
-                    case MessageBoxResult.Cancel:
-                    default:
-                        break;
+                    switch (MessageBox.Show("Weather period is a date\nIt will expire\nWould you like to save it anyway?",
+                        "Potential date issue", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                    {
+                        case MessageBoxResult.Yes:
+                            SaveLocationAndTime(weatherPeriod);
+                            break;
+                        case MessageBoxResult.No:
+                        case MessageBoxResult.Cancel:
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    SaveLocationAndTime(weatherPeriod);
                 }
             }
             else
             {
-                SaveLocationAndTime(weatherPeriod);
+                MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
 
         /// <summary>

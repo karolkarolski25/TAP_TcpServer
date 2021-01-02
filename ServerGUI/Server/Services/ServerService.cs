@@ -28,7 +28,7 @@ namespace Server.Services
         private bool badCredentials = false;
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
-            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator, 
+            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator,
             IStorageService storageService)
         {
             _weatherService = weatherService;
@@ -93,11 +93,11 @@ namespace Server.Services
             {
                 string receivedData = Encoding.ASCII.GetString(buffer);
 
-                if (receivedData.IndexOf("exit") >= 0)
+                if (receivedData.Contains("exit"))
                 {
                     return "exit";
                 }
-                else if (receivedData.IndexOf("change") >= 0)
+                else if (receivedData.Contains("change"))
                 {
                     await HandlePasswordChange(stream);
 
@@ -107,7 +107,7 @@ namespace Server.Services
 
                     return "ok";
                 }
-                else if (receivedData.IndexOf("favourite") >= 0)
+                else if (receivedData.Contains("favourite"))
                 {
                     await HandleFavouriteLocationSave(stream);
 
@@ -118,9 +118,9 @@ namespace Server.Services
                     return "ok";
                 }
 
-                else if (receivedData.IndexOf("??") < 0)
+                else if (!receivedData.Contains("??"))
                 {
-                    if (receivedData.IndexOf("\r\n") < 0)
+                    if (!receivedData.Contains("\r\n"))
                     {
                         string[] locations = new string(receivedData.Where(c => c != '\0').ToArray()).Split(',');
 
@@ -151,7 +151,7 @@ namespace Server.Services
                     Array.Clear(buffer, 0, buffer.Length);
                 }
 
-                else if (receivedData.IndexOf("??") >= 0)
+                else if (receivedData.Contains("??"))
                 {
                     await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.NonAsciiCharsMessage),
                         0, ServerMessagesResources.NonAsciiCharsMessage.Length);
@@ -192,29 +192,7 @@ namespace Server.Services
 
             string weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
 
-            int days;
-
-            if (weatherDate.Contains('-'))
-            {
-                DateTime date;
-
-                if (DateTime.TryParse(weatherDate, out date))
-                {
-                    var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-                    days = (int)(date - currentDate).TotalDays + 1;
-                }
-                else
-                {
-                    days = -1;
-                }
-            }
-            else
-            {
-                if (!int.TryParse(weatherDate, out days))
-                {
-                    days = -1;
-                }
-            }
+            int days = _weatherService.CalculateWeatherPeriod(weatherDate);
 
             while (days < 1 || days > 6)
             {
@@ -232,27 +210,7 @@ namespace Server.Services
 
                 weatherDate = Encoding.ASCII.GetString(daysPeriodBuffer);
 
-                if (weatherDate.Contains('-'))
-                {
-                    DateTime date;
-
-                    if (DateTime.TryParse(weatherDate, out date))
-                    {
-                        var currentDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-                        days = (int)(date - currentDate).TotalDays;
-                    }
-                    else
-                    {
-                        days = -1;
-                    }
-                }
-                else
-                {
-                    if (!int.TryParse(weatherDate, out days))
-                    {
-                        days = -1;
-                    }
-                }
+                days = _weatherService.CalculateWeatherPeriod(weatherDate);
             }
 
             return days;
@@ -388,9 +346,6 @@ namespace Server.Services
             await stream.ReadAsync(locationBuffer, 0, locationBuffer.Length);
             string data = Encoding.ASCII.GetString(locationBuffer);
             data = data.Replace("\0", "");
-
-            //string login = data.Substring(0, data.IndexOf(';'));
-            //string locations = data.Substring(data.IndexOf(';') + 1);
 
             string[] clientData = data.Split(';');
 

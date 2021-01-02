@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace ServerGUI.ViewModels
@@ -29,6 +30,7 @@ namespace ServerGUI.ViewModels
         public string NewWeatherPeriod { get; set; } = string.Empty;
 
         public Visibility NewUserVisibility { get; set; } = Visibility.Collapsed;
+        public Visibility EditSelectedUserVisibility { get; set; } = Visibility.Collapsed;
 
         public ObservableCollection<User> UsersDataView { get; set; }
         public ObservableCollection<User> SelectedUserDetails { get; set; } = new ObservableCollection<User>();
@@ -50,6 +52,13 @@ namespace ServerGUI.ViewModels
         private DelegateCommand _exportDatabaseContentCommand;
         public DelegateCommand ExportDatabaseContentCommand => _exportDatabaseContentCommand ??= new DelegateCommand(CheckDatabaseContent);
 
+        private DelegateCommand _showEditUserFieldsCommand;
+        public DelegateCommand ShowEditUserFieldsCommand => _showEditUserFieldsCommand ??= new DelegateCommand(ShowEditUserFields)
+            .ObservesCanExecute(() => canEditUser);
+
+        private DelegateCommand _confirmEditUserUserCommand;
+        public DelegateCommand ConfirmEditUserUserCommand => _confirmEditUserUserCommand ??= new DelegateCommand(ConfirmEditUserUser);
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -68,6 +77,74 @@ namespace ServerGUI.ViewModels
         }
 
         /// <summary>
+        /// Edit selected user data
+        /// </summary>
+        private void ConfirmEditUserUser()
+        {
+            if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
+                || string.IsNullOrEmpty(NewWeatherPeriod))
+            {
+                _storageService.UpdateData(new User()
+                {
+                    Login = SelectedUser.Login,
+                    FavouriteLocations = NewFavouriteLocation,
+                    PreferredWeatherPeriod = NewWeatherPeriod
+                });
+
+                NewFavouriteLocation = string.Empty;
+                OnPropertyChanged(nameof(NewFavouriteLocation));
+
+                NewWeatherPeriod = string.Empty;
+                OnPropertyChanged(nameof(NewWeatherPeriod));
+
+                EditSelectedUserVisibility = Visibility.Collapsed;
+
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
+
+                SelectionChanged();
+
+                MessageBox.Show($"Sucessfully edited user {SelectedUser.Login}", "Edit completed",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Show fileds to edit selected user
+        /// </summary>
+        private async void ShowEditUserFields()
+        {
+            var userToEdit = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == SelectedUser.Login);
+
+            if (userToEdit != null)
+            {
+                NewFavouriteLocation = userToEdit.FavouriteLocations;
+                OnPropertyChanged(nameof(NewFavouriteLocation));
+
+                NewWeatherPeriod = userToEdit.PreferredWeatherPeriod;
+                OnPropertyChanged(nameof(NewWeatherPeriod));
+
+                if (EditSelectedUserVisibility == Visibility.Collapsed)
+                {
+                    EditSelectedUserVisibility = Visibility.Visible;
+                    NewUserVisibility = Visibility.Collapsed;
+
+                    OnPropertyChanged(nameof(NewUserVisibility));
+                }
+                else
+                {
+                    EditSelectedUserVisibility = Visibility.Collapsed;
+                }
+
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
+            }
+        }
+
+        /// <summary>
         /// Refresh ListView collection
         /// </summary>
         private async void UpdateListViewCollection()
@@ -75,6 +152,8 @@ namespace ServerGUI.ViewModels
             UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
 
             OnPropertyChanged(nameof(UsersDataView));
+
+            SelectionChanged();
         }
 
         /// <summary>
@@ -160,6 +239,9 @@ namespace ServerGUI.ViewModels
             if (NewUserVisibility == Visibility.Collapsed)
             {
                 NewUserVisibility = Visibility.Visible;
+                EditSelectedUserVisibility = Visibility.Collapsed;
+
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
             }
             else
             {
@@ -178,35 +260,44 @@ namespace ServerGUI.ViewModels
             {
                 if (!(await _storageService.GetUserDataAsync()).Any(u => u.Login == NewLogin))
                 {
-                    var newUser = new User()
+                    if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, @"((0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-([12]\d{3}))")
+                          || string.IsNullOrEmpty(NewWeatherPeriod))
                     {
-                        Login = NewLogin,
-                        Password = await _cryptoService.EncryptPassword("1234"),
-                        FavouriteLocations = NewFavouriteLocation,
-                        PreferredWeatherPeriod = NewWeatherPeriod
-                    };
+                        var newUser = new User()
+                        {
+                            Login = NewLogin,
+                            Password = await _cryptoService.EncryptPassword("1234"),
+                            FavouriteLocations = NewFavouriteLocation,
+                            PreferredWeatherPeriod = NewWeatherPeriod
+                        };
 
-                    _storageService.UpdateData(newUser);
+                        _storageService.UpdateData(newUser);
 
-                    MessageBox.Show($"User {NewLogin} added with default password: 1234", "New user added",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"User {NewLogin} added with default password: 1234", "New user added",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    _logger.LogInformation($"User {NewLogin} added with default password: 1234");
+                        _logger.LogInformation($"User {NewLogin} added with default password: 1234");
 
-                    UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
-                    OnPropertyChanged(nameof(UsersDataView));
+                        UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
+                        OnPropertyChanged(nameof(UsersDataView));
 
-                    NewUserVisibility = Visibility.Collapsed;
-                    OnPropertyChanged(nameof(NewUserVisibility));
+                        NewUserVisibility = Visibility.Collapsed;
+                        OnPropertyChanged(nameof(NewUserVisibility));
 
-                    NewLogin = string.Empty;
-                    OnPropertyChanged(nameof(NewLogin));
+                        NewLogin = string.Empty;
+                        OnPropertyChanged(nameof(NewLogin));
 
-                    NewFavouriteLocation = string.Empty;
-                    OnPropertyChanged(nameof(NewFavouriteLocation));
+                        NewFavouriteLocation = string.Empty;
+                        OnPropertyChanged(nameof(NewFavouriteLocation));
 
-                    NewWeatherPeriod = string.Empty;
-                    OnPropertyChanged(nameof(NewWeatherPeriod));
+                        NewWeatherPeriod = string.Empty;
+                        OnPropertyChanged(nameof(NewWeatherPeriod));
+                    }
+                    else
+                    {
+                        MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {
@@ -226,18 +317,21 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void SelectionChanged()
         {
-            if (SelectedUserDetails.Any())
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                SelectedUserDetails.Clear();
-            }
+                if (SelectedUserDetails.Any())
+                {
+                    SelectedUserDetails.Clear();
+                }
 
-            if (SelectedUser != null)
-            {
-                SelectedUserDetails.Add(SelectedUser);
+                if (SelectedUser != null)
+                {
+                    SelectedUserDetails.Add(SelectedUser);
 
-                canEditUser = true;
-                OnPropertyChanged(nameof(canEditUser));
-            }
+                    canEditUser = true;
+                    OnPropertyChanged(nameof(canEditUser));
+                }
+            });
         }
 
         /// <summary>
@@ -271,6 +365,9 @@ namespace ServerGUI.ViewModels
 
                         canEditUser = false;
                         OnPropertyChanged(nameof(canEditUser));
+
+                        EditSelectedUserVisibility = Visibility.Collapsed;
+                        OnPropertyChanged(nameof(EditSelectedUserVisibility));
                     }
 
                     break;

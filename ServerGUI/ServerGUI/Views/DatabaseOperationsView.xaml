@@ -71,7 +71,7 @@
             </ListView.View>
         </ListView>
         <Label Content="Selected user" FontSize="16" Foreground="White" HorizontalAlignment="Left" Margin="616,86,0,0" VerticalAlignment="Top"/>
-        <ListView Margin="428,122,4,269"
+        <ListView Margin="428,122,4,255"
                   ItemsSource="{Binding SelectedUserDetails}"
                   FontSize="16"
                   Foreground="White"
@@ -87,17 +87,41 @@
             </ListView.View>
         </ListView>
 
-        <Grid Margin="468,195,60,224">
+        <Grid Margin="494,198,56,172">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding RemoveUserCommand}" FontSize="16" Grid.Column="0" Content="Remove" HorizontalAlignment="Center" VerticalAlignment="Center" Width="122"/>
-            <Button Command="{Binding ShowAddNewUserFieldsCommand}" FontSize="16" Grid.Column="2" Content="Add new user" HorizontalAlignment="Center" VerticalAlignment="Center" Width="122"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Button Command="{Binding RemoveUserCommand}" FontSize="16" Grid.Column="0" Content="Remove user" HorizontalAlignment="Center" VerticalAlignment="Center" Width="154"/>
+            <Button Command="{Binding ShowAddNewUserFieldsCommand}" FontSize="16" Grid.Column="2" Content="Add new user" HorizontalAlignment="Center" VerticalAlignment="Center" Width="154"/>
+            <Button Command="{Binding ShowEditUserFieldsCommand}" FontSize="16" Grid.Column="0" Grid.Row="1" Content="Edit selected user" HorizontalAlignment="Center" VerticalAlignment="Center" Width="154"/>
+            <Button Command="{Binding ExportDatabaseContentCommand}" FontSize="16" Grid.Column="1" Grid.Row="1" Content="Export database" HorizontalAlignment="Center" VerticalAlignment="Center" Width="154"/>
         </Grid>
 
-        <Button Command="{Binding ExportDatabaseContentCommand}" FontSize="16" Content="Export Database" HorizontalAlignment="Left" VerticalAlignment="Top" Width="134" Margin="594,246,0,0"/>
+        <Grid Visibility="{Binding Path=EditSelectedUserVisibility, Mode=TwoWay}" Margin="470,296,46,22">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
 
+            <Button Command="{Binding ConfirmEditUserUserCommand}" FontSize="16" Grid.Row="3" Grid.Column="1" Content="Confirm" HorizontalAlignment="Center" VerticalAlignment="Center" Width="90"/>
+
+            <Label Content="Favourite location(s):" Grid.Row="0" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35"/>
+            <Label Content="Weather period (days):" Grid.Row="1" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35"/>
+
+            <TextBox Text="{Binding NewFavouriteLocation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Margin="0,8,0,0" Grid.Row="0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="185"/>
+            <TextBox Text="{Binding NewWeatherPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Center" Margin="0,8,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="185"/>
+        </Grid>
+        
         <Grid Margin="418,303,10,10" Visibility="{Binding Path=NewUserVisibility, Mode=TwoWay}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
