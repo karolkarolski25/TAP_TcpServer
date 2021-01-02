@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace ServerGUI.ViewModels
@@ -80,27 +81,36 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void ConfirmEditUserUser()
         {
-            _storageService.UpdateData(new User()
+            if (int.TryParse(NewWeatherPeriod, out _) || Regex.IsMatch(NewWeatherPeriod, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}") 
+                || string.IsNullOrEmpty(NewWeatherPeriod))
             {
-                Login = SelectedUser.Login,
-                FavouriteLocations = NewFavouriteLocation,
-                PreferredWeatherPeriod = NewWeatherPeriod
-            });
+                _storageService.UpdateData(new User()
+                {
+                    Login = SelectedUser.Login,
+                    FavouriteLocations = NewFavouriteLocation,
+                    PreferredWeatherPeriod = NewWeatherPeriod
+                });
 
-            NewFavouriteLocation = string.Empty;
-            OnPropertyChanged(nameof(NewFavouriteLocation));
+                NewFavouriteLocation = string.Empty;
+                OnPropertyChanged(nameof(NewFavouriteLocation));
 
-            NewWeatherPeriod = string.Empty;
-            OnPropertyChanged(nameof(NewWeatherPeriod));
+                NewWeatherPeriod = string.Empty;
+                OnPropertyChanged(nameof(NewWeatherPeriod));
 
-            EditSelectedUserVisibility = Visibility.Collapsed;
+                EditSelectedUserVisibility = Visibility.Collapsed;
 
-            OnPropertyChanged(nameof(EditSelectedUserVisibility));
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
 
-            SelectionChanged();
+                SelectionChanged();
 
-            MessageBox.Show($"Sucessfully edited user {SelectedUser.Login}", "Edit completed", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Sucessfully edited user {SelectedUser.Login}", "Edit completed",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Incorrect weather period\nEnter days number or date (eg. DD-MM-YYYY)", "Weather period error", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
