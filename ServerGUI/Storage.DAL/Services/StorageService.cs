@@ -105,6 +105,11 @@ namespace Storage.DAL
             return _userDataContext.Users.ToList();
         }
 
+        public string GetFavouriteLocations(string login)
+        {
+            return _userDataContext.Users.FirstOrDefault(d => d.Login == login).FavouriteLocations;
+        }
+
         /// <summary>
         /// Apply migrations
         /// </summary>

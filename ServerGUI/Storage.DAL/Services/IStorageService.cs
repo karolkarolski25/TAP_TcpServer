@@ -13,6 +13,7 @@ namespace Storage.DAL
         void RemoveUserDataAsync(User userData);
         void UpdateData(User userData);
         void EditData();
+        string GetFavouriteLocations(string login);
 
         User Users { get; set; }
     }

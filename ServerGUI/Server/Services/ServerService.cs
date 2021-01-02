@@ -454,12 +454,13 @@ namespace Server.Services
                     byte[] weatherBuffer = new byte[_serverConfiguration.WeatherBufferSize];
 
                     string data = string.Empty;
+                    string login = string.Empty;
 
                     Task.Run(async () =>
                      {
                          do
                          {
-                             var login = await GetLoginString(client.GetStream(), signInBuffer);
+                             login = await GetLoginString(client.GetStream(), signInBuffer);
 
                              await client.GetStream().ReadAsync(signInBuffer, 0, 2);
 
@@ -470,6 +471,8 @@ namespace Server.Services
                              await HandleLogin(client.GetStream(), signInBuffer, login, password);
 
                          } while (badCredentials);
+
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes("fav" + _storageService.GetFavouriteLocations(login)));
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                              0, ServerMessagesResources.EnterLocationMessage.Length);

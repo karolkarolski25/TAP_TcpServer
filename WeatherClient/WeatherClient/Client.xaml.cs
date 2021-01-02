@@ -146,6 +146,16 @@ namespace WeatherClient
                 buffer = new byte[1024];
                 await stream.ReadAsync(buffer, 0, buffer.Length);
 
+                message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+                if (message.Contains("fav"))
+                {
+                    textBoxLocation.Text = message.Substring(3);
+
+                    buffer = new byte[1024];
+                    await stream.ReadAsync(buffer, 0, buffer.Length);
+                }
+
                 ClientLogTextBox.Text = "Enter Location and number of days or date";
 
                 GetWeatherButton.IsEnabled = true;
