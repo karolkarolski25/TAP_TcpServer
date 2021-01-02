@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Prism.Commands;
+using Prism.Events;
 using Storage.DAL;
+using Storage.Events;
 using Storage.Models;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace ServerGUI.ViewModels
         private readonly ILogger<DatabaseOperationsViewModel> _logger;
         private readonly IStorageService _storageService;
         private readonly ICryptoService _cryptoService;
-
+        private readonly IEventAggregator _eventAggregator;
         private bool canEditUser { get; set; } = false;
 
         public string NewLogin { get; set; } = string.Empty;
@@ -46,24 +48,39 @@ namespace ServerGUI.ViewModels
         public DelegateCommand ConfirmAddNewUserCommand => _confirmAddNewUserCommand ??= new DelegateCommand(ConfirmAddNewUser);
 
         private DelegateCommand _exportDatabaseContentCommand;
-        public DelegateCommand ExportDatabaseContentCommand => _exportDatabaseContentCommand ??= new DelegateCommand(ExportDatabaseContent);
+        public DelegateCommand ExportDatabaseContentCommand => _exportDatabaseContentCommand ??= new DelegateCommand(CheckDatabaseContent);
 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
 
         public DatabaseOperationsViewModel(IStorageService storageService,
-            ILogger<DatabaseOperationsViewModel> logger, ICryptoService cryptoService)
+            ILogger<DatabaseOperationsViewModel> logger, ICryptoService cryptoService,
+            IEventAggregator eventAggregator)
         {
             _storageService = storageService;
             _logger = logger;
             _cryptoService = cryptoService;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(UpdateListViewCollection);
+            _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection); 
+        }
+
+        /// <summary>
+        /// Refresh ListView collection
+        /// </summary>
+        private async void UpdateListViewCollection()
+        {
+            UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
+
+            OnPropertyChanged(nameof(UsersDataView));
         }
 
         /// <summary>
         /// Check database content
         /// </summary>
-        private async void ExportDatabaseContent()
+        private async void CheckDatabaseContent()
         {
             var databaseContent = await _storageService.GetUserDataAsync();
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Prism.Events;
 using Storage.Context;
+using Storage.Events;
 using Storage.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +17,16 @@ namespace Storage.DAL
 
         private readonly ILogger<StorageService> _logger;
         private readonly IUserContext _userDataContext;
+        private readonly IEventAggregator _eventAggregator;
 
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public StorageService(IUserContext userDataContext, ILogger<StorageService> logger)
+        public StorageService(IUserContext userDataContext, ILogger<StorageService> logger, 
+            IEventAggregator eventAggregator)
         {
             _userDataContext = userDataContext;
             _logger = logger;
+            _eventAggregator = eventAggregator;
 
             Users = new User();
         }
@@ -39,6 +44,8 @@ namespace Storage.DAL
             _logger.LogInformation($"Added new user: {userData.Login}");
 
             await SaveChangesAsync();
+
+            _eventAggregator.GetEvent<NewUserRegistered>().Publish();
         }
 
         /// <summary>
@@ -56,6 +63,8 @@ namespace Storage.DAL
                 userToEdit.FavouriteLocation = Users.FavouriteLocation ?? userToEdit.FavouriteLocation;
 
                 await SaveChangesAsync();
+
+                _eventAggregator.GetEvent<DatabaseContentChanged>().Publish();
             }
             else
             {
