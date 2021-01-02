@@ -63,93 +63,24 @@ namespace ServerGUI.ViewModels
             _cryptoService = cryptoService;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(async () =>
-            {
-                UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
+            _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(UpdateListViewCollection);
+            _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection); 
+        }
 
-                OnPropertyChanged(nameof(UsersDataView));
-            });
+        /// <summary>
+        /// Refresh ListView collection
+        /// </summary>
+        private async void UpdateListViewCollection()
+        {
+            UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
+
+            OnPropertyChanged(nameof(UsersDataView));
         }
 
         /// <summary>
         /// Check database content
         /// </summary>
         private async void CheckDatabaseContent()
-        {
-            var databaseContent = await _storageService.GetUserDataAsync();
-
-            if (databaseContent.Any())
-            {
-                ExportDatabaseContent(databaseContent);
-            }
-            else
-            {
-                switch (MessageBox.Show("Database is empty\nDo you want to export it anyway?", "Question",
-                    MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
-                {
-                    case MessageBoxResult.Yes:
-                        ExportDatabaseContent(databaseContent);
-                        break;
-                    case MessageBoxResult.No:
-                    case MessageBoxResult.Cancel:
-                    default:
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Export database content to *.csv file
-        /// </summary>
-        /// <param name="databaseContent">databae content</param>
-        private async void ExportDatabaseContent(IEnumerable<User> databaseContent)
-        {
-            SaveFileDialog dlg = new SaveFileDialog
-            {
-                FileName = "Weather server database",
-                DefaultExt = ".csv",
-                Filter = "CSV file (.csv)|*.csv"
-            };
-
-            if (dlg.ShowDialog() == true)
-            {
-                string filePath = dlg.FileName;
-
-                using var writer = new StreamWriter(filePath);
-
-                await writer.WriteLineAsync("ID,Login,FavouriteLocation");
-
-                foreach (var user in databaseContent)
-                {
-                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocation}");
-                }
-
-                MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-
-                OpenCsvFile(filePath);
-            }
-        }
-
-        /// <summary>
-        /// Start csv file after saving logs
-        /// </summary>
-        /// <param name="filePath">database content file path</param>
-        private void OpenCsvFile(string filePath)
-        {
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = filePath,
-                UseShellExecute = true
-            };
-
-            Process.Start(processStartInfo);
-        }
-
-        /// <summary>
-        /// Check database content
-        /// </summary>
-        private async void ExportDatabaseContent()
         {
             var databaseContent = await _storageService.GetUserDataAsync();
 

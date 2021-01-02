@@ -60,6 +60,8 @@ namespace Storage.DAL
                 userToEdit.Password = Users.Password;
 
                 await SaveChangesAsync();
+
+                _eventAggregator.GetEvent<DatabaseContentChanged>().Publish();
             }
             else
             {

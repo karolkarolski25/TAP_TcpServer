@@ -6,4 +6,9 @@ namespace Storage.Events
     {
 
     }
+
+    public class DatabaseContentChanged : PubSubEvent
+    {
+
+    }
 }
