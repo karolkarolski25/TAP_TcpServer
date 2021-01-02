@@ -102,6 +102,16 @@ namespace Server.Services
 
                     return "ok";
                 }
+                else if (receivedData.IndexOf("favourite") >= 0)
+                {
+                    await HandleFavouriteLocationSave(stream);
+
+                    Array.Clear(buffer, 0, buffer.Length);
+
+                    await stream.ReadAsync(buffer, 0, _serverConfiguration.WeatherBufferSize);
+
+                    return "ok";
+                }
 
                 else if (receivedData.IndexOf("??") < 0)
                 {
@@ -349,19 +359,49 @@ namespace Server.Services
 
             if (await _loginService.ChangePassword(login, password))
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} changed password");
 
-                _logger.LogInformation($"User: {data.Substring(0, data.IndexOf(';'))} changed password");
+                _logger.LogInformation($"User: {login} changed password");
 
                 data = "Password changed\r\n";
             }
             else
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {login} password");
 
-                _logger.LogInformation($"Error while changing User: {data.Substring(0, data.IndexOf(';'))} password");
+                _logger.LogInformation($"Error while changing User: {login} password");
 
                 data = "Error password not changed\r\n";
+            }
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+        }
+
+        private async Task HandleFavouriteLocationSave(NetworkStream stream)
+        {
+            byte[] locationBuffer = new byte[256];
+            await stream.ReadAsync(locationBuffer, 0, locationBuffer.Length);
+            string data = Encoding.ASCII.GetString(locationBuffer);
+            data = data.Replace("\0", "");
+
+            string login = data.Substring(0, data.IndexOf(';'));
+            string location = data.Substring(data.IndexOf(';') + 1);
+
+            // Weź wrzuć tu zapisywanie do bazy
+            if (true)
+            {
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} saved favourite location");
+
+                _logger.LogInformation($"User: {login} saved favourite location");
+
+                data = "Favourite location saved\r\n";
+            }
+            else
+            {
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {login} favourite location");
+
+                _logger.LogInformation($"Error while saving User: {login} favourite location");
+
+                data = "Error favourite location not saved\r\n";
             }
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }

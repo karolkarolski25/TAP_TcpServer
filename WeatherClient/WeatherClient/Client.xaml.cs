@@ -94,6 +94,7 @@ namespace WeatherClient
             GetWeatherButton.IsEnabled = false;
             SaveWeatherButton.IsEnabled = true;
             ChangePasswordButton.IsEnabled = false;
+            SaveFavouriteLocationButton.IsEnabled = false;
             buffer = new byte[85];
             ClientLogTextBox.Text = "";
         }
@@ -151,6 +152,7 @@ namespace WeatherClient
                 SaveWeatherButton.IsEnabled = true;
                 LoginButton.IsEnabled = false;
                 ChangePasswordButton.IsEnabled = true;
+                SaveFavouriteLocationButton.IsEnabled = true;
             }
         }
 
@@ -351,12 +353,40 @@ namespace WeatherClient
             }
         }
 
-        /// <summary>
-        /// Minimizes application
-        /// </summary>
-        /// <param name="sender">button object</param>
-        /// <param name="e">button event</param>
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+
+        private async void SaveFavouriteLocation()
+        {
+            buffer = Encoding.ASCII.GetBytes("favourite");
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+
+            buffer = new byte[85];
+
+            buffer = Encoding.ASCII.GetBytes(textBoxLogin.Text + ";" + textBoxLocation.Text);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+
+            buffer = new byte[1024];
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+            string data = Encoding.ASCII.GetString(buffer).Replace("\0", "");
+
+            if (data.Contains("Error"))
+            {
+                MessageBox.Show("Can't save favourite location, try again", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show("Favourite location saved", "Location saved",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+            /// <summary>
+            /// Minimizes application
+            /// </summary>
+            /// <param name="sender">button object</param>
+            /// <param name="e">button event</param>
+            private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
@@ -407,6 +437,11 @@ namespace WeatherClient
         private void SaveWeatherButton_Click(object sender, RoutedEventArgs e)
         {
             SaveWeather();
+        }
+
+        private void SaveFavouriteLocationButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFavouriteLocation();
         }
 
         private void ClearWeatherForecast_Click(object sender, RoutedEventArgs e)
