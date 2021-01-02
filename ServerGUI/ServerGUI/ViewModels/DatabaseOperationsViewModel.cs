@@ -127,7 +127,7 @@ namespace ServerGUI.ViewModels
 
                 foreach (var user in databaseContent)
                 {
-                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocation}");
+                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocations}");
                 }
 
                 MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
@@ -182,7 +182,7 @@ namespace ServerGUI.ViewModels
                     {
                         Login = NewLogin,
                         Password = await _cryptoService.EncryptPassword("1234"),
-                        FavouriteLocation = NewFavouriteLocation
+                        FavouriteLocations = NewFavouriteLocation
                     };
 
                     _storageService.UpdateData(newUser);
