@@ -25,9 +25,14 @@ namespace Weather.Services
             weatherUrl = weatherUrl.Replace("@api@", _weatherApiConfiguration.ApiKey);
         }
 
+        /// <summary>
+        /// Calculates weather period
+        /// </summary>
+        /// <param name="weatherDate">Date</param>
+        /// <returns>Days naumber between today and given date</returns>
         public int CalculateWeatherPeriod(string weatherDate)
         {
-            int days = 0;
+            int days;
 
             if (Regex.IsMatch(weatherDate, "[0-9]{2}-{1}[0-9]{2}-{1}[0-9]{4}"))
             {

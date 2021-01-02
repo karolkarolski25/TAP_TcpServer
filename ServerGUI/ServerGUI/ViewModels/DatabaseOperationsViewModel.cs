@@ -152,6 +152,8 @@ namespace ServerGUI.ViewModels
             UsersDataView = new ObservableCollection<User>(await _storageService.GetUserDataAsync());
 
             OnPropertyChanged(nameof(UsersDataView));
+
+            SelectionChanged();
         }
 
         /// <summary>
@@ -306,18 +308,21 @@ namespace ServerGUI.ViewModels
         /// </summary>
         private void SelectionChanged()
         {
-            if (SelectedUserDetails.Any())
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                SelectedUserDetails.Clear();
-            }
+                if (SelectedUserDetails.Any())
+                {
+                    SelectedUserDetails.Clear();
+                }
 
-            if (SelectedUser != null)
-            {
-                SelectedUserDetails.Add(SelectedUser);
+                if (SelectedUser != null)
+                {
+                    SelectedUserDetails.Add(SelectedUser);
 
-                canEditUser = true;
-                OnPropertyChanged(nameof(canEditUser));
-            }
+                    canEditUser = true;
+                    OnPropertyChanged(nameof(canEditUser));
+                }
+            });
         }
 
         /// <summary>
