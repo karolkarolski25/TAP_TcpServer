@@ -65,7 +65,7 @@
                 <GridView>
                     <GridViewColumn Header="ID:" Width="40" DisplayMemberBinding="{Binding Path=Id}"/>
                     <GridViewColumn Header="Login" Width="125" DisplayMemberBinding="{Binding Path=Login}"/>
-                    <GridViewColumn Header="Favourite location" Width="155" DisplayMemberBinding="{Binding Path=FavouriteLocation}"/>
+                    <GridViewColumn Header="Favourite locations" Width="155" DisplayMemberBinding="{Binding Path=FavouriteLocations}"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -80,7 +80,7 @@
                 <GridView>
                     <GridViewColumn Header="ID:" Width="40" DisplayMemberBinding="{Binding Path=Id}"/>
                     <GridViewColumn Header="Login" Width="125" DisplayMemberBinding="{Binding Path=Login}"/>
-                    <GridViewColumn Header="Favourite location" Width="155" DisplayMemberBinding="{Binding Path=FavouriteLocation}"/>
+                    <GridViewColumn Header="Favourite locations" Width="155" DisplayMemberBinding="{Binding Path=FavouriteLocations}"/>
                 </GridView>
             </ListView.View>
         </ListView>
