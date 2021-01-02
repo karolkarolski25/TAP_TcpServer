@@ -29,6 +29,7 @@ namespace ServerGUI.ViewModels
         public string NewWeatherPeriod { get; set; } = string.Empty;
 
         public Visibility NewUserVisibility { get; set; } = Visibility.Collapsed;
+        public Visibility EditSelectedUserVisibility { get; set; } = Visibility.Collapsed;
 
         public ObservableCollection<User> UsersDataView { get; set; }
         public ObservableCollection<User> SelectedUserDetails { get; set; } = new ObservableCollection<User>();
@@ -50,6 +51,13 @@ namespace ServerGUI.ViewModels
         private DelegateCommand _exportDatabaseContentCommand;
         public DelegateCommand ExportDatabaseContentCommand => _exportDatabaseContentCommand ??= new DelegateCommand(CheckDatabaseContent);
 
+        private DelegateCommand _showEditUserFieldsCommand;
+        public DelegateCommand ShowEditUserFieldsCommand => _showEditUserFieldsCommand ??= new DelegateCommand(ShowEditUserFields)
+            .ObservesCanExecute(() => canEditUser);
+
+        private DelegateCommand _confirmEditUserUserCommand;
+        public DelegateCommand ConfirmEditUserUserCommand => _confirmEditUserUserCommand ??= new DelegateCommand(ConfirmEditUserUser);
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -65,6 +73,65 @@ namespace ServerGUI.ViewModels
 
             _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(UpdateListViewCollection);
             _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection);
+        }
+
+        /// <summary>
+        /// Edit selected user data
+        /// </summary>
+        private void ConfirmEditUserUser()
+        {
+            _storageService.UpdateData(new User()
+            {
+                Login = SelectedUser.Login,
+                FavouriteLocations = NewFavouriteLocation,
+                PreferredWeatherPeriod = NewWeatherPeriod
+            });
+
+            NewFavouriteLocation = string.Empty;
+            OnPropertyChanged(nameof(NewFavouriteLocation));
+
+            NewWeatherPeriod = string.Empty;
+            OnPropertyChanged(nameof(NewWeatherPeriod));
+
+            EditSelectedUserVisibility = Visibility.Collapsed;
+
+            OnPropertyChanged(nameof(EditSelectedUserVisibility));
+
+            SelectionChanged();
+
+            MessageBox.Show($"Sucessfully edited user {SelectedUser.Login}", "Edit completed", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Show fileds to edit selected user
+        /// </summary>
+        private async void ShowEditUserFields()
+        {
+            var userToEdit = (await _storageService.GetUserDataAsync()).FirstOrDefault(u => u.Login == SelectedUser.Login);
+
+            if (userToEdit != null)
+            {
+                NewFavouriteLocation = userToEdit.FavouriteLocations;
+                OnPropertyChanged(nameof(NewFavouriteLocation));
+
+                NewWeatherPeriod = userToEdit.PreferredWeatherPeriod;
+                OnPropertyChanged(nameof(NewWeatherPeriod));
+
+                if (EditSelectedUserVisibility == Visibility.Collapsed)
+                {
+                    EditSelectedUserVisibility = Visibility.Visible;
+                    NewUserVisibility = Visibility.Collapsed;
+
+                    OnPropertyChanged(nameof(NewUserVisibility));
+                }
+                else
+                {
+                    EditSelectedUserVisibility = Visibility.Collapsed;
+                }
+
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
+            }
         }
 
         /// <summary>
@@ -160,6 +227,9 @@ namespace ServerGUI.ViewModels
             if (NewUserVisibility == Visibility.Collapsed)
             {
                 NewUserVisibility = Visibility.Visible;
+                EditSelectedUserVisibility = Visibility.Collapsed;
+
+                OnPropertyChanged(nameof(EditSelectedUserVisibility));
             }
             else
             {
@@ -271,6 +341,9 @@ namespace ServerGUI.ViewModels
 
                         canEditUser = false;
                         OnPropertyChanged(nameof(canEditUser));
+
+                        EditSelectedUserVisibility = Visibility.Collapsed;
+                        OnPropertyChanged(nameof(EditSelectedUserVisibility));
                     }
 
                     break;
