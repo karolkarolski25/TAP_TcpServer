@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Server.Events;
 using Server.Resources;
+using Storage.DAL;
+using Storage.Models;
 using System;
 using System.Linq;
 using System.Net;
@@ -18,20 +20,23 @@ namespace Server.Services
     {
         private readonly IWeatherService _weatherService;
         private readonly ILoginService _loginService;
-        private readonly ILogger<ServerService> _logger;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IStorageService _storageService;
+        private readonly ILogger<ServerService> _logger;
         private readonly ServerConfiguration _serverConfiguration;
 
         private bool badCredentials = false;
 
         public ServerService(IWeatherService weatherService, ServerConfiguration serverConfiguration,
-            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator)
+            ILoginService loginService, ILogger<ServerService> logger, IEventAggregator eventAggregator, 
+            IStorageService storageService)
         {
             _weatherService = weatherService;
             _loginService = loginService;
             _serverConfiguration = serverConfiguration;
             _logger = logger;
             _eventAggregator = eventAggregator;
+            _storageService = storageService;
         }
 
         /// <summary>
@@ -386,7 +391,12 @@ namespace Server.Services
             string login = data.Substring(0, data.IndexOf(';'));
             string location = data.Substring(data.IndexOf(';') + 1);
 
-            // Weź wrzuć tu zapisywanie do bazy
+            _storageService.UpdateData(new User()
+            {
+                Login = login,
+                FavouriteLocation = location
+            });
+
             if (true)
             {
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} saved favourite location");
@@ -403,6 +413,7 @@ namespace Server.Services
 
                 data = "Error favourite location not saved\r\n";
             }
+
             await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 

@@ -381,12 +381,12 @@ namespace WeatherClient
             }
         }
 
-            /// <summary>
-            /// Minimizes application
-            /// </summary>
-            /// <param name="sender">button object</param>
-            /// <param name="e">button event</param>
-            private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Minimizes application
+        /// </summary>
+        /// <param name="sender">button object</param>
+        /// <param name="e">button event</param>
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
