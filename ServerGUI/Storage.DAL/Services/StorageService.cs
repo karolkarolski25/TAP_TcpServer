@@ -102,12 +102,12 @@ namespace Storage.DAL
                 semaphoreSlim.Release();
             }
 
-            return _userDataContext.Users.ToList();
+            return _userDataContext.Users.Local.ToList();
         }
 
-        public string GetFavouriteLocations(string login)
+        public async Task<string> GetFavouriteLocations(string login)
         {
-            return _userDataContext.Users.FirstOrDefault(d => d.Login == login).FavouriteLocations;
+            return (await GetUserDataAsync()).FirstOrDefault(d => d.Login == login).FavouriteLocations;
         }
 
         /// <summary>

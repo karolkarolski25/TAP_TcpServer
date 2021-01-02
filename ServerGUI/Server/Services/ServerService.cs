@@ -315,6 +315,7 @@ namespace Server.Services
                     await _loginService.RegisterAccount(login, password);
 
                     _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {login} registered");
+                    _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
                     _logger.LogInformation($"New user: {login} registered");
                 }
@@ -472,7 +473,7 @@ namespace Server.Services
 
                          } while (badCredentials);
 
-                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes("fav" + _storageService.GetFavouriteLocations(login)));
+                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes("fav" + await _storageService.GetFavouriteLocations(login)));
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
                              0, ServerMessagesResources.EnterLocationMessage.Length);
