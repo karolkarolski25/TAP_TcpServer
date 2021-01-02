@@ -391,30 +391,32 @@ namespace Server.Services
             string login = data.Substring(0, data.IndexOf(';'));
             string location = data.Substring(data.IndexOf(';') + 1);
 
-            _storageService.UpdateData(new User()
+            try
             {
-                Login = login,
-                FavouriteLocation = location
-            });
+                _storageService.UpdateData(new User()
+                {
+                    Login = login,
+                    FavouriteLocation = location
+                });
 
-            if (true)
-            {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} saved favourite location");
+                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} saved favourite location ({location})");
 
                 _logger.LogInformation($"User: {login} saved favourite location");
 
                 data = "Favourite location saved\r\n";
             }
-            else
+            catch (Exception ex)
             {
                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {login} favourite location");
 
-                _logger.LogInformation($"Error while saving User: {login} favourite location");
+                _logger.LogInformation($"Error while saving User: {login} favourite location ({ex.Message})");
 
                 data = "Error favourite location not saved\r\n";
             }
-
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+            finally
+            {
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
+            }
         }
 
         /// <summary>
