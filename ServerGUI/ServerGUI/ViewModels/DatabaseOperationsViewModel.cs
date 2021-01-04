@@ -202,11 +202,11 @@ namespace ServerGUI.ViewModels
 
                 using var writer = new StreamWriter(filePath);
 
-                await writer.WriteLineAsync("ID,Login,FavouriteLocation");
+                await writer.WriteLineAsync("ID,Login,FavouriteLocation,WetaherPeriod");
 
                 foreach (var user in databaseContent)
                 {
-                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user.FavouriteLocations}");
+                    await writer.WriteLineAsync($"{user.Id},{user.Login},{user?.FavouriteLocations?.Replace(',', ' ')},{user?.PreferredWeatherPeriod}");
                 }
 
                 MessageBox.Show($"File has been sucessfully saved\n{filePath}", "Saved",
