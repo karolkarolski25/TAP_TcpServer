@@ -2,12 +2,12 @@
 
 namespace Storage.DAL.Events
 {
-    public class NewUserRegistered : PubSubEvent
+    public class NewUserRegisteredEvent : PubSubEvent
     {
 
     }
 
-    public class DatabaseContentChanged : PubSubEvent
+    public class DatabaseContentChangedEvent : PubSubEvent
     {
 
     }

@@ -108,9 +108,9 @@ namespace Server.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Fetching data from API.
         /// </summary>
-        internal static string FethcingDataFromAPIMessage {
+        internal static string FetchcingDataFromAPIMessage {
             get {
-                return ResourceManager.GetString("FethcingDataFromAPIMessage", resourceCulture);
+                return ResourceManager.GetString("FetchcingDataFromAPIMessage", resourceCulture);
             }
         }
         

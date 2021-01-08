@@ -72,8 +72,8 @@ namespace ServerGUI.ViewModels
             _cryptoService = cryptoService;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<NewUserRegistered>().Subscribe(UpdateListViewCollection);
-            _eventAggregator.GetEvent<DatabaseContentChanged>().Subscribe(UpdateListViewCollection);
+            _eventAggregator.GetEvent<NewUserRegisteredEvent>().Subscribe(UpdateListViewCollection);
+            _eventAggregator.GetEvent<DatabaseContentChangedEvent>().Subscribe(UpdateListViewCollection);
         }
 
         /// <summary>

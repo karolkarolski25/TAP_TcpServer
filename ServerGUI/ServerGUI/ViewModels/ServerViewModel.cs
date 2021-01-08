@@ -72,7 +72,7 @@ namespace ServerGUI.ViewModels
             _eventAggregator.GetEvent<UserLoggedInEvent>().Subscribe(UserConnected);
             _eventAggregator.GetEvent<UserDisconnectedEvent>().Subscribe(UserDisconnected);
             _eventAggregator.GetEvent<WrongServerConfigurationEvent>().Subscribe(WrongServerConfiguration);
-            _eventAggregator.GetEvent<ServerLogsChanged>().Subscribe(UpdateServerLogs);
+            _eventAggregator.GetEvent<ServerLogsChangedEvent>().Subscribe(UpdateServerLogs);
 
             InitializeTimer();
         }

@@ -45,7 +45,7 @@ namespace Storage.DAL
 
             await SaveChangesAsync();
 
-            _eventAggregator.GetEvent<NewUserRegistered>().Publish();
+            _eventAggregator.GetEvent<NewUserRegisteredEvent>().Publish();
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Storage.DAL
 
                 await SaveChangesAsync();
 
-                _eventAggregator.GetEvent<DatabaseContentChanged>().Publish();
+                _eventAggregator.GetEvent<DatabaseContentChangedEvent>().Publish();
             }
             else
             {

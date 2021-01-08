@@ -130,10 +130,10 @@ namespace Server.Services
 
                         foreach (var location in locations)
                         {
-                            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FethcingDataFromAPIMessage),
-                               0, ServerMessagesResources.FethcingDataFromAPIMessage.Length);
+                            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FetchcingDataFromAPIMessage),
+                               0, ServerMessagesResources.FetchcingDataFromAPIMessage.Length);
 
-                            _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Weather forecast requested for {location} for {days} day(s)");
+                            _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"Weather forecast requested for {location} for {days} day(s)");
 
                             string weatherData = await _weatherService.GetWeather(location, days);
 
@@ -272,7 +272,7 @@ namespace Server.Services
                 {
                     await _loginService.RegisterAccount(login, password);
 
-                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"New user: {login} registered");
+                    _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"New user: {login} registered");
                     _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
                     _logger.LogInformation($"New user: {login} registered");
@@ -287,7 +287,7 @@ namespace Server.Services
             }
             else if (userCheck == UserLoginSettings.LoggedIn)
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} logged in");
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"User: {login} logged in");
 
                 _eventAggregator.GetEvent<UserLoggedInEvent>().Publish();
 
@@ -295,7 +295,7 @@ namespace Server.Services
             }
             else
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} bad password");
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"User: {login} bad password");
                 _logger.LogInformation($"User: {login} bad password");
 
                 badCredentials = true;
@@ -323,7 +323,7 @@ namespace Server.Services
 
             if (await _loginService.ChangePassword(login, password))
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {login} changed password");
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"User: {login} changed password");
 
                 _logger.LogInformation($"User: {login} changed password");
 
@@ -331,7 +331,7 @@ namespace Server.Services
             }
             else
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while changing User: {login} password");
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"Error while changing User: {login} password");
 
                 _logger.LogInformation($"Error while changing User: {login} password");
 
@@ -358,7 +358,7 @@ namespace Server.Services
                     PreferredWeatherPeriod = clientData[2]
                 });
 
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"User: {clientData[0]} saved favourite location(s) " +
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"User: {clientData[0]} saved favourite location(s) " +
                     $"({clientData[1]}, {clientData[2]} days)");
 
                 _logger.LogInformation($"User: {clientData[0]} saved favourite location(s) ({clientData[1]}, {clientData[2]} days)");
@@ -367,7 +367,7 @@ namespace Server.Services
             }
             catch (Exception ex)
             {
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Error while saving User: {clientData[0]} favourite location(s)");
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"Error while saving User: {clientData[0]} favourite location(s)");
 
                 _logger.LogInformation($"Error while saving User: {clientData[0]} favourite location(s) ({ex.Message})");
 
@@ -395,7 +395,7 @@ namespace Server.Services
 
                 server.Start();
 
-                _eventAggregator.GetEvent<ServerLogsChanged>().Publish($"Starting Server at ipAddress: " +
+                _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"Starting Server at ipAddress: " +
                     $"{ipAddress}, port: {port}");
 
                 _logger.LogInformation($"Starting Server at ipAddress: {ipAddress}, port: {port}");
@@ -406,7 +406,7 @@ namespace Server.Services
                 {
                     TcpClient client = await server.AcceptTcpClientAsync();
 
-                    _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client connected");
+                    _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish("Client connected");
 
                     _logger.LogInformation("Client connected");
 
@@ -446,7 +446,7 @@ namespace Server.Services
                                  _logger.LogDebug("Client disconnected");
 
                                  _eventAggregator.GetEvent<UserDisconnectedEvent>().Publish();
-                                 _eventAggregator.GetEvent<ServerLogsChanged>().Publish("Client disconnected");
+                                 _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish("Client disconnected");
 
                                  client.Close();
                              }

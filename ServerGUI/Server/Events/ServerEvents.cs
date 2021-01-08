@@ -12,7 +12,7 @@ namespace Server.Events
 
     }
 
-    public class ServerLogsChanged : PubSubEvent<string>
+    public class ServerLogsChangedEvent : PubSubEvent<string>
     {
 
     }

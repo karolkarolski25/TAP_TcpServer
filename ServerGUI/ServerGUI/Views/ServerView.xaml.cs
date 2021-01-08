@@ -9,9 +9,9 @@ namespace ServerGUI.Views
     /// </summary>
     public partial class ServerView : Window
     {
-        public ServerView(ServerViewModel mainWindowViewModel)
+        public ServerView(ServerViewModel serverWindowViewModel)
         {
-            DataContext = mainWindowViewModel;
+            DataContext = serverWindowViewModel;
 
             InitializeComponent();
         }

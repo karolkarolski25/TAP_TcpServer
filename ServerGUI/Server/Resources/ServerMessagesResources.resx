@@ -132,7 +132,7 @@
   <data name="EnterTimePeriodMessage" xml:space="preserve">
     <value>Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020):</value>
   </data>
-  <data name="FethcingDataFromAPIMessage" xml:space="preserve">
+  <data name="FetchcingDataFromAPIMessage" xml:space="preserve">
     <value>Fetching data from API</value>
   </data>
   <data name="NonAsciiCharsMessage" xml:space="preserve">
