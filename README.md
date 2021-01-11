@@ -19,14 +19,19 @@ Client
  
  Connected client can change it's own password for next login
  
- <img src="Assets/PasswordChange.png">
+ <img src="Assets/changePassword.png">
  
  Server
  
  <img src="Assets/Server.png">
  
+ Server administrator can manage database and it's users
+ 
+ <img src="Assets/database.png">
+ 
  Applications provide some user asking methods or informing about exceptions
  
+ <img src="Assets/date.png">
  <img src="Assets/CreatingNewAccount.png">
  <img src="Assets/WeatherError.png">
  <img src="Assets/WrongConf1.png">
