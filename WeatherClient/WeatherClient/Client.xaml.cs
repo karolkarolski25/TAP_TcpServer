@@ -88,16 +88,21 @@ namespace WeatherClient
         /// </summary>
         private void DisconnectFromServer()
         {
+            buffer = Encoding.ASCII.GetBytes("exit");
+            stream.Write(buffer, 0, buffer.Length);
+
             client.Close();
             ConnectButton.Content = "Connect";
             connected = false;
             LoginButton.IsEnabled = false;
-            GetWeatherButton.IsEnabled = false;
             SaveWeatherButton.IsEnabled = true;
             ChangePasswordButton.IsEnabled = false;
             SaveFavouriteLocationButton.IsEnabled = false;
+            GetWeatherButton.IsEnabled = true;
             buffer = new byte[85];
             ClientLogTextBox.Text = "";
+            textBoxLocation.Text = "";
+            
 
 #if RELEASE
             textBoxLogin.Clear();
@@ -136,7 +141,16 @@ namespace WeatherClient
 
                 string message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
 
-                if (message == "Account not found, do you want to create new account? (Y/N):")
+                if (message.Contains("fav"))
+                {
+                    var weatherPreferences = message.Substring(3).Split(';');
+
+                    textBoxLocation.Text = weatherPreferences[0];
+                    textBoxDate.Text = weatherPreferences[1];
+
+                    buffer = new byte[1024];
+                }
+                else if (message == "Account not found, do you want to create new account? (Y/N):")
                 {
                     if (!await HandleRegistration())
                     {
@@ -149,22 +163,6 @@ namespace WeatherClient
                     buffer = new byte[85];
                     await stream.ReadAsync(buffer, 0, 85);
                     return;
-                }
-
-                buffer = new byte[1024];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
-
-                message = Encoding.ASCII.GetString(buffer).Replace("\0", "");
-
-                if (message.Contains("fav"))
-                {
-                    var weatherPreferences = message.Substring(3).Split(';');
-
-                    textBoxLocation.Text = weatherPreferences[0];
-                    textBoxDate.Text = weatherPreferences[1];
-
-                    buffer = new byte[1024];
-                    await stream.ReadAsync(buffer, 0, buffer.Length);
                 }
 
                 ClientLogTextBox.Text = "Enter Location and number of days or date";
@@ -225,7 +223,6 @@ namespace WeatherClient
                 await stream.WriteAsync(buffer, 0, buffer.Length);
 
                 buffer = new byte[1024];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 buffer = Encoding.ASCII.GetBytes(daysPeriod);
 
