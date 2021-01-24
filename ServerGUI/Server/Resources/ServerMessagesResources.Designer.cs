@@ -97,24 +97,6 @@ namespace Server.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter days count for weather forecast (1 - 6) or date (eg. 30-11-2020):.
-        /// </summary>
-        internal static string EnterTimePeriodMessage {
-            get {
-                return ResourceManager.GetString("EnterTimePeriodMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fetching data from API.
-        /// </summary>
-        internal static string FetchcingDataFromAPIMessage {
-            get {
-                return ResourceManager.GetString("FetchcingDataFromAPIMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Non ASCII char detected (use only english letters, exit to disconnect), try again.
         /// </summary>
         internal static string NonAsciiCharsMessage {

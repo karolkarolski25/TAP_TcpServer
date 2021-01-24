@@ -95,7 +95,7 @@ namespace Server.Services
 
                 if (receivedData.Contains("exit"))
                 {
-                    return "exit";
+                    throw new ArgumentNullException();
                 }
                 else if (receivedData.Contains("change"))
                 {
@@ -130,9 +130,6 @@ namespace Server.Services
 
                         foreach (var location in locations)
                         {
-                            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.FetchcingDataFromAPIMessage),
-                               0, ServerMessagesResources.FetchcingDataFromAPIMessage.Length);
-
                             _eventAggregator.GetEvent<ServerLogsChangedEvent>().Publish($"Weather forecast requested for {location} for {days} day(s)");
 
                             string weatherData = await _weatherService.GetWeather(location, days);
@@ -143,9 +140,6 @@ namespace Server.Services
 
                             await stream.WriteAsync(weather, 0, weather.Length);
                         }
-
-                        await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
-                            0, ServerMessagesResources.EnterLocationMessage.Length);
                     }
 
                     Array.Clear(buffer, 0, buffer.Length);
@@ -181,9 +175,6 @@ namespace Server.Services
         /// <returns>dates period eg. 3</returns>
         private async Task<int> GetWeatherPeriod(NetworkStream stream, byte[] daysPeriodBuffer)
         {
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage),
-                0, ServerMessagesResources.EnterTimePeriodMessage.Length);
-
             do
             {
                 Array.Clear(daysPeriodBuffer, 0, daysPeriodBuffer.Length);
@@ -198,9 +189,6 @@ namespace Server.Services
             {
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.WrongTimePeriodMessage),
                     0, ServerMessagesResources.WrongTimePeriodMessage.Length);
-
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterTimePeriodMessage),
-                    0, ServerMessagesResources.EnterTimePeriodMessage.Length);
 
                 do
                 {
@@ -305,10 +293,6 @@ namespace Server.Services
 
                 return;
             }
-
-            string data = $"Welcome {login}\r\n";
-
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(data), 0, data.Length);
         }
 
         private async Task HandlePasswordChange(NetworkStream stream)
@@ -433,9 +417,6 @@ namespace Server.Services
                          } while (badCredentials);
 
                          await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes($"fav{await _storageService.GetFavouriteLocations(login)}"));
-
-                         await client.GetStream().WriteAsync(Encoding.ASCII.GetBytes(ServerMessagesResources.EnterLocationMessage),
-                             0, ServerMessagesResources.EnterLocationMessage.Length);
 
                          await client.GetStream().ReadAsync(weatherBuffer, 0, weatherBuffer.Length);
 
